@@ -3,5 +3,6 @@ package com.superkele.translation.annotation.constant;
 public enum ExecuteTiming {
 
     AFTER_RETURN,
-    JSON_SERIALIZE;
+    JSON_SERIALIZE,
+    NO_EXECUTE;
 }
