@@ -16,13 +16,12 @@ import java.lang.annotation.*;
 public @interface Mapping {
 
     /**
-     * 指定翻译器
-     * @return
+     * Specify a translator, and if you don't specify a translator, automatically look for a translator that matches the type
      */
-    String translator();
+    String translator() default "";
 
     /**
-     *
+     * mapped from
      */
     String[] mappers() default "";
 
