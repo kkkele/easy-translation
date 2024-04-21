@@ -7,11 +7,14 @@ import com.superkele.translation.core.function.TranslationHandler;
 import java.lang.invoke.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MethodConvert {
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+    private static final Map<Class<?>, Pair<Method, MethodType>> FUNCTION_INTERFACE_CACHE = new ConcurrentHashMap<>();
 
     public static <T> T convertToFunctionInterface(Class<T> targetInterface,
                                                    Object convertObject,
@@ -40,31 +43,30 @@ public class MethodConvert {
      * @return
      */
     public static Pair<Method, MethodType> findMethodType(Class<?> functionInterface) {
-        Objects.requireNonNull(functionInterface, "target function interface can not be null");
-        Method[] methods = functionInterface.getMethods();
-        if (functionInterface.isAnnotationPresent(FunctionalInterface.class)) {
-            for (Method method : methods) {
-                if (Modifier.isAbstract(method.getModifiers())) {
-                    return Pair.of(method, MethodType.methodType(method.getReturnType(), method.getParameterTypes()));
+        return FUNCTION_INTERFACE_CACHE.computeIfAbsent(functionInterface, key -> {
+            Objects.requireNonNull(functionInterface, "target function interface can not be null");
+            Method[] methods = functionInterface.getMethods();
+            if (functionInterface.isAnnotationPresent(FunctionalInterface.class)) {
+                for (Method method : methods) {
+                    if (Modifier.isAbstract(method.getModifiers())) {
+                        return Pair.of(method, MethodType.methodType(method.getReturnType(), method.getParameterTypes()));
+                    }
+                }
+            } else {
+                Method resultMethod = null;
+                int count = 0;
+                for (Method method : methods) {
+                    if (Modifier.isAbstract(method.getModifiers())) {
+                        resultMethod = method;
+                        count++;
+                    }
+                }
+                if (count == 1) {
+                    return Pair.of(resultMethod, MethodType.methodType(resultMethod.getReturnType(), resultMethod.getParameterTypes()));
                 }
             }
-        } else {
-            Method resultMethod = null;
-            int count = 0;
-            for (Method method : methods) {
-                if (Modifier.isAbstract(method.getModifiers())) {
-                    resultMethod = method;
-                    count++;
-                }
-            }
-            if (count == 1) {
-                return Pair.of(resultMethod, MethodType.methodType(resultMethod.getReturnType(), resultMethod.getParameterTypes()));
-            }
-        }
-        throw new IllegalStateException(functionInterface.getName() + "not function interface");
+            throw new IllegalStateException(functionInterface.getName() + "is not a function interface");
+        });
     }
 
-    public String getById(Long id){
-        return "hello:"+id;
-    }
 }
