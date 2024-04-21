@@ -2,9 +2,11 @@ package com.superkele.translation.core.handler;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.superkele.translation.annotation.Translator;
+import com.superkele.translation.core.exception.NotDefineException;
 import com.superkele.translation.core.exception.RepeatDefineException;
 import com.superkele.translation.core.function.TranslationHandler;
 import com.superkele.translation.core.scaner.PackageScanner;
+import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.MethodConvert;
 import com.superkele.translation.core.util.Pair;
 
@@ -87,6 +89,15 @@ public class TranslatorContainer {
             childMap.put(translator.other(), handler);
         });
         return conditionHandlerMap;
+    }
+
+
+    public TranslationHandler findTranslationHandler(String translator, String other) {
+        Map<String, TranslationHandler> otherMap = conditionHandlerMap.get(translator);
+        Assert.notNull(otherMap, String.format("Translator (%s) is never defined", translator));
+        TranslationHandler translationHandler = otherMap.get(other);
+        return Optional.ofNullable(translationHandler)
+                .orElse(defaultHandlerMap.get(translator));
     }
 }
 
