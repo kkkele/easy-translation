@@ -1,4 +1,4 @@
-package com.superkele.translation.core.handler;
+package com.superkele.translation.core.container;
 
 import com.superkele.translation.core.function.TranslationHandler;
 
