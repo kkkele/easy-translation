@@ -9,6 +9,7 @@ import java.lang.annotation.*;
  *      需要传递的两个参数value和other,
  *      必须是确定的常量，这样才能确保映射的字段顺利找到翻译器
  *  </p>
+ *  <hr/>
  *  <p>
  *      annotate the method to make it a translator. The two parameters that need to be passed,
  *      'value' and 'other', must be definite constants,
@@ -24,9 +25,9 @@ public @interface Translator {
     /**
      * <p>转换器名称，当value为空时，默认赋值为方法名</p>
      * <p>translator name</p>
-     * @return
      */
-    String value() default "";
+    String name() default "";
+
 
     /**
      * <p>其他的补充条件</p>

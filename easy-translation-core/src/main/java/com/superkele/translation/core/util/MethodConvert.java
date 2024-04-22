@@ -2,7 +2,6 @@ package com.superkele.translation.core.util;
 
 
 import cn.hutool.core.lang.Pair;
-import com.superkele.translation.core.function.TranslationHandler;
 
 import java.lang.invoke.*;
 import java.lang.reflect.Method;
@@ -68,5 +67,4 @@ public class MethodConvert {
             throw new IllegalStateException(functionInterface.getName() + "is not a function interface");
         });
     }
-
 }

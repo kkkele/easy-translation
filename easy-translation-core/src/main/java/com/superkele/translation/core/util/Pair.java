@@ -1,6 +1,7 @@
 package com.superkele.translation.core.util;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 public class Pair<K, V>  implements Serializable {
@@ -8,8 +9,8 @@ public class Pair<K, V>  implements Serializable {
     protected K key;
     protected V value;
 
-    public static <K, V> cn.hutool.core.lang.Pair<K, V> of(K key, V value) {
-        return new cn.hutool.core.lang.Pair(key, value);
+    public static <K, V> Pair<Object, Method> of(K key, V value) {
+        return new Pair(key, value);
     }
 
     public Pair(K key, V value) {
