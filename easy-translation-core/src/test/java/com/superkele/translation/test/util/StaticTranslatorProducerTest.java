@@ -2,7 +2,6 @@ package com.superkele.translation.test.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.core.function.Translator;
-import com.superkele.translation.core.handler.impl.StaticTranslatorProducer;
 import org.junit.Test;
 
 import java.lang.invoke.LambdaConversionException;
