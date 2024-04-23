@@ -20,21 +20,13 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Translator {
+public @interface Translation {
 
     /**
      * <p>转换器名称，当value为空时，默认赋值为方法名</p>
      * <p>translator name</p>
      */
     String name() default "";
-
-
-    /**
-     * <p>其他的补充条件</p>
-     *
-     * <p>Other complementary conditions</p>
-     */
-    String other() default "";
 
 
     /**
