@@ -1,6 +1,8 @@
 package com.superkele.translation.annotation;
 
 
+import com.superkele.translation.annotation.constant.TranslateTiming;
+
 import java.lang.annotation.*;
 
 
@@ -31,11 +33,13 @@ public @interface Mapping {
      * <p>The received property content supports SPEL expressions</p>
      * @return
      */
-    String resolver() default "";
+    String receive() default "";
 
     /**
      * Supplementary judgment conditions
      * support SPEL expression
      */
     String other() default "";
+
+    TranslateTiming timing() default TranslateTiming.JSON_SERIALIZE;
 }

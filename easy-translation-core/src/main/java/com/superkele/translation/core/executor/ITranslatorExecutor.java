@@ -2,11 +2,11 @@ package com.superkele.translation.core.executor;
 
 import java.util.List;
 
-public interface ITranslatorExecutor {
+public interface  ITranslatorExecutor {
 
-    void execute(Object source);
+    Object execute(Object source);
 
-    void execute(List<Object> sourceList);
+    Object execute(List<Object> sourceList);
 
     void executeAsync(Object source);
 

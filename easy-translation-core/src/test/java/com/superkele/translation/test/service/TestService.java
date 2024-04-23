@@ -1,14 +1,6 @@
 package com.superkele.translation.test.service;
 
 
-import com.superkele.translation.annotation.Translate;
-import com.superkele.translation.annotation.Translator;
-import com.superkele.translation.core.executor.TranslateExecutor;
-import com.superkele.translation.core.container.AbstractTranslatorContainer;
-import com.superkele.translation.test.entity.Book;
-import org.junit.Test;
-
-
 public class TestService {
 
 /*    TestService service = this;

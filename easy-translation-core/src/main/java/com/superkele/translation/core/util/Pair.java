@@ -9,7 +9,7 @@ public class Pair<K, V>  implements Serializable {
     protected K key;
     protected V value;
 
-    public static <K, V> Pair<Object, Method> of(K key, V value) {
+    public static <K, V> Pair<K, V> of(K key, V value) {
         return new Pair(key, value);
     }
 

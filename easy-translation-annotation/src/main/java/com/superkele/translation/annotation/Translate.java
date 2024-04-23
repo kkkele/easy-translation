@@ -1,7 +1,7 @@
 package com.superkele.translation.annotation;
 
 
-import com.superkele.translation.annotation.constant.ExecuteTiming;
+import com.superkele.translation.annotation.constant.TranslateTiming;
 
 import java.lang.annotation.*;
 
@@ -11,5 +11,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface Translate {
 
-    ExecuteTiming timing() default ExecuteTiming.AFTER_RETURN;
+    TranslateTiming timing() default TranslateTiming.AFTER_RETURN;
 }

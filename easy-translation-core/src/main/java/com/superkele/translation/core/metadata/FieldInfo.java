@@ -1,17 +1,30 @@
 package com.superkele.translation.core.metadata;
 
-import com.superkele.translation.annotation.constant.ExecuteTiming;
 
+import com.superkele.translation.annotation.constant.TranslateTiming;
+import lombok.Data;
+
+import java.io.Serializable;
 import java.lang.reflect.Field;
 
 /**
  * 字段描述类
  */
-public abstract class FieldInfo {
+@Data
+public class FieldInfo implements Serializable {
 
-    private final Field originField;
+    private static final long serialVersionUID = 1L;
 
-    protected FieldInfo(Field originField) {
-        this.originField = originField;
-    }
+    private Field originField;
+
+    private String translator;
+
+    private String other;
+
+    private TranslateTiming translateTiming;
+
+    private String receive;
+
+    private String mapper;
+
 }

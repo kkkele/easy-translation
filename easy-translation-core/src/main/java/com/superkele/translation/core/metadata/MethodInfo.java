@@ -1,19 +1,18 @@
 package com.superkele.translation.core.metadata;
 
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 
 
-public abstract class MethodInfo {
+public  class MethodInfo implements Serializable {
 
-    private final Method originMethod;
+    private static final long serialVersionUID = 1L;
 
-    private final Object invokeObj;
+    private Method originMethod;
 
-    public MethodInfo(Method originMethod, Object invokeObj) {
-        this.originMethod = originMethod;
-        this.invokeObj = invokeObj;
-    }
+    private Object invokeObj;
 
-    protected abstract String getDeclaringBeanName();
+    private String declaringBeanName;
+
 }

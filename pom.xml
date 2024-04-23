@@ -60,6 +60,7 @@
         <redisson.version>3.20.1</redisson.version>
         <javax-api.version>4.0.1</javax-api.version>
         <lombok.version>1.18.30</lombok.version>
+        <reflections.version>0.9.11</reflections.version>
     </properties>
 
 
@@ -93,6 +94,12 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${common.lang3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
             </dependency>
 
         </dependencies>
