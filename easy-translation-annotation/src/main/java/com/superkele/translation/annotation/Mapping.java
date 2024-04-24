@@ -23,23 +23,24 @@ public @interface Mapping {
     String translator() default "";
 
     /**
-     * <p>映射的字段，支持spel表达式</p>
-     * <p>Mapped fields, SPEL expressions are supported</p>
+     * <p>映射的字段，spring环境下支持spel表达式</p>
+     * <hr>
+     * <p>Mapped fields, SPEL expressions are supported in spring app</p>
      */
     String mapper() default "";
 
     /**
-     * <p>接收的属性内容，支持spel表达式</p>
-     * <p>The received property content supports SPEL expressions</p>
-     * @return
+     * <p>接收的属性内容</p>
      */
     String receive() default "";
 
-    /**
-     * Supplementary judgment conditions
-     * support SPEL expression
-     */
+
     String other() default "";
 
     TranslateTiming timing() default TranslateTiming.JSON_SERIALIZE;
+
+    /**
+     * 当不为null时，是否也映射
+     */
+    boolean notNullMapping() default false;
 }

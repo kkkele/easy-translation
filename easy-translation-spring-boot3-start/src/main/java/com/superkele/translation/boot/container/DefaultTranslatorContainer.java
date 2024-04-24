@@ -1,5 +1,6 @@
 package com.superkele.translation.boot.container;
 
-public class DefaultTranslatorContainer  {
+import org.springframework.context.ApplicationContext;
 
+public class DefaultTranslatorContainer  {
 }

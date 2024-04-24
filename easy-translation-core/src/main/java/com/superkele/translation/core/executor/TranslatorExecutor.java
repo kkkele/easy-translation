@@ -2,7 +2,7 @@ package com.superkele.translation.core.executor;
 
 import java.util.List;
 
-public interface  ITranslatorExecutor {
+public interface TranslatorExecutor {
 
     Object execute(Object source);
 
