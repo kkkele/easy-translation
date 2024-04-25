@@ -6,5 +6,7 @@ public interface TranslationFactory {
 
     Translator findTranslator(String translator);
 
+    <T> T findTranslator(String name, Class<T> requireType);
 
+    boolean containsTranslator(String name);
 }

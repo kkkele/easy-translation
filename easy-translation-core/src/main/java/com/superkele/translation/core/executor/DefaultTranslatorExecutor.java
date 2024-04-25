@@ -35,6 +35,7 @@ public class DefaultTranslatorExecutor implements TranslatorExecutor {
         this.factory = factory;
     }
 
+
     @Override
     public Object execute(Object source) {
         if (source == null) {
@@ -70,19 +71,7 @@ public class DefaultTranslatorExecutor implements TranslatorExecutor {
             Field[] declaredFields = clazz.getDeclaredFields();
             List<FieldInfo> collect = Arrays.stream(declaredFields)
                     .filter(field -> field.isAnnotationPresent(Mapping.class))
-                    .map(field -> {
-                        Mapping mapping = field.getAnnotation(Mapping.class);
-                        FieldInfo fieldInfo = new FieldInfo();
-                        fieldInfo.setOriginField(field);
-                        fieldInfo.setFieldName(field.getName());
-                        fieldInfo.setTranslator(mapping.translator());
-                        fieldInfo.setMapper(mapping.mapper());
-                        fieldInfo.setOther(mapping.other());
-                        fieldInfo.setReceive(mapping.receive());
-                        fieldInfo.setTranslateTiming(mapping.timing());
-                        fieldInfo.setNotNullMapping(mapping.notNullMapping());
-                        return fieldInfo;
-                    })
+                    .map(this::mapToFieldInfo)
                     .collect(Collectors.toList());
             if (CollectionUtil.isEmpty(collect)) {
                 notMappingClazzCache.add(clazz);
@@ -90,18 +79,11 @@ public class DefaultTranslatorExecutor implements TranslatorExecutor {
             return collect;
         });
         if (CollectionUtil.isEmpty(fieldInfoList)) {
+            fieldInfoCache.remove(clazz);
             return source;
         }
         for (FieldInfo fieldInfo : fieldInfoList) {
-            String translatorName = fieldInfo.getTranslator();
-            Translator translator = context.findTranslator(translatorName);
-            String mapper = fieldInfo.getMapper();
-            String other = fieldInfo.getOther();
-            Object mappingValue = translate(source, mapper, other, translator);
-            if (StringUtils.isNotBlank(fieldInfo.getReceive())) {
-                mappingValue = ReflectUtils.invokeGetter(mappingValue, fieldInfo.getReceive());
-            }
-            ReflectUtils.invokeSetter(source, fieldInfo.getFieldName(), mappingValue);
+            translateValue(source, context, fieldInfo);
         }
         return source;
     }
@@ -131,16 +113,34 @@ public class DefaultTranslatorExecutor implements TranslatorExecutor {
         return this;
     }
 
-
-    private Object translate(Object source, String mapper, Object other, Translator translator) {
-        Object translationValue = null;
-        if (translator instanceof ConditionTranslator conditionTranslator) {
-            translationValue = conditionTranslator.translate(ReflectUtils.invokeGetter(source, mapper), other);
-        } else if (translator instanceof MapperTranslator mapsTranslator) {
-            translationValue = mapsTranslator.translate(ReflectUtils.invokeGetter(source, mapper));
-        } else if (translator instanceof ContextTranslator contextTranslator) {
-            translationValue = contextTranslator.translate();
+    private void translateValue(Object source, TranslationFactory context, FieldInfo fieldInfo) {
+        String translatorName = fieldInfo.getTranslator();
+        Translator translator = context.findTranslator(translatorName);
+        String mapper = fieldInfo.getMapper();
+        String other = fieldInfo.getOther();
+        Object mappingValue = null;
+        if (StringUtils.isBlank(mapper)) {
+            mappingValue = translator.executeTranslator(ReflectUtils.invokeGetter(source, fieldInfo.getFieldName()), other);
+        } else {
+            mappingValue = translator.executeTranslator(ReflectUtils.invokeGetter(source, mapper), other);
         }
-        return translationValue;
+        if (StringUtils.isNotBlank(fieldInfo.getReceive())) {
+            mappingValue = ReflectUtils.invokeGetter(mappingValue, fieldInfo.getReceive());
+        }
+        ReflectUtils.invokeSetter(source, fieldInfo.getFieldName(), mappingValue);
+    }
+
+    private FieldInfo mapToFieldInfo(Field field) {
+        Mapping mapping = field.getAnnotation(Mapping.class);
+        FieldInfo fieldInfo = new FieldInfo();
+        fieldInfo.setOriginField(field);
+        fieldInfo.setFieldName(field.getName());
+        fieldInfo.setTranslator(mapping.translator());
+        fieldInfo.setMapper(mapping.mapper());
+        fieldInfo.setOther(mapping.other());
+        fieldInfo.setReceive(mapping.receive());
+        fieldInfo.setTranslateTiming(mapping.timing());
+        fieldInfo.setNotNullMapping(mapping.notNullMapping());
+        return fieldInfo;
     }
 }

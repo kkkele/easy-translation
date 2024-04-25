@@ -4,4 +4,9 @@ package com.superkele.translation.core.function;
 public interface ContextTranslator extends Translator {
 
     Object translate();
+
+    @Override
+    default Object executeTranslator(Object... args) {
+        return translate();
+    }
 }
