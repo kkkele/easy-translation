@@ -1,4 +1,4 @@
-package com.superkele.translation.core.function;
+package com.superkele.translation.core.metadata;
 
 
 public interface Translator {

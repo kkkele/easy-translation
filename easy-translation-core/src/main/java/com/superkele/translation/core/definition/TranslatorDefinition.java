@@ -1,7 +1,7 @@
-package com.superkele.translation.core.metadata;
+package com.superkele.translation.core.definition;
 
 import com.superkele.translation.core.enums.TranslatorType;
-import com.superkele.translation.core.function.Translator;
+import com.superkele.translation.core.metadata.Translator;
 import lombok.Data;
 
 @Data

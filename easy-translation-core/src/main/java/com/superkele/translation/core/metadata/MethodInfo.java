@@ -1,8 +1,6 @@
 package com.superkele.translation.core.metadata;
 
 
-import com.superkele.translation.core.function.Translator;
-
 import java.io.Serializable;
 import java.lang.reflect.Method;
 

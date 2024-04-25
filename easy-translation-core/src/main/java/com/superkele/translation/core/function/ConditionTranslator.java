@@ -1,5 +1,7 @@
 package com.superkele.translation.core.function;
 
+import com.superkele.translation.core.metadata.Translator;
+
 @FunctionalInterface
 public interface ConditionTranslator extends Translator {
 
