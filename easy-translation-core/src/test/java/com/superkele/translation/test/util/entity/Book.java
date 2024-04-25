@@ -11,4 +11,11 @@ public class Book {
 
     @Mapping(translator = "bookNameTranslator",mapper = "id")
     private String name;
+
+    private Student student;
+}
+
+
+ class Student {
+    Long id;
 }

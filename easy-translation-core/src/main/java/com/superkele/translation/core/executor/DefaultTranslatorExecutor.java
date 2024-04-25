@@ -3,8 +3,11 @@ package com.superkele.translation.core.executor;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import com.superkele.translation.annotation.Mapping;
-import com.superkele.translation.core.context.TranslationContext;
+import com.superkele.translation.core.context.TranslationFactory;
 import com.superkele.translation.core.filter.TranslationFilterChain;
+import com.superkele.translation.core.function.ConditionTranslator;
+import com.superkele.translation.core.function.ContextTranslator;
+import com.superkele.translation.core.function.MapperTranslator;
 import com.superkele.translation.core.function.Translator;
 import com.superkele.translation.core.metadata.FieldInfo;
 import com.superkele.translation.core.util.ReflectUtils;
@@ -20,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class DefaultTranslatorExecutor implements TranslatorExecutor {
 
-    private TranslationContext context;
+    private TranslationFactory factory;
 
     private Map<Class<?>, List<FieldInfo>> fieldInfoCache;
 
@@ -28,8 +31,8 @@ public class DefaultTranslatorExecutor implements TranslatorExecutor {
 
     private Set<Class<?>> notMappingClazzCache;
 
-    public DefaultTranslatorExecutor(TranslationContext context) {
-        this.context = context;
+    public DefaultTranslatorExecutor(TranslationFactory factory) {
+        this.factory = factory;
     }
 
     @Override
@@ -51,14 +54,14 @@ public class DefaultTranslatorExecutor implements TranslatorExecutor {
                 }
             }
         }
-        if (context == null){
+        if (factory == null) {
             throw new RuntimeException("context is null");
         }
-        execute(source,context);
+        execute(source, factory);
         return source;
     }
 
-    public Object execute(Object source, TranslationContext context) {
+    public Object execute(Object source, TranslationFactory context) {
         Class<?> clazz = source.getClass();
         if (notMappingClazzCache.contains(clazz)) {
             return source;
@@ -94,14 +97,7 @@ public class DefaultTranslatorExecutor implements TranslatorExecutor {
             Translator translator = context.findTranslator(translatorName);
             String mapper = fieldInfo.getMapper();
             String other = fieldInfo.getOther();
-            Object mappingValue = null;
-            if (StringUtils.isBlank(mapper)) {
-                mappingValue = translator.translate();
-            } else if (StringUtils.isBlank(other)) {
-                mappingValue = translator.translate(ReflectUtils.invokeGetter(source,mapper));
-            } else {
-                mappingValue = translator.translate(ReflectUtils.invokeGetter(source,mapper), other);
-            }
+            Object mappingValue = translate(source, mapper, other, translator);
             if (StringUtils.isNotBlank(fieldInfo.getReceive())) {
                 mappingValue = ReflectUtils.invokeGetter(mappingValue, fieldInfo.getReceive());
             }
@@ -130,8 +126,21 @@ public class DefaultTranslatorExecutor implements TranslatorExecutor {
         return this;
     }
 
-    public DefaultTranslatorExecutor setContext(TranslationContext context) {
-        this.context = context;
+    public DefaultTranslatorExecutor setFactory(TranslationFactory factory) {
+        this.factory = factory;
         return this;
+    }
+
+
+    private Object translate(Object source, String mapper, Object other, Translator translator) {
+        Object translationValue = null;
+        if (translator instanceof ConditionTranslator conditionTranslator) {
+            translationValue = conditionTranslator.translate(ReflectUtils.invokeGetter(source, mapper), other);
+        } else if (translator instanceof MapperTranslator mapsTranslator) {
+            translationValue = mapsTranslator.translate(ReflectUtils.invokeGetter(source, mapper));
+        } else if (translator instanceof ContextTranslator contextTranslator) {
+            translationValue = contextTranslator.translate();
+        }
+        return translationValue;
     }
 }
