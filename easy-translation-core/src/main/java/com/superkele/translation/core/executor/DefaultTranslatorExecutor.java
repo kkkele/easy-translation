@@ -117,9 +117,9 @@ public class DefaultTranslatorExecutor implements TranslatorExecutor {
         String other = fieldInfo.getOther();
         Object mappingValue = null;
         if (StringUtils.isBlank(mapper)) {
-            mappingValue = translator.executeTranslator(ReflectUtils.invokeGetter(source, fieldInfo.getFieldName()), other);
+            mappingValue = translator.executeTranslate(ReflectUtils.invokeGetter(source, fieldInfo.getFieldName()), other);
         } else {
-            mappingValue = translator.executeTranslator(ReflectUtils.invokeGetter(source, mapper), other);
+            mappingValue = translator.executeTranslate(ReflectUtils.invokeGetter(source, mapper), other);
         }
         if (StringUtils.isNotBlank(fieldInfo.getReceive())) {
             mappingValue = ReflectUtils.invokeGetter(mappingValue, fieldInfo.getReceive());

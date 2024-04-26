@@ -1,8 +1,12 @@
 package com.superkele.translation.core.metadata;
 
 
+import com.superkele.translation.core.handler.ParameterHandler;
+
 public interface Translator {
-    default Object executeTranslator(Object... args) {
-        return null;
-    }
+
+
+    ParameterHandler getParameterHandler();
+
+    Object executeTranslate(Object... parameters);
 }

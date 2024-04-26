@@ -4,4 +4,5 @@ public interface ConfigurableTranslatorFactory extends TranslationFactory {
 
     void addTranslatorPostProcessor(TranslatorPostProcessor translatorPostProcessor);
 
+
 }

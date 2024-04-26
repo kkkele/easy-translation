@@ -3,12 +3,16 @@ package com.superkele.translation.core.factory;
 import com.superkele.translation.core.definition.TranslatorDefinition;
 import com.superkele.translation.core.metadata.Translator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractTranslatorFactory implements ConfigurableTranslatorFactory {
 
     private final Map<String, Translator> translatorCache = new ConcurrentHashMap<>();
+
+    private final List<TranslatorPostProcessor> translatorPostProcessors = new ArrayList<>();
 
     @Override
     public Translator findTranslator(String translatorName) {
@@ -31,6 +35,15 @@ public abstract class AbstractTranslatorFactory implements ConfigurableTranslato
     @Override
     public boolean containsTranslator(String name) {
         return containsTranslatorDefinition(name);
+    }
+
+    @Override
+    public void addTranslatorPostProcessor(TranslatorPostProcessor translatorPostProcessor) {
+        translatorPostProcessors.remove(translatorPostProcessor);
+        translatorPostProcessors.add(translatorPostProcessor);
+    }
+    public List<TranslatorPostProcessor> getTranslatorPostProcessors() {
+        return this.translatorPostProcessors;
     }
 
     protected abstract boolean containsTranslatorDefinition(String name);
