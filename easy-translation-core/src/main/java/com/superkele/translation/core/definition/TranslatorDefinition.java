@@ -5,7 +5,7 @@ import com.superkele.translation.core.metadata.Translator;
 import lombok.Data;
 
 @Data
-public class TranslatorDefinition<T extends Translator> {
+public class TranslatorDefinition {
 
     public static final String TRANSLATOR_CONDITION = "condition";
     public static final String TRANSLATOR_MAPPER = "mapper";
@@ -15,7 +15,7 @@ public class TranslatorDefinition<T extends Translator> {
 
     private Class<?>[] parameterTypes;
 
-    private Class<T> translatorClass;
+    private Class<? extends Translator> translatorClass;
 
     private Object invokeObj;
 
