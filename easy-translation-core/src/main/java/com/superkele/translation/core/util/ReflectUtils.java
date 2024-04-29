@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 
 /**
@@ -52,5 +53,15 @@ public class ReflectUtils extends ReflectUtil {
                 invoke(object, method, value);
             }
         }
+    }
+
+    public static boolean isStaticMethod(Method method) {
+        Assert.notNull(method, "method can not be null");
+        return Modifier.isStatic(method.getModifiers());
+    }
+
+    public static boolean isAbstractMethod(Method method) {
+        Assert.notNull(method, "method can not be null");
+        return Modifier.isAbstract(method.getModifiers());
     }
 }

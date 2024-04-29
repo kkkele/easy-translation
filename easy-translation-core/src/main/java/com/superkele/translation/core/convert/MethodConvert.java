@@ -2,6 +2,7 @@ package com.superkele.translation.core.convert;
 
 
 import cn.hutool.core.lang.Pair;
+import com.superkele.translation.core.util.Assert;
 
 import java.lang.invoke.*;
 import java.lang.reflect.Method;
@@ -123,7 +124,7 @@ public class MethodConvert {
      */
     public static Pair<Method, MethodType> findFunctionInterfaceMethodType(Class<?> functionInterface) {
         return FUNCTION_INTERFACE_CACHE.computeIfAbsent(functionInterface, key -> {
-            Objects.requireNonNull(functionInterface, "target function interface can not be null");
+            Assert.notNull(functionInterface, "target function interface can not be null");
             Method[] methods = functionInterface.getMethods();
             if (functionInterface.isAnnotationPresent(FunctionalInterface.class)) {
                 for (Method method : methods) {
@@ -148,9 +149,4 @@ public class MethodConvert {
         });
     }
 
-
-    public static boolean isStaticMethod(Method method) {
-        Objects.requireNonNull(method);
-        return Modifier.isStatic(method.getModifiers());
-    }
 }

@@ -28,10 +28,4 @@ public @interface Translation {
      */
     String name() default "";
 
-
-    /**
-     * <p>是否为默认翻译器</p>
-     * <p>Whether it is the default translator</p>
-     */
-    boolean isDefault() default true;
 }

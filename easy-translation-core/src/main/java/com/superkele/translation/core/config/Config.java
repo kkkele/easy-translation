@@ -10,9 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 @Getter
 public class Config {
 
-    private BeanNameGetter beanNameGetter = obj -> StrUtil.toCamelCase(obj.getClass().getName());
+    private BeanNameGetter beanNameGetter = clazz -> StrUtil.toCamelCase(clazz.getSimpleName());
 
-    private DefaultTranslatorGenerator defaultTranslatorGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
+    private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
 
 
     public Config setBeanNameGetter(BeanNameGetter beanNameGetter) {
@@ -20,21 +20,21 @@ public class Config {
         return this;
     }
 
-    public Config setDefaultTranslatorGenerator(DefaultTranslatorGenerator defaultTranslatorGenerator) {
-        this.defaultTranslatorGenerator = defaultTranslatorGenerator;
+    public Config setDefaultTranslatorNameGenerator(DefaultTranslatorNameGenerator defaultTranslatorNameGenerator) {
+        this.defaultTranslatorNameGenerator = defaultTranslatorNameGenerator;
         return this;
     }
 
     @FunctionalInterface
-    interface BeanNameGetter {
+    public interface BeanNameGetter {
 
-        String getDeclaringBeanName(Object invokeObj);
+        String getDeclaringBeanName(Class clazz);
 
     }
 
     @FunctionalInterface
-    interface DefaultTranslatorGenerator {
-        String genName(String clazzName, String methodName);
+    public interface DefaultTranslatorNameGenerator {
+        String genName(String beanName, String methodName);
     }
 
 }
