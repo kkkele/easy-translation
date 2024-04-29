@@ -1,6 +1,6 @@
 package com.superkele.translation.core.translator.support;
 
-import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
+import com.superkele.translation.core.translator.definition.ConfigurableTransDefinitionExecutorFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
 
@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultTranslatorFactory extends AbstractAutowireCapableTranslatorFactory
-        implements ConfigurableTranslatorDefinitionFactory, TranslatorDefinitionRegistry {
+public class DefaultTransExecutorFactory extends AbstractAutowireCapableTransExecutorFactory
+        implements ConfigurableTransDefinitionExecutorFactory, TranslatorDefinitionRegistry {
 
     private final Map<String, TranslatorDefinition> translatorDefinitionMap = new ConcurrentHashMap<>();
 

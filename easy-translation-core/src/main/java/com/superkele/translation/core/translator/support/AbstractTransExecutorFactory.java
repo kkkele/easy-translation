@@ -1,25 +1,25 @@
 package com.superkele.translation.core.translator.support;
 
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
-import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
-import com.superkele.translation.core.translator.factory.ConfigurableTranslatorFactory;
+import com.superkele.translation.core.translator.factory.ConfigurableTransExecutorFactory;
+import com.superkele.translation.core.translator.handle.TranslateExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class AbstractTranslatorFactory implements ConfigurableTranslatorFactory {
+public abstract class AbstractTransExecutorFactory implements ConfigurableTransExecutorFactory {
 
-    private final Map<String, Translator> translatorCache = new ConcurrentHashMap<>();
+    private final Map<String, TranslateExecutor> translatorCache = new ConcurrentHashMap<>();
 
     private final List<TranslatorPostProcessor> translatorPostProcessors = new ArrayList<>();
 
 
     @Override
-    public Translator findTranslator(String translatorName) {
-        Translator translator = translatorCache.get(translatorName);
+    public TranslateExecutor findExecutor(String translatorName) {
+        TranslateExecutor translator = translatorCache.get(translatorName);
         if (translator != null) {
             return translator;
         }
@@ -30,8 +30,9 @@ public abstract class AbstractTranslatorFactory implements ConfigurableTranslato
     }
 
     @Override
-    public <T extends Translator> T findTranslator(String name, Class<T> requireType) {
-        return (T) findTranslator(name);
+    public <T extends TranslateExecutor> T findExecutor(String name, Class<?> requireType) {
+        //todo
+        return null;
     }
 
     @Override
@@ -51,7 +52,7 @@ public abstract class AbstractTranslatorFactory implements ConfigurableTranslato
 
     protected abstract boolean containsTranslatorDefinition(String name);
 
-    protected abstract Translator createTranslator(String translatorName, TranslatorDefinition definition);
+    protected abstract TranslateExecutor createTranslator(String translatorName, TranslatorDefinition definition);
 
     protected abstract TranslatorDefinition findTranslatorDefinition(String translatorName);
 }

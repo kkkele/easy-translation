@@ -1,15 +1,17 @@
 package com.superkele.translation.test.context;
 
-import com.superkele.translation.core.context.support.DefaultTranslatorContext;
+import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
 import com.superkele.translation.core.translator.Translator;
+import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import org.junit.Test;
 
 public class DefaultTranslatorContextTest {
 
     @Test
     public void test(){
-        DefaultTranslatorContext context = new DefaultTranslatorContext("com.superkele.translation.test");
-        Translator getById = context.findTranslator("getById");
-        System.out.println(getById.getDefaultTranslateHandler().execute(1L));
+        DefaultTransExecutorContext context = new DefaultTransExecutorContext("com.superkele.translation.test");
+        TranslateExecutor getById = context.findExecutor("getById");
+        Object execute = getById.execute(1L);
+        System.out.println(execute);
     }
 }

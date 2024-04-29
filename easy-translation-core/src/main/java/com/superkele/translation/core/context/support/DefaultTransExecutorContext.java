@@ -5,7 +5,7 @@ import com.superkele.translation.core.config.Config;
 /**
  * 默认翻译器上下文
  */
-public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext {
+public class DefaultTransExecutorContext extends AbstractAutoLoadTransExecutorContext {
 
 
     private Config config;
@@ -14,19 +14,19 @@ public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext 
 
     private String[] packages;
 
-    public DefaultTranslatorContext(Object... invokeObjs) {
+    public DefaultTransExecutorContext(Object... invokeObjs) {
         this(null, invokeObjs);
     }
 
-    public DefaultTranslatorContext(String... packages) {
+    public DefaultTransExecutorContext(String... packages) {
         this(new Config(), null, packages);
     }
 
-    public DefaultTranslatorContext(String[] packages, Object[] invokeObjs) {
+    public DefaultTransExecutorContext(String[] packages, Object[] invokeObjs) {
         this(new Config(), invokeObjs, packages);
     }
 
-    public DefaultTranslatorContext(Config config, Object[] invokeObjs, String[] packages) {
+    public DefaultTransExecutorContext(Config config, Object[] invokeObjs, String[] packages) {
         this.config = config;
         this.invokeObjs = invokeObjs;
         this.packages = packages;

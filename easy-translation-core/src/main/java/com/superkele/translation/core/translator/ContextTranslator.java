@@ -8,7 +8,7 @@ public interface ContextTranslator extends Translator {
     Object translate();
 
     @Override
-    default TranslateExecutor getDefaultTranslateHandler() {
+    default TranslateExecutor getDefaultExecutor() {
         return args -> translate();
     }
 }

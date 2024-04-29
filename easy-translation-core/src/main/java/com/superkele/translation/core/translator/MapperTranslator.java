@@ -9,7 +9,7 @@ public interface MapperTranslator extends Translator {
     Object translate(Object var0);
 
     @Override
-    default TranslateExecutor getDefaultTranslateHandler() {
+    default TranslateExecutor getDefaultExecutor() {
         return args -> translate(args[0]);
     }
 }
