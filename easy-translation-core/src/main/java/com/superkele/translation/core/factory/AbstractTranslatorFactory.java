@@ -1,7 +1,7 @@
 package com.superkele.translation.core.factory;
 
 import com.superkele.translation.core.definition.TranslatorDefinition;
-import com.superkele.translation.core.metadata.Translator;
+import com.superkele.translation.core.translator.Translator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,7 @@ public abstract class AbstractTranslatorFactory implements ConfigurableTranslato
 
     private final List<TranslatorPostProcessor> translatorPostProcessors = new ArrayList<>();
 
+
     @Override
     public Translator findTranslator(String translatorName) {
         Translator translator = translatorCache.get(translatorName);
@@ -25,7 +26,6 @@ public abstract class AbstractTranslatorFactory implements ConfigurableTranslato
         translatorCache.put(translatorName, translator);
         return translator;
     }
-
 
     @Override
     public <T extends Translator> T findTranslator(String name, Class<T> requireType) {
@@ -42,6 +42,7 @@ public abstract class AbstractTranslatorFactory implements ConfigurableTranslato
         translatorPostProcessors.remove(translatorPostProcessor);
         translatorPostProcessors.add(translatorPostProcessor);
     }
+
     public List<TranslatorPostProcessor> getTranslatorPostProcessors() {
         return this.translatorPostProcessors;
     }

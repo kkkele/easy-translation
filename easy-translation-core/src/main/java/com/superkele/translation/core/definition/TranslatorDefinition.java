@@ -1,15 +1,12 @@
 package com.superkele.translation.core.definition;
 
 import com.superkele.translation.core.enums.TranslatorType;
-import com.superkele.translation.core.metadata.Translator;
+import com.superkele.translation.core.translator.Translator;
 import lombok.Data;
 
 @Data
 public class TranslatorDefinition {
 
-    public static final String TRANSLATOR_CONDITION = "condition";
-    public static final String TRANSLATOR_MAPPER = "mapper";
-    public static final String TRANSLATOR_CONTEXT = "context";
 
     private Class<?> returnType;
 

@@ -1,6 +1,6 @@
 package com.superkele.translation.core.factory;
 
-import com.superkele.translation.core.metadata.Translator;
+import com.superkele.translation.core.translator.Translator;
 
 public interface AutowireCapableTranslatorFactory extends TranslationFactory {
 

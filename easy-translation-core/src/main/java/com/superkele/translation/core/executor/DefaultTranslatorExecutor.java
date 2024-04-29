@@ -5,7 +5,7 @@ import cn.hutool.core.collection.ConcurrentHashSet;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.core.factory.TranslationFactory;
 import com.superkele.translation.core.filter.TranslationFilterChain;
-import com.superkele.translation.core.metadata.Translator;
+import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.metadata.FieldInfo;
 import com.superkele.translation.core.util.ReflectUtils;
 import org.apache.commons.lang3.StringUtils;

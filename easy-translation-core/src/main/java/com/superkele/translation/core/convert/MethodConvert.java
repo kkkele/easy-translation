@@ -149,7 +149,7 @@ public class MethodConvert {
     }
 
 
-    public static boolean isStaticMethod(Method method){
+    public static boolean isStaticMethod(Method method) {
         Objects.requireNonNull(method);
         return Modifier.isStatic(method.getModifiers());
     }
