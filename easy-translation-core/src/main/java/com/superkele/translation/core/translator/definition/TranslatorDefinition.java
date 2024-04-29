@@ -1,7 +1,7 @@
 package com.superkele.translation.core.translator.definition;
 
 import com.superkele.translation.core.translator.Translator;
-import com.superkele.translation.core.translator.handle.TranslateHandler;
+import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import lombok.Data;
 
 @Data
@@ -35,7 +35,7 @@ public class TranslatorDefinition {
     /**
      * 翻译器处理器
      */
-    private TranslateHandler translateHandler;
+    private TranslateExecutor translateExecutor;
 
     /**
      * 需要映射的参数位置

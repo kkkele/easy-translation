@@ -5,18 +5,31 @@ import com.superkele.translation.core.config.Config;
 /**
  * 默认翻译器上下文
  */
-public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext{
+public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext {
 
-    private String[] packages;
 
     private Config config;
 
     private Object[] invokeObjs;
 
-    public DefaultTranslatorContext(String[] packages, Config config, Object[] invokeObjs) {
-        this.packages = packages;
+    private String[] packages;
+
+    public DefaultTranslatorContext(Object... invokeObjs) {
+        this(null, invokeObjs);
+    }
+
+    public DefaultTranslatorContext(String... packages) {
+        this(new Config(), null, packages);
+    }
+
+    public DefaultTranslatorContext(String[] packages, Object[] invokeObjs) {
+        this(new Config(), invokeObjs, packages);
+    }
+
+    public DefaultTranslatorContext(Config config, Object[] invokeObjs, String[] packages) {
         this.config = config;
         this.invokeObjs = invokeObjs;
+        this.packages = packages;
         refresh();
     }
 
