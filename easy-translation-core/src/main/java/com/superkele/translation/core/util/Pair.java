@@ -1,7 +1,6 @@
 package com.superkele.translation.core.util;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.Objects;
 
 public class Pair<K, V>  implements Serializable {
@@ -33,10 +32,10 @@ public class Pair<K, V>  implements Serializable {
     public boolean equals(Object o) {
         if (this == o) {
             return true;
-        } else if (!(o instanceof cn.hutool.core.lang.Pair)) {
+        } else if (!(o instanceof Pair)) {
             return false;
         } else {
-            cn.hutool.core.lang.Pair<?, ?> pair = (cn.hutool.core.lang.Pair)o;
+            Pair<?, ?> pair = (Pair)o;
             return Objects.equals(this.getKey(), pair.getKey()) && Objects.equals(this.getValue(), pair.getValue());
         }
     }

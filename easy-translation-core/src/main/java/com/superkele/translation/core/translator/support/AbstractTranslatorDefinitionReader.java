@@ -20,8 +20,8 @@ import java.util.Set;
 
 public abstract class AbstractTranslatorDefinitionReader implements TranslatorDefinitionReader {
 
-    private final TranslatorDefinitionRegistry registry;
-    private final Config config;
+    protected final TranslatorDefinitionRegistry registry;
+    protected final Config config;
 
     protected AbstractTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, Config config) {
         this.registry = registry;

@@ -5,8 +5,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -21,6 +24,9 @@ public class ReflectUtils extends ReflectUtil {
     private static final String SETTER_PREFIX = "set";
 
     private static final String GETTER_PREFIX = "get";
+
+    private static final Map<Class<?>, Pair<Method, MethodType>> FUNCTION_INTERFACE_CACHE = new ConcurrentHashMap<>();
+
 
     /**
      * 调用Getter方法.
@@ -64,4 +70,39 @@ public class ReflectUtils extends ReflectUtil {
         Assert.notNull(method, "method can not be null");
         return Modifier.isAbstract(method.getModifiers());
     }
+
+
+    /**
+     * 获取函数式接口的lambda方法的MethodType
+     *
+     * @param functionInterface 函数式接口
+     * @return
+     */
+    public static Pair<Method, MethodType> findFunctionInterfaceMethodType(Class<?> functionInterface) {
+        return FUNCTION_INTERFACE_CACHE.computeIfAbsent(functionInterface, key -> {
+            Assert.notNull(functionInterface, "target function interface can not be null");
+            Method[] methods = functionInterface.getMethods();
+            if (functionInterface.isAnnotationPresent(FunctionalInterface.class)) {
+                for (Method method : methods) {
+                    if (Modifier.isAbstract(method.getModifiers())) {
+                        return Pair.of(method, MethodType.methodType(method.getReturnType(), method.getParameterTypes()));
+                    }
+                }
+            } else {
+                Method resultMethod = null;
+                int count = 0;
+                for (Method method : methods) {
+                    if (Modifier.isAbstract(method.getModifiers())) {
+                        resultMethod = method;
+                        count++;
+                    }
+                }
+                if (count == 1) {
+                    return Pair.of(resultMethod, MethodType.methodType(resultMethod.getReturnType(), resultMethod.getParameterTypes()));
+                }
+            }
+            throw new IllegalStateException(functionInterface.getName() + "is not a function interface");
+        });
+    }
+
 }

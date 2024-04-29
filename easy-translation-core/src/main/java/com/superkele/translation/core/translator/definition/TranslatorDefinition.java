@@ -42,9 +42,4 @@ public class TranslatorDefinition {
      */
     private int[] mapperIndex;
 
-    /**
-     * 不需要映射的参数位置
-     */
-    private int[] otherIndex;
-
 }

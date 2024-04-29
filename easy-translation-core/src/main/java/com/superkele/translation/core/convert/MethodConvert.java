@@ -1,20 +1,17 @@
 package com.superkele.translation.core.convert;
 
 
-import cn.hutool.core.lang.Pair;
-import com.superkele.translation.core.util.Assert;
+
+import com.superkele.translation.core.util.Pair;
 
 import java.lang.invoke.*;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+
+import static com.superkele.translation.core.util.ReflectUtils.findFunctionInterfaceMethodType;
 
 public class MethodConvert {
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
-    private static final Map<Class<?>, Pair<Method, MethodType>> FUNCTION_INTERFACE_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 转换动态方法
@@ -116,37 +113,5 @@ public class MethodConvert {
         }
     }
 
-    /**
-     * 获取函数式接口的lambda方法的MethodType
-     *
-     * @param functionInterface 函数式接口
-     * @return
-     */
-    public static Pair<Method, MethodType> findFunctionInterfaceMethodType(Class<?> functionInterface) {
-        return FUNCTION_INTERFACE_CACHE.computeIfAbsent(functionInterface, key -> {
-            Assert.notNull(functionInterface, "target function interface can not be null");
-            Method[] methods = functionInterface.getMethods();
-            if (functionInterface.isAnnotationPresent(FunctionalInterface.class)) {
-                for (Method method : methods) {
-                    if (Modifier.isAbstract(method.getModifiers())) {
-                        return Pair.of(method, MethodType.methodType(method.getReturnType(), method.getParameterTypes()));
-                    }
-                }
-            } else {
-                Method resultMethod = null;
-                int count = 0;
-                for (Method method : methods) {
-                    if (Modifier.isAbstract(method.getModifiers())) {
-                        resultMethod = method;
-                        count++;
-                    }
-                }
-                if (count == 1) {
-                    return Pair.of(resultMethod, MethodType.methodType(resultMethod.getReturnType(), resultMethod.getParameterTypes()));
-                }
-            }
-            throw new IllegalStateException(functionInterface.getName() + "is not a function interface");
-        });
-    }
 
 }
