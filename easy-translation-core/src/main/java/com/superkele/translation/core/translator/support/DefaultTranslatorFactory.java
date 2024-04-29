@@ -20,8 +20,7 @@ public class DefaultTranslatorFactory extends AbstractAutowireCapableTranslatorF
 
     @Override
     public TranslatorDefinition getTranslatorDefinition(String translatorName) {
-        return Optional.ofNullable(translatorDefinitionMap.get(translatorName))
-                .orElseThrow(() -> new RuntimeException("No translator name '" + translatorName + "' is founded"));
+        return this.findTranslatorDefinition(translatorName);
     }
 
     @Override
@@ -37,6 +36,7 @@ public class DefaultTranslatorFactory extends AbstractAutowireCapableTranslatorF
 
     @Override
     public TranslatorDefinition findTranslatorDefinition(String translatorName) {
-        return this.getTranslatorDefinition(translatorName);
+        return Optional.ofNullable(translatorDefinitionMap.get(translatorName))
+                .orElseThrow(() -> new RuntimeException("No translator name '" + translatorName + "' is founded"));
     }
 }
