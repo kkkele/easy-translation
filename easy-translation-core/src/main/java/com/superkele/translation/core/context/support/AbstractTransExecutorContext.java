@@ -29,11 +29,6 @@ public abstract class AbstractTransExecutorContext implements ConfigurableTransE
     }
 
     @Override
-    public <T extends TranslateExecutor> T findExecutor(String name, Class<?> requireType) {
-        return getTranslatorFactory().findExecutor(name, requireType);
-    }
-
-    @Override
     public boolean containsTranslator(String name) {
         return getTranslatorFactory().containsTranslator(name);
     }

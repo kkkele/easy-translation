@@ -1,5 +1,6 @@
 package com.superkele.translation.core.translator.support;
 
+import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.translator.definition.ConfigurableTransDefinitionExecutorFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
@@ -37,6 +38,6 @@ public class DefaultTransExecutorFactory extends AbstractAutowireCapableTransExe
     @Override
     public TranslatorDefinition findTranslatorDefinition(String translatorName) {
         return Optional.ofNullable(translatorDefinitionMap.get(translatorName))
-                .orElseThrow(() -> new RuntimeException("No translator name '" + translatorName + "' is founded"));
+                .orElseThrow(() -> new TranslationException("No translator name '" + translatorName + "' is found"));
     }
 }

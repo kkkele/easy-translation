@@ -12,13 +12,8 @@ import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.ReflectUtils;
 
 import java.lang.invoke.LambdaConversionException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.*;
+import java.util.*;
 
 public class LambdaTranslatorDefinitionReader extends AbstractTranslatorDefinitionReader {
 
@@ -29,6 +24,7 @@ public class LambdaTranslatorDefinitionReader extends AbstractTranslatorDefiniti
     public LambdaTranslatorDefinitionReader(TranslatorDefinitionRegistry registry) {
         super(registry);
     }
+
 
     /**
      * 枚举翻译暂且只支持一个mapper参数
@@ -62,7 +58,7 @@ public class LambdaTranslatorDefinitionReader extends AbstractTranslatorDefiniti
         Map<Object, Object> map = new HashMap<>();
         Field mapperField = declaredFields[mapperIndex];
         for (Enum enumConstant : enumClass.getEnumConstants()) {
-            map.put(ReflectUtils.invokeGetter(enumClass, mapperField.getName()), ReflectUtils.invokeGetter(enumConstant, mappedField.getName()));
+            map.put(ReflectUtils.invokeGetter(enumConstant, mapperField.getName()), ReflectUtils.invokeGetter(enumConstant, mappedField.getName()));
         }
         MapperTranslator mapperTranslator = mapper -> map.get(mapper);
         translatorDefinition.setTranslator(mapperTranslator);
@@ -130,4 +126,5 @@ public class LambdaTranslatorDefinitionReader extends AbstractTranslatorDefiniti
         }
         return mapperIndexList.stream().mapToInt(Integer::intValue).toArray();
     }
+
 }

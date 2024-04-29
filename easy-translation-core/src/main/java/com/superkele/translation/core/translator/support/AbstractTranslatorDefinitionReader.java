@@ -99,11 +99,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                     reflections.getSubTypesOf(Enum.class)
                             .stream()
                             .filter(clazz -> clazz.isAnnotationPresent(Translation.class))
-                            .forEach(clazz -> {
-                                Translation translation = clazz.getAnnotation(Translation.class);
-                                TranslatorDefinition definition = convertEnumToTranslatorDefinition(clazz);
-                                registry.register(translation.name(), definition);
-                            });
+                            .forEach(clazz -> registry.register(getTranslatorName(clazz), convertEnumToTranslatorDefinition(clazz)));
                 });
     }
 
@@ -125,6 +121,16 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
         }
         return translatorName;
     }
+
+    protected String getTranslatorName(Class<? extends Enum> clazz) {
+        Translation translation = clazz.getAnnotation(Translation.class);
+        String translatorName = translation.name();
+        if (StringUtils.isBlank(translatorName)) {
+            translatorName = config.getBeanNameGetter().getDeclaringBeanName(clazz);
+        }
+        return translatorName;
+    }
+
 
     protected String getDefaultTranslatorName(Method method) {
         String beanName = config.getBeanNameGetter().getDeclaringBeanName(method.getDeclaringClass());
