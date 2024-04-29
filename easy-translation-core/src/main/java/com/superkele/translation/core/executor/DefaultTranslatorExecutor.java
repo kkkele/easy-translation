@@ -3,7 +3,7 @@ package com.superkele.translation.core.executor;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import com.superkele.translation.annotation.Mapping;
-import com.superkele.translation.core.factory.TranslationFactory;
+import com.superkele.translation.core.translator.factory.TranslationFactory;
 import com.superkele.translation.core.filter.TranslationFilterChain;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.metadata.FieldInfo;

@@ -1,4 +1,4 @@
-package com.superkele.translation.core.definition;
+package com.superkele.translation.core.translator.definition;
 
 public interface TranslatorDefinitionRegistry {
 

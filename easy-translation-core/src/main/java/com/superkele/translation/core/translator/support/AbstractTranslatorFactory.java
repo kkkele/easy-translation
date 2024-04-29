@@ -1,7 +1,9 @@
-package com.superkele.translation.core.factory;
+package com.superkele.translation.core.translator.support;
 
-import com.superkele.translation.core.definition.TranslatorDefinition;
+import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.Translator;
+import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
+import com.superkele.translation.core.translator.factory.ConfigurableTranslatorFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +23,7 @@ public abstract class AbstractTranslatorFactory implements ConfigurableTranslato
         if (translator != null) {
             return translator;
         }
-        TranslatorDefinition definition = getTranslatorDefinition(translatorName);
+        TranslatorDefinition definition = findTranslatorDefinition(translatorName);
         translator = createTranslator(translatorName, definition);
         translatorCache.put(translatorName, translator);
         return translator;
@@ -51,5 +53,5 @@ public abstract class AbstractTranslatorFactory implements ConfigurableTranslato
 
     protected abstract Translator createTranslator(String translatorName, TranslatorDefinition definition);
 
-    protected abstract TranslatorDefinition getTranslatorDefinition(String translatorName);
+    protected abstract TranslatorDefinition findTranslatorDefinition(String translatorName);
 }

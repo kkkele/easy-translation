@@ -1,8 +1,10 @@
-package com.superkele.translation.core.factory;
+package com.superkele.translation.core.translator.support;
 
 
-import com.superkele.translation.core.definition.TranslatorDefinition;
+import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.Translator;
+import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
+import com.superkele.translation.core.translator.factory.AutowireCapableTranslatorFactory;
 
 
 public abstract class AbstractAutowireCapableTranslatorFactory extends AbstractTranslatorFactory
@@ -10,7 +12,7 @@ public abstract class AbstractAutowireCapableTranslatorFactory extends AbstractT
 
 
     @Override
-    protected Translator createTranslator(String translatorName, TranslatorDefinition definition) {
+    public Translator createTranslator(String translatorName, TranslatorDefinition definition) {
         Translator translator = definition.getTranslator();
         Translator process = applyTranslatorPostProcessorBeforeInit(translator, translatorName);
         if (process != null) {

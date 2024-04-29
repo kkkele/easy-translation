@@ -1,4 +1,4 @@
-package com.superkele.translation.core.factory;
+package com.superkele.translation.core.translator.definition;
 
 import com.superkele.translation.core.translator.Translator;
 
