@@ -28,7 +28,7 @@ public class Config {
      */
     private Map<Integer, Class<? extends Translator>> translatorClazzMap = new ConcurrentHashMap<>(16);
 
-    private BeanNameGetter beanNameGetter = clazz -> StrUtil.toCamelCase(clazz.getSimpleName());
+    private BeanNameGetter beanNameGetter = clazz -> StrUtil.lowerFirst(clazz.getSimpleName());
 
     private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
 
