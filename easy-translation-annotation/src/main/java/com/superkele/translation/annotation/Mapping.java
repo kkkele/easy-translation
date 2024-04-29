@@ -27,7 +27,7 @@ public @interface Mapping {
      * <hr>
      * <p>Mapped fields, SPEL expressions are supported in spring app</p>
      */
-    String mapper() default "";
+    String[] mapper() default "";
 
     /**
      * <p>接收的属性内容</p>
@@ -35,7 +35,7 @@ public @interface Mapping {
     String receive() default "";
 
 
-    String other() default "";
+    String[] other() default "";
 
     TranslateTiming timing() default TranslateTiming.JSON_SERIALIZE;
 

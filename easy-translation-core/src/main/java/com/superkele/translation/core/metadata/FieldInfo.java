@@ -21,13 +21,13 @@ public class FieldInfo implements Serializable {
 
     private String translator;
 
-    private String other;
+    private String[] other;
 
     private TranslateTiming translateTiming;
 
     private String receive;
 
-    private String mapper;
+    private String[] mapper;
 
     private boolean notNullMapping;
 }
