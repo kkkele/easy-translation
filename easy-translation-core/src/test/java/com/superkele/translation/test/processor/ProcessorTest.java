@@ -66,8 +66,11 @@ public class ProcessorTest {
 
         private Integer createBy;
 
-        @Mapping(translator = "getUserById",mapper = "createBy",receive = "name")
+        @Mapping(translator = "getUserById", mapper = "createBy", receive = "name")
         private String createName;
+
+        @Mapping(translator = "getUserNameByIdV2", mapper = "createBy", other = "xx")
+        private  String otherName;
 
         public Order(String orderNo, Integer createBy) {
             this.orderNo = orderNo;
@@ -84,6 +87,11 @@ public class ProcessorTest {
         @Translation(name = "getUserById")
         public User getUser(Integer id) {
             return map.get(id);
+        }
+
+        @Translation(name = "getUserNameByIdV2")
+        public String getUserById(Integer id, String other) {
+            return map.get(id) + other;
         }
     }
 }

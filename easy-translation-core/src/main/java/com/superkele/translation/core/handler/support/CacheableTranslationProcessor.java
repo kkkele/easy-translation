@@ -70,7 +70,7 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
             args[i] = ReflectUtils.invokeGetter(source, fieldInfo.getMapper()[i]);
         }
         int j = 0;
-        for (int i = mapperLength; i < otherLength; i++) {
+        for (int i = mapperLength; i < mapperLength + otherLength; i++) {
             args[i] = fieldInfo.getOther()[j++];
         }
         Object mappingValue = executor.execute(args);
