@@ -20,11 +20,6 @@ public class DefaultTransExecutorFactory extends AbstractAutowireCapableTransExe
     }
 
     @Override
-    public TranslatorDefinition getTranslatorDefinition(String translatorName) {
-        return this.findTranslatorDefinition(translatorName);
-    }
-
-    @Override
     public String[] getTranslatorNames() {
         return translatorDefinitionMap.keySet().toArray(String[]::new);
     }

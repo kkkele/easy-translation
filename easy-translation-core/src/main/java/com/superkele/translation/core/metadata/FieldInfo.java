@@ -15,7 +15,7 @@ public class FieldInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Field  originField;
+    private Field originField;
 
     private String fieldName;
 
@@ -30,4 +30,6 @@ public class FieldInfo implements Serializable {
     private String[] mapper;
 
     private boolean notNullMapping;
+
+    private int sort;
 }

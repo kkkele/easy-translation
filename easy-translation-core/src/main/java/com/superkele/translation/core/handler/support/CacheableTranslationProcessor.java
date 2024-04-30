@@ -12,19 +12,15 @@ import com.superkele.translation.core.util.ReflectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 public abstract class CacheableTranslationProcessor implements TranslationProcessor {
 
     public static int max_translator_param_len = 16;
 
-    protected final Map<Class<?>, List<FieldInfo>> fieldInfoCache = new ConcurrentHashMap<>();
+    protected final Map<Class<?>, List<List<FieldInfo>>> fieldInfoCache = new ConcurrentHashMap<>();
 
     protected final Set<Class<?>> notMappingClazzCache = new ConcurrentHashSet<>();
 
@@ -39,25 +35,35 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
         if (notMappingClazzCache.contains(clazz)) {
             return;
         }
-        List<FieldInfo> fieldInfoList = fieldInfoCache.computeIfAbsent(clazz, declaringClass -> {
+        List<List<FieldInfo>> fieldInfoList = fieldInfoCache.computeIfAbsent(clazz, declaringClass -> {
             Field[] declaredFields = clazz.getDeclaredFields();
-            List<FieldInfo> collect = Arrays.stream(declaredFields)
+            Map<Integer, List<FieldInfo>> sortListMap = Arrays.stream(declaredFields)
                     .filter(field -> field.isAnnotationPresent(Mapping.class))
                     .map(this::mapToFieldInfo)
-                    .collect(Collectors.toList());
-            if (CollectionUtil.isEmpty(collect)) {
+                    .collect(Collectors.groupingBy(FieldInfo::getSort));
+            if (CollectionUtil.isEmpty(sortListMap)) {
                 notMappingClazzCache.add(clazz);
+                return null;
             }
+            List<List<FieldInfo>> collect = sortListMap.values()
+                    .stream()
+                    .sorted(Comparator.comparingInt(o -> o.get(0).getSort()))
+                    .collect(Collectors.toList());
+
             return collect;
         });
         if (CollectionUtil.isEmpty(fieldInfoList)) {
             fieldInfoCache.remove(clazz);
             return;
         }
-        for (FieldInfo fieldInfo : fieldInfoList) {
-            translateValue(source, fieldInfo);
-        }
+        processStrategy(fieldInfoList);
     }
+
+    /**
+     * 使用不同的策略处理
+     * @param fieldInfoList
+     */
+    protected abstract void processStrategy(List<List<FieldInfo>> fieldInfoList);
 
     private void translateValue(Object source, FieldInfo fieldInfo) {
         String translatorName = fieldInfo.getTranslator();
@@ -79,11 +85,6 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
         ReflectUtils.invokeSetter(source, fieldInfo.getFieldName(), mappingValue);
     }
 
-    @Override
-    public void process(List<Object> objList) {
-        objList.forEach(this::process);
-    }
-
     protected FieldInfo mapToFieldInfo(Field field) {
         Mapping mapping = field.getAnnotation(Mapping.class);
         FieldInfo fieldInfo = new FieldInfo();
@@ -95,6 +96,7 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
         fieldInfo.setReceive(mapping.receive());
         fieldInfo.setTranslateTiming(mapping.timing());
         fieldInfo.setNotNullMapping(mapping.notNullMapping());
+        fieldInfo.setSort(mapping.sort());
         return fieldInfo;
     }
 }

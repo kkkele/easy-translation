@@ -5,7 +5,6 @@ import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionReader;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
-import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.ReflectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;

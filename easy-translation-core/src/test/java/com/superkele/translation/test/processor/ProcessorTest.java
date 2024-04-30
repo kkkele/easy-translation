@@ -1,11 +1,13 @@
 package com.superkele.translation.test.processor;
 
 import com.superkele.translation.annotation.Mapping;
+import com.superkele.translation.annotation.TransMapper;
 import com.superkele.translation.annotation.Translation;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.context.TransExecutorContext;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
 import com.superkele.translation.core.handler.support.CacheableTranslationProcessor;
+import com.superkele.translation.core.metadata.FieldInfo;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import lombok.AllArgsConstructor;
@@ -15,45 +17,33 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class ProcessorTest {
 
-    UserService userService = new UserService();
     static Config config = new Config();
-    static{
+
+    static {
         config.registerTranslatorClazz(ThreeParam.class);
     }
-    DefaultTransExecutorContext context = new DefaultTransExecutorContext(config,new Object[]{userService},new String[]{"com.superkele.translation"});
+
+    UserService userService = new UserService();
+    DefaultTransExecutorContext context = new DefaultTransExecutorContext(config, new Object[]{userService}, new String[]{"com.superkele.translation"});
     CacheableTranslationProcessor processor = new CacheableTranslationProcessor() {
-        @Override
-        public void process(Object obj, ThreadPoolExecutor executor) {
-        }
-
-        @Override
-        public void process(List<Object> obj, ThreadPoolExecutor executor) {
-        }
-
-        @Override
-        public void processAsync(Object obj) {
-        }
-
-        @Override
-        public void processAsync(List<Object> obj) {
-        }
-
         @Override
         protected TransExecutorContext getContext() {
             return context;
+        }
+
+        @Override
+        protected void processStrategy(List<List<FieldInfo>> fieldInfoList) {
+
         }
     };
 
     @Test
     public void test() {
-        Order source = new Order("123", 1,1);
-        System.out.println(source);
-        processor.process(source);
-        System.out.println(source);
+        TranslateExecutor executor = context.findExecutor("getUserNameByIdV3");
+        System.out.println(executor.execute("hello,","world",666,"yyyyyyyyy"));
     }
 
 
@@ -61,8 +51,8 @@ public class ProcessorTest {
         Object translate(Object var0, Object var1, Object var2);
 
         @Override
-        default TranslateExecutor getDefaultExecutor() {
-            return args -> translate(args[0], args[1], args[2]);
+        default Object doTranslate(Object... args) {
+            return translate(args[0], args[1], args[2]);
         }
     }
 
@@ -88,7 +78,7 @@ public class ProcessorTest {
         @Mapping(translator = "getUserById", mapper = "createBy", receive = "name")
         private String createName;
 
-        @Mapping(translator = "getUserNameByIdV2", mapper = {"createBy", "type"}, other = {"HELLO WORLD","NICE "})
+        @Mapping(translator = "getUserNameByIdV2", mapper = {"createBy", "type"}, other = {"HELLO WORLD", "NICE "})
         private String otherName;
 
         public Order(String orderNo, Integer createBy, Integer type) {
@@ -111,11 +101,17 @@ public class ProcessorTest {
         }
 
         @Translation(name = "getUserNameByIdV2")
-        public String getUserNameById(Integer id, Integer type, String other) {
-            if (type != null && type == 0){
+        public String getUserNameById(Integer id, @TransMapper Integer type, String other) {
+            if (type != null && type == 0) {
                 return "default Value";
             }
             return map.get(id).getName() + other;
+        }
+
+
+        @Translation(name = "getUserNameByIdV3")
+        public String getUserNameById(Integer id, @TransMapper String type, @TransMapper String other) {
+            return type + other + id;
         }
     }
 }

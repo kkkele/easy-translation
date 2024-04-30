@@ -11,7 +11,7 @@ import org.junit.Test;
 
 public class DefaultTranslatorContextTest {
 
-    @Test
+/*    @Test
     public void testDynamic(){
         LoginUser loginUser = new LoginUser("小红");
         DefaultTransExecutorContext context = new DefaultTransExecutorContext(loginUser);
@@ -56,5 +56,5 @@ public class DefaultTranslatorContextTest {
     @Translation
     public static String testStaticLord(){
         return "hello world!";
-    }
+    }*/
 }

@@ -18,29 +18,42 @@ import java.lang.annotation.*;
 public @interface Mapping {
 
     /**
-     * Specify a translator, and if you don't specify a translator, automatically look for a translator that matches the type
+     * 翻译器名称
      */
     String translator() default "";
 
     /**
-     * <p>映射的字段，spring环境下支持spel表达式</p>
-     * <hr>
-     * <p>Mapped fields, SPEL expressions are supported in spring app</p>
+     * 映射的字段，spring环境下支持spel表达式
      */
     String[] mapper() default "";
 
     /**
-     * <p>接收的属性内容</p>
+     * 接收的属性内容
      */
     String receive() default "";
 
-
+    /**
+     * 其他字段
+     */
     String[] other() default "";
 
+    /**
+     * 执行时机
+     */
     TranslateTiming timing() default TranslateTiming.JSON_SERIALIZE;
 
     /**
      * 当不为null时，是否也映射
      */
     boolean notNullMapping() default false;
+
+    /**
+     * 排序字段，按从小到大依次执行，如果值相同，则代表可以并发执行
+     */
+    int sort() default 0;
+
+    /**
+     * 是否异步执行
+     */
+    boolean async() default false;
 }

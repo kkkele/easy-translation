@@ -62,8 +62,8 @@ public class LambdaTranslatorDefinitionReader extends AbstractTranslatorDefiniti
         }
         MapperTranslator mapperTranslator = mapper -> map.get(mapper);
         translatorDefinition.setTranslator(mapperTranslator);
-        translatorDefinition.setTranslateExecutor(mapperTranslator.getDefaultExecutor());
-        translatorDefinition.setMapperIndex(new int[mapperIndex]);
+        translatorDefinition.setTranslateExecutor(null);
+        translatorDefinition.setMapperIndex(new int[1]);
         return translatorDefinition;
     }
 
@@ -80,7 +80,7 @@ public class LambdaTranslatorDefinitionReader extends AbstractTranslatorDefiniti
         try {
             Translator translator = MethodConvert.convertToFunctionInterface(translatorClazz, method);
             definition.setTranslator(translator);
-            definition.setTranslateExecutor(translator.getDefaultExecutor());
+            definition.setTranslateExecutor(args -> translator.doTranslate(args));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (LambdaConversionException e) {
@@ -102,7 +102,7 @@ public class LambdaTranslatorDefinitionReader extends AbstractTranslatorDefiniti
         try {
             Translator translator = MethodConvert.convertToFunctionInterface(translatorClazz, invokeObj, method);
             definition.setTranslator(translator);
-            definition.setTranslateExecutor(translator.getDefaultExecutor());
+            definition.setTranslateExecutor(args -> translator.doTranslate(args));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (LambdaConversionException e) {
