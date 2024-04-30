@@ -56,4 +56,9 @@ public @interface Mapping {
      * 是否异步执行
      */
     boolean async() default false;
+
+    /**
+     * 异步执行分组，同一分组的异步任务按顺序执行
+     */
+    String groupName() default "";
 }

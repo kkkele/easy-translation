@@ -54,17 +54,17 @@ public class DefaultTransExecutorContext extends AbstractAutoLoadTransExecutorCo
     }
 
     @Override
-    protected String[] getLocations() {
+    public String[] getLocations() {
         return this.packages;
     }
 
     @Override
-    protected Object[] getRegisterObjs() {
+    public Object[] getRegisterObjs() {
         return this.invokeObjs;
     }
 
     @Override
-    protected Config getConfig() {
+    public Config getConfig() {
         return this.config;
     }
 

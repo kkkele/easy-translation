@@ -12,4 +12,6 @@ import java.lang.annotation.*;
 public @interface Translate {
 
     TranslateTiming timing() default TranslateTiming.AFTER_RETURN;
+
+
 }

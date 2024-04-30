@@ -1,7 +1,6 @@
 package com.superkele.translation.core.metadata;
 
 
-import com.superkele.translation.annotation.constant.TranslateTiming;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -23,8 +22,6 @@ public class FieldInfo implements Serializable {
 
     private String[] other;
 
-    private TranslateTiming translateTiming;
-
     private String receive;
 
     private String[] mapper;
@@ -32,4 +29,8 @@ public class FieldInfo implements Serializable {
     private boolean notNullMapping;
 
     private int sort;
+
+    private boolean async;
+
+    private String groupName;
 }

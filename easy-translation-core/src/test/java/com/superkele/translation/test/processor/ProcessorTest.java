@@ -28,17 +28,6 @@ public class ProcessorTest {
 
     UserService userService = new UserService();
     DefaultTransExecutorContext context = new DefaultTransExecutorContext(config, new Object[]{userService}, new String[]{"com.superkele.translation"});
-    CacheableTranslationProcessor processor = new CacheableTranslationProcessor() {
-        @Override
-        protected TransExecutorContext getContext() {
-            return context;
-        }
-
-        @Override
-        protected void processStrategy(List<List<FieldInfo>> fieldInfoList) {
-
-        }
-    };
 
     @Test
     public void test() {

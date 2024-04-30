@@ -4,11 +4,11 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.core.context.TransExecutorContext;
-import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
 import com.superkele.translation.core.handler.TranslationProcessor;
 import com.superkele.translation.core.metadata.FieldInfo;
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.ReflectUtils;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -27,11 +27,11 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
     protected abstract TransExecutorContext getContext();
 
     @Override
-    public void process(Object source) {
-        if (source == null) {
+    public void process(Object obj) {
+        if (obj == null) {
             return;
         }
-        Class<?> clazz = source.getClass();
+        Class<?> clazz = obj.getClass();
         if (notMappingClazzCache.contains(clazz)) {
             return;
         }
@@ -56,16 +56,16 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
             fieldInfoCache.remove(clazz);
             return;
         }
-        processStrategy(fieldInfoList);
+        processFields(obj, fieldInfoList);
     }
 
     /**
-     * 使用不同的策略处理
-     * @param fieldInfoList
+     * 处理字段
      */
-    protected abstract void processStrategy(List<List<FieldInfo>> fieldInfoList);
+    protected abstract void processFields(Object obj, List<List<FieldInfo>> fieldInfoList);
 
-    private void translateValue(Object source, FieldInfo fieldInfo) {
+
+    public void translateValue(Object source, FieldInfo fieldInfo) {
         String translatorName = fieldInfo.getTranslator();
         TranslateExecutor executor = getContext().findExecutor(translatorName);
         //将 mapper字段和 other字段调整位置
@@ -94,9 +94,24 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
         fieldInfo.setMapper(mapping.mapper());
         fieldInfo.setOther(mapping.other());
         fieldInfo.setReceive(mapping.receive());
-        fieldInfo.setTranslateTiming(mapping.timing());
         fieldInfo.setNotNullMapping(mapping.notNullMapping());
         fieldInfo.setSort(mapping.sort());
+        fieldInfo.setAsync(mapping.async());
+        fieldInfo.setGroupName(mapping.groupName());
         return fieldInfo;
+    }
+
+    @Data
+    public static class JobGroup{
+
+        /**
+         * 需要顺序同步执行的翻译字段
+         */
+        private List<FieldInfo> syncFields;
+
+        /**
+         * 不同组异步执行，同一组内顺序执行的翻译字段
+         */
+        private Map<String, List<FieldInfo>> asyncFields;
     }
 }

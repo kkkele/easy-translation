@@ -15,6 +15,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Easy-Translation 全局配置类
@@ -29,6 +30,8 @@ public class Config {
     private Map<Integer, Class<? extends Translator>> translatorClazzMap = new ConcurrentHashMap<>(16);
 
     private BeanNameGetter beanNameGetter = clazz -> StrUtil.lowerFirst(clazz.getSimpleName());
+
+    private ThreadPoolExecutor threadPoolExecutor;
 
     private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
 
@@ -58,7 +61,7 @@ public class Config {
         return this;
     }
 
-    public Config registerTranslatorClazz(Class<? extends Translator>... translatorClazzArr){
+    public Config registerTranslatorClazz(Class<? extends Translator>... translatorClazzArr) {
         for (Class<? extends Translator> translatorClazz : translatorClazzArr) {
             Pair<Method, MethodType> pair = ReflectUtils.findFunctionInterfaceMethodType(translatorClazz);
             translatorClazzMap.put(pair.getKey().getParameterCount(), translatorClazz);
@@ -66,10 +69,18 @@ public class Config {
         return this;
     }
 
-    protected void init(){
+    protected void init() {
         registerTranslatorClazz(ContextTranslator.class, MapperTranslator.class, ConditionTranslator.class);
     }
 
+    public ThreadPoolExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
+    }
+
+    public Config setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor) {
+        this.threadPoolExecutor = threadPoolExecutor;
+        return this;
+    }
 
     @FunctionalInterface
     public interface BeanNameGetter {
@@ -82,5 +93,4 @@ public class Config {
     public interface DefaultTranslatorNameGenerator {
         String genName(String beanName, String methodName);
     }
-
 }
