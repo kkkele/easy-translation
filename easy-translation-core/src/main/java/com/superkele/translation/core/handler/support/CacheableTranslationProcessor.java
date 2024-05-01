@@ -1,5 +1,6 @@
 package com.superkele.translation.core.handler.support;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import com.superkele.translation.annotation.Mapping;
@@ -20,13 +21,13 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
 
     public static int max_translator_param_len = 16;
 
-    protected final Map<Class<?>, List<List<FieldInfo>>> fieldInfoCache = new ConcurrentHashMap<>();
+    protected final Map<Class<?>, List<FieldInfo>> fieldInfoCache = new ConcurrentHashMap<>();
 
     protected final Set<Class<?>> notMappingClazzCache = new ConcurrentHashSet<>();
 
     protected abstract TransExecutorContext getContext();
 
-    @Override
+/*    @Override
     public void process(Object obj) {
         if (obj == null) {
             return;
@@ -35,7 +36,7 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
         if (notMappingClazzCache.contains(clazz)) {
             return;
         }
-        List<List<FieldInfo>> fieldInfoList = fieldInfoCache.computeIfAbsent(clazz, declaringClass -> {
+        fieldInfoCache.computeIfAbsent(clazz, declaringClass -> {
             Field[] declaredFields = clazz.getDeclaredFields();
             Map<Integer, List<FieldInfo>> sortListMap = Arrays.stream(declaredFields)
                     .filter(field -> field.isAnnotationPresent(Mapping.class))
@@ -56,13 +57,12 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
             fieldInfoCache.remove(clazz);
             return;
         }
-        processFields(obj, fieldInfoList);
+        processFields(obj, JobGroup);
     }
 
-    /**
-     * 处理字段
-     */
-    protected abstract void processFields(Object obj, List<List<FieldInfo>> fieldInfoList);
+
+
+    protected abstract void processFields(Object obj, JobGroup jobGroup);
 
 
     public void translateValue(Object source, FieldInfo fieldInfo) {
@@ -88,30 +88,9 @@ public abstract class CacheableTranslationProcessor implements TranslationProces
     protected FieldInfo mapToFieldInfo(Field field) {
         Mapping mapping = field.getAnnotation(Mapping.class);
         FieldInfo fieldInfo = new FieldInfo();
+        BeanUtil.copyProperties(mapping, fieldInfo);
         fieldInfo.setOriginField(field);
-        fieldInfo.setFieldName(field.getName());
-        fieldInfo.setTranslator(mapping.translator());
-        fieldInfo.setMapper(mapping.mapper());
-        fieldInfo.setOther(mapping.other());
-        fieldInfo.setReceive(mapping.receive());
-        fieldInfo.setNotNullMapping(mapping.notNullMapping());
-        fieldInfo.setSort(mapping.sort());
-        fieldInfo.setAsync(mapping.async());
-        fieldInfo.setGroupName(mapping.groupName());
         return fieldInfo;
-    }
+    }*/
 
-    @Data
-    public static class JobGroup{
-
-        /**
-         * 需要顺序同步执行的翻译字段
-         */
-        private List<FieldInfo> syncFields;
-
-        /**
-         * 不同组异步执行，同一组内顺序执行的翻译字段
-         */
-        private Map<String, List<FieldInfo>> asyncFields;
-    }
 }

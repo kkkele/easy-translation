@@ -34,4 +34,9 @@ public class DefaultTranslatorProcessor extends AsyncableTranslationProcessor {
     protected TransExecutorContext getContext() {
         return context;
     }
+
+    @Override
+    public void process(Object obj) {
+
+    }
 }

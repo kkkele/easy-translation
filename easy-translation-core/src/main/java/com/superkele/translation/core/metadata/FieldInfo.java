@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * 字段描述类
@@ -32,5 +33,7 @@ public class FieldInfo implements Serializable {
 
     private boolean async;
 
-    private String groupName;
+    private String[] groupName;
+
+    private List<FieldInfo> afterExecutes;
 }

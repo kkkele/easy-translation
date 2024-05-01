@@ -48,17 +48,23 @@ public @interface Mapping {
     boolean notNullMapping() default false;
 
     /**
-     * 排序字段，按从小到大依次执行，如果值相同，则代表可以并发执行
+     * 控制同步任务的执行顺序
      */
     int sort() default 0;
 
     /**
-     * 是否异步执行
+     * 是否异步执行;
+     * 开启后仍然遵循sort排序，需要等待sort低的批次同步翻译字段全部执行完毕才开始翻译
      */
     boolean async() default false;
 
+
     /**
-     * 异步执行分组，同一分组的异步任务按顺序执行
+     * 在该字段翻译执行后再开始翻译，主要用于精细化控制异步翻译时的执行顺序
+     * 当该字段生效时，无视sort的执行顺序
+     * 该字段默认是由事件驱动进行翻译的，所以即时您将async设为false,也存在不在主线程中运行的情况
+     * 这主要取决于最后触发该事件的翻译字段在哪个线程中
      */
-    String groupName() default "";
+    String after() default "";
+
 }
