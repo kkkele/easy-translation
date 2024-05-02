@@ -1,14 +1,17 @@
 package com.superkele.translation.core.metadata;
 
+import lombok.Data;
+
 import java.util.function.Consumer;
 
+@Data
 public class FieldTranslationEvent {
 
     private String fieldName;
 
-    private Consumer<String> translatorConsumer;
+    private Consumer<FieldTranslationEvent> action;
 
-    private short eventIndex;
+    private short event;
 
     private String[] mapper;
 
