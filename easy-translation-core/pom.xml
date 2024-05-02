@@ -17,16 +17,19 @@
 
     <dependencies>
 
+        <!--hutool工具类-->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-core</artifactId>
         </dependency>
 
+        <!--基本注解-->
         <dependency>
             <groupId>com.superkele</groupId>
             <artifactId>easy-translation-annotation</artifactId>
         </dependency>
 
+        <!--lombok，快速生成setter,getter,constructor...-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -36,10 +39,20 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
+
+        <!--包扫描工具-->
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
         </dependency>
+
+        <!--spring核心包-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+
+        <!--测试类-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

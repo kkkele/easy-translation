@@ -1,3 +1,4 @@
+/*
 package com.superkele.translation.core.handler.support;
 
 import com.superkele.translation.core.config.Config;
@@ -40,3 +41,4 @@ public class DefaultTranslatorProcessor extends AsyncableTranslationProcessor {
 
     }
 }
+*/

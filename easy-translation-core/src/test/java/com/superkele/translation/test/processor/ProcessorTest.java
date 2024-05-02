@@ -4,10 +4,7 @@ import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.TransMapper;
 import com.superkele.translation.annotation.Translation;
 import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.context.TransExecutorContext;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
-import com.superkele.translation.core.handler.support.CacheableTranslationProcessor;
-import com.superkele.translation.core.metadata.FieldInfo;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import lombok.AllArgsConstructor;
@@ -15,7 +12,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.Map;
 
 public class ProcessorTest {

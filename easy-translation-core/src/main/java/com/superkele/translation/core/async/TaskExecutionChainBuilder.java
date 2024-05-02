@@ -1,5 +1,9 @@
 package com.superkele.translation.core.async;
 
+import com.superkele.translation.core.metadata.FieldTranslation;
+
+import java.util.List;
+
 /**
  * 任务执行链构造器
  * @description
@@ -7,5 +11,5 @@ package com.superkele.translation.core.async;
  */
 public interface TaskExecutionChainBuilder {
 
-
+    List<FieldTranslation> build(Class<?> clazz);
 }
