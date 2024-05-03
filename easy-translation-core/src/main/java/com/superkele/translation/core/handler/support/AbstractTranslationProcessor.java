@@ -18,8 +18,17 @@ public abstract class AbstractTranslationProcessor implements TranslationProcess
      * @param mapper             映射的字段
      * @param other              其他补充条件
      */
-    protected void translateValue(Object source, TranslateExecutor translatorExecutor, String fieldName, String[] mapper, String[] other) {
+    protected Boolean translateValue(Object source, TranslateExecutor translatorExecutor, String fieldName, String[] mapper, String[] other) {
+        if (source == null || StringUtils.isBlank(fieldName) || translatorExecutor == null) {
+            return false;
+        }
         //将 mapper字段和 other字段调整位置
+        if (mapper == null) {
+            mapper = new String[0];
+        }
+        if (other == null) {
+            other = new String[0];
+        }
         int mapperLength = mapper.length;
         int otherLength = other.length;
         //组建参数
@@ -38,5 +47,6 @@ public abstract class AbstractTranslationProcessor implements TranslationProcess
         Object mappingValue = translatorExecutor.execute(args);
         //set注入
         ReflectUtils.invokeSetter(source, fieldName, mappingValue);
+        return true;
     }
 }
