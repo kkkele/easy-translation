@@ -1,5 +1,6 @@
 package com.superkele.translation.core.metadata;
 
+import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.ReflectUtils;
 import lombok.Data;
 
@@ -14,6 +15,8 @@ public class FieldTranslationEvent {
      */
     private String fieldName;
 
+
+    private TranslateExecutor translateExecutor;
     /**
      * 事件
      */

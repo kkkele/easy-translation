@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 可异步的字段处理器
@@ -40,10 +41,26 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
     @Override
     protected void processInternal(Object obj, Class<?> clazz) {
         FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
-        short[] afterEvents = fieldTranslation.getAfterEventMasks();
+        short[] afterEventMasks = fieldTranslation.getAfterEventMasks();
+        Set<Short> activedAfterEventSet = new HashSet<>();
         FieldTranslationEvent[] sortEvents = fieldTranslation.getSortEvents();
-        int index = 0;
+        AtomicInteger activeEvent = new AtomicInteger(0);
         for (FieldTranslationEvent sortEvent : sortEvents) {
+            sortEvent.translate(obj, event -> {
+                activeEvent.updateAndGet(v -> v | event);
+                for (short afterEventMask : afterEventMasks) {
+                    if (activedAfterEventSet.contains(afterEventMask)) {
+                        continue;
+                    }
+                    if ((activeEvent.get() & afterEventMask) == afterEventMask) {
+                        FieldTranslationEvent[] afterEvents = fieldTranslation.getAfterEventMaskMap()
+                                .get(afterEventMask);
+                        activedAfterEventSet.add(afterEventMask);
+                        for (FieldTranslationEvent afterEvent : afterEvents) {
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -84,12 +101,11 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
             fieldTranslationEvent.setMapper(pair.getValue().mapper());
             fieldTranslationEvent.setOther(pair.getValue().other());
             fieldTranslationEvent.setNotNullMapping(pair.getValue().notNullMapping());
-            TranslateExecutor translateExecutor = getTranslateExecutor(pair.getValue().translator());
-            fieldTranslationEvent.setCaller(obj -> {
-                translateValue(obj, translateExecutor, fieldTranslationEvent.getFieldName(), fieldTranslationEvent.getMapper(), fieldTranslationEvent.getOther());
-                return true;
-            });
+            fieldTranslationEvent.setTranslateExecutor(getTranslateExecutor(pair.getValue().translator()));
         }
         return null;
     }
+
+
+
 }
