@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 
-public  class DefaultMappingHandler implements MappingHandler {
+public class DefaultMappingHandler implements MappingHandler {
 
     private final TransExecutorFactory translatorFactory;
 
@@ -24,6 +24,15 @@ public  class DefaultMappingHandler implements MappingHandler {
         Assert.isTrue(translatorFactory.containsTranslator(mapping.translator()), "translator not found: " + mapping.translator());
         TranslateExecutor executor = translatorFactory.findExecutor(mapping.translator());
         return obj -> {
+            if (obj == null){
+                return null;
+            }
+            //当字段不为空也映射关闭时，判断字段情况，当不为空时不进行处理
+            if (!mapping.notNullMapping()) {
+                if (ReflectUtils.invokeGetter(obj, declaringField.getName()) != null) {
+                    return obj;
+                }
+            }
             String[] mapper = mapping.mapper();
             String[] other = mapping.other();
             int mapperLength = mapper.length;

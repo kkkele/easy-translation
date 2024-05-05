@@ -65,6 +65,6 @@ public @interface Mapping {
      * 该字段默认是由事件驱动进行翻译的，所以即时您将async设为false,也存在不在主线程中运行的情况
      * 这主要取决于最后触发该事件的翻译字段在哪个线程中
      */
-    String after() default "";
+    String[] after() default "";
 
 }

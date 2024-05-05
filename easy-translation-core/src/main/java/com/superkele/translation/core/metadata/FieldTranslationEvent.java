@@ -13,5 +13,5 @@ public class FieldTranslationEvent {
 
     private FieldTranslationInvoker  fieldTranslationInvoker;
 
-
+    private boolean async;
 }
