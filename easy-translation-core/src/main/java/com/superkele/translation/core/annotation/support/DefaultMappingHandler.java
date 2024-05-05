@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 
-public class DefaultMappingHandler implements MappingHandler {
+public  class DefaultMappingHandler implements MappingHandler {
 
     private final TransExecutorFactory translatorFactory;
 

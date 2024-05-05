@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.constant.TranslateTiming;
+import com.superkele.translation.core.annotation.MappingHandler;
+import com.superkele.translation.core.annotation.support.DefaultMappingHandler;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.thread.ContextHolder;
@@ -33,6 +35,9 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
 
     protected abstract TranslateExecutor getTranslateExecutor(String translatorName);
 
+    protected abstract MappingHandler getMappingHandler();
+
+
     public void addContextHolders(ContextHolder contextHolder) {
         contextHolders.remove(contextHolder);
         contextHolders.add(contextHolder);
@@ -46,21 +51,6 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
         FieldTranslationEvent[] sortEvents = fieldTranslation.getSortEvents();
         AtomicInteger activeEvent = new AtomicInteger(0);
         for (FieldTranslationEvent sortEvent : sortEvents) {
-            sortEvent.translate(obj, event -> {
-                activeEvent.updateAndGet(v -> v | event);
-                for (short afterEventMask : afterEventMasks) {
-                    if (activedAfterEventSet.contains(afterEventMask)) {
-                        continue;
-                    }
-                    if ((activeEvent.get() & afterEventMask) == afterEventMask) {
-                        FieldTranslationEvent[] afterEvents = fieldTranslation.getAfterEventMaskMap()
-                                .get(afterEventMask);
-                        activedAfterEventSet.add(afterEventMask);
-                        for (FieldTranslationEvent afterEvent : afterEvents) {
-                        }
-                    }
-                }
-            });
         }
     }
 
@@ -95,17 +85,12 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
         byte leftShift = 0;
         for (Pair<Field, Mapping> pair : mappingFields) {
             FieldTranslationEvent fieldTranslationEvent = new FieldTranslationEvent();
-            fieldTranslationEvent.setFieldName(pair.getKey().getName());
             final short event = (short) (initEvent << leftShift++);
-            fieldTranslationEvent.setEvent(event);
-            fieldTranslationEvent.setMapper(pair.getValue().mapper());
-            fieldTranslationEvent.setOther(pair.getValue().other());
-            fieldTranslationEvent.setNotNullMapping(pair.getValue().notNullMapping());
-            fieldTranslationEvent.setTranslateExecutor(getTranslateExecutor(pair.getValue().translator()));
+            fieldTranslationEvent.setEventValue(event);
+            fieldTranslationEvent.setFieldTranslationInvoker(getMappingHandler().convert(pair.getKey(), pair.getValue()));
         }
         return null;
     }
-
 
 
 }
