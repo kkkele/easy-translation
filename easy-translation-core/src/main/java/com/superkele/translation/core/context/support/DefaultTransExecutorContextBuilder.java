@@ -1,6 +1,7 @@
 package com.superkele.translation.core.context.support;
 
 
+import cn.hutool.core.collection.ListUtil;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
@@ -25,32 +26,35 @@ public class DefaultTransExecutorContextBuilder {
 
     private List<TranslatorPostProcessor> translatorPostProcessors = new ArrayList<>();
 
-    public DefaultTransExecutorContextBuilder setConfig(Config config) {
+    public DefaultTransExecutorContextBuilder config(Config config) {
         this.config = config;
         return this;
     }
 
-    public DefaultTransExecutorContextBuilder setTranslatorPostProcessors(List<TranslatorPostProcessor> translatorPostProcessors) {
+    public DefaultTransExecutorContextBuilder translatorPostProcessors(List<TranslatorPostProcessor> translatorPostProcessors) {
         Assert.notNull(translatorPostProcessors, "translatorPostProcessors must not be null");
         this.translatorPostProcessors = translatorPostProcessors;
         return this;
     }
 
-    public DefaultTransExecutorContextBuilder setFactoryPostProcessors(List<TranslatorFactoryPostProcessor> factoryPostProcessors) {
+    public DefaultTransExecutorContextBuilder factoryPostProcessors(List<TranslatorFactoryPostProcessor> factoryPostProcessors) {
         Assert.notNull(factoryPostProcessors, "factoryPostProcessors must not be null");
         this.factoryPostProcessors = factoryPostProcessors;
         return this;
     }
 
-    public DefaultTransExecutorContextBuilder setInvokeObjs(Object... invokeObjs) {
+    public DefaultTransExecutorContextBuilder invokeObjs(Object... invokeObjs) {
         Assert.notNull(invokeObjs, "invokeObjs must not be null");
         this.invokeObjs = Arrays.asList(invokeObjs);
         return this;
     }
 
-    public DefaultTransExecutorContextBuilder setPackages(String... packages) {
+    public DefaultTransExecutorContextBuilder packages(String... packages) {
         Assert.notNull(packages, "packages must not be null");
-        this.packages = Arrays.asList(packages);
+        this.packages = new ArrayList<>();
+        for (String packageName : packages) {
+            this.packages.add(packageName);
+        }
         return this;
     }
 
@@ -94,7 +98,7 @@ public class DefaultTransExecutorContextBuilder {
         DefaultTransExecutorContext context = new DefaultTransExecutorContext();
         context.setConfig(config);
         packages.remove(DEFAULT_PACKAGE);
-        packages.add(0, DEFAULT_PACKAGE);
+        packages.add(DEFAULT_PACKAGE);
         context.setPackages(packages.toArray(String[]::new));
         context.setInvokeObjs(invokeObjs.toArray(Object[]::new));
         for (TranslatorFactoryPostProcessor factoryPostProcessor : factoryPostProcessors) {
