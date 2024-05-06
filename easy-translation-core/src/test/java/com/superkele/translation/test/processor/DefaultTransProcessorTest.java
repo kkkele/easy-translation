@@ -5,6 +5,7 @@ import com.superkele.translation.annotation.TransMapper;
 import com.superkele.translation.annotation.TransValue;
 import com.superkele.translation.annotation.Translation;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
+import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.test.context.DefaultTransExecutorContextTest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +24,7 @@ public class DefaultTransProcessorTest {
             .invokeObjs(userService)
             .packages("com.superkele.translation.test.processor")
             .build();
+    DefaultTranslationProcessor processor = new DefaultTranslationProcessor(context);
 
     @Test
     public void commonTest() {
@@ -31,6 +33,9 @@ public class DefaultTransProcessorTest {
         operate.setOperateTime("增加");
         operate.setActionCode(CodeEnum.SUCCESS.code);
         operate.setUserId(1);
+        System.out.println(operate);
+        processor.process(operate);
+        System.out.println(operate);
     }
 
     @Translation(name = "res_code_to_msg")

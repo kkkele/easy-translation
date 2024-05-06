@@ -18,8 +18,8 @@ public abstract class FilterTranslationProcessor extends AbstractTranslationProc
             return;
         }
         Class<?> clazz = obj.getClass();
-        Boolean filter = filterCache.computeIfAbsent(clazz, this::predictFilter);
-        if (filter) {
+        Boolean exists = filterCache.computeIfAbsent(clazz, this::predictFilter);
+        if (!exists) {
             return;
         }
         processInternal(obj, clazz);

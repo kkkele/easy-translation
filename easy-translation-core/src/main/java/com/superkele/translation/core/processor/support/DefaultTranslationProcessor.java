@@ -9,7 +9,7 @@ import com.superkele.translation.core.translator.handle.TranslateExecutor;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class DefaultTranslatorProcessor extends AsyncableTranslationProcessor {
+public class DefaultTranslationProcessor extends AsyncableTranslationProcessor {
 
     private final TransExecutorContext context;
 
@@ -17,7 +17,7 @@ public class DefaultTranslatorProcessor extends AsyncableTranslationProcessor {
 
     private ThreadPoolExecutor threadPoolExecutor;
 
-    public DefaultTranslatorProcessor(TransExecutorContext context) {
+    public DefaultTranslationProcessor(TransExecutorContext context) {
         this.context = context;
         this.mappingHandler = new DefaultMappingHandler(context);
         if (context instanceof DefaultTransExecutorContext defaultContext) {
@@ -26,7 +26,7 @@ public class DefaultTranslatorProcessor extends AsyncableTranslationProcessor {
         }
     }
 
-    public DefaultTranslatorProcessor(TransExecutorContext context, MappingHandler mappingHandler) {
+    public DefaultTranslationProcessor(TransExecutorContext context, MappingHandler mappingHandler) {
         this(context);
         this.mappingHandler = mappingHandler;
     }
