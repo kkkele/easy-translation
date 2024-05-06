@@ -1,7 +1,6 @@
 package com.superkele.translation.test.processor.complex;
 
 import com.superkele.translation.annotation.Mapping;
-import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.test.processor.entity.Operate;
@@ -14,7 +13,6 @@ import com.superkele.translation.test.util.TimeRecorder;
 import lombok.Data;
 import org.junit.Test;
 
-import java.util.concurrent.Executors;
 
 public class ComplexTransProcessorTest {
 
@@ -24,7 +22,6 @@ public class ComplexTransProcessorTest {
     DefaultTransExecutorContext context = DefaultTransExecutorContext.builder()
             .invokeObjs(userService, shopService, operateService)
             .packages("com.superkele.translation.test.processor.complex")
-            .config(new Config().setThreadPoolExecutor(Executors.newFixedThreadPool(10)))
             .build();
     DefaultTranslationProcessor processor = new DefaultTranslationProcessor(context);
 
@@ -44,7 +41,7 @@ public class ComplexTransProcessorTest {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
             complexOperateVO.setOperateId(1);
             processor.process(complexOperateVO);
-        }, 10);
+        }, 20);
         TimeRecorder.record(() -> {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
             complexOperateVO.setOperateId(1);
@@ -57,7 +54,7 @@ public class ComplexTransProcessorTest {
             complexOperateVO.shopId = user.getShopId();
             Shop shop = shopService.getShop(complexOperateVO.shopId);
             complexOperateVO.shopName = shop.getShopName();
-        }, 10);
+        }, 20);
         //正式测试
         long record2 = TimeRecorder.record(() -> {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
@@ -74,7 +71,7 @@ public class ComplexTransProcessorTest {
             if (complexOperateVO.getShopName() == null){
                 throw new RuntimeException("赋值失败");
             }
-        }, 500);
+        }, 1);
         System.out.println("syncMethod cost =" + record2 + "ms");
         long record = TimeRecorder.record(() -> {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
@@ -83,7 +80,7 @@ public class ComplexTransProcessorTest {
             if (complexOperateVO.getShopName() == null){
                 throw new RuntimeException("赋值失败");
             }
-        }, 500);
+        }, 1);
         System.out.println("asyncMethod cost =" + record + "ms");
     }
 
