@@ -14,4 +14,10 @@ public class FieldTranslationEvent {
     private FieldTranslationInvoker  fieldTranslationInvoker;
 
     private boolean async;
+
+    private String fieldName;
+    /**
+     * 前置事件
+     */
+    private short[] preEvents;
 }

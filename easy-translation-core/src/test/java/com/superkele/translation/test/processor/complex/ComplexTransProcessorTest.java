@@ -1,10 +1,57 @@
 package com.superkele.translation.test.processor.complex;
 
 import com.superkele.translation.annotation.Mapping;
+import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
+import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
+import com.superkele.translation.test.processor.DefaultTransProcessorTest;
+import com.superkele.translation.test.processor.service.OperateService;
+import com.superkele.translation.test.processor.service.ShopService;
+import com.superkele.translation.test.processor.service.UserService;
+import com.superkele.translation.test.util.TimeRecorder;
 import lombok.Data;
+import org.junit.Test;
+
+import java.util.concurrent.Executors;
 
 public class ComplexTransProcessorTest {
 
+    UserService userService = new UserService();
+    OperateService operateService = new OperateService();
+    ShopService shopService = new ShopService();
+    DefaultTransExecutorContext context = DefaultTransExecutorContext.builder()
+            .invokeObjs(userService, shopService, operateService)
+            .packages("com.superkele.translation.test.processor.complex")
+            .config(new Config()
+                    .setThreadPoolExecutor(Executors.newFixedThreadPool(32)))
+            .build();
+    DefaultTranslationProcessor processor = new DefaultTranslationProcessor(context);
+
+
+    @Test
+    public void commonTest(){
+        ComplexOperateVO complexOperateVO = new ComplexOperateVO();
+        complexOperateVO.setOperateId(1);
+        processor.process(complexOperateVO);
+        System.out.println(complexOperateVO);
+    }
+
+    @Test
+    public void test() {
+/*        //预热
+        for (int i = 0; i < 1000; i++) {
+            ComplexOperateVO complexOperateVO = new ComplexOperateVO();
+            complexOperateVO.setOperateId(1);
+            processor.process(complexOperateVO);
+        }
+        long record = TimeRecorder.record(() -> {
+            ComplexOperateVO complexOperateVO = new ComplexOperateVO();
+            complexOperateVO.setOperateId(1);
+            processor.process(complexOperateVO);
+            System.out.println(complexOperateVO);
+        }, 1000);
+        System.out.println("cost =" + record + "ms");*/
+    }
 
     /**
      * userId先查，在获取userId对应的shop，然后渲染出shopName
@@ -15,13 +62,13 @@ public class ComplexTransProcessorTest {
 
         private Integer operateId;
 
-        @Mapping(translator = "operate_id_to_operate", mapper = "operateId", sort = 0)
+        @Mapping(translator = "operate_id_to_operate", mapper = "operateId", sort = 0, receive = "name")
         private String operateName;
 
         @Mapping(translator = "operate_name_to_desc", mapper = "operateName", sort = 1)
         private String operateDesc;
 
-        @Mapping(translator = "operate_id_to_operate", mapper = "operateId", sort = 0)
+        @Mapping(translator = "operate_id_to_operate", mapper = "operateId", sort = 0, receive = "userId")
         private Integer userId;
 
         @Mapping(translator = "user_id_to_user", mapper = "userId", receive = "username", after = "userId", async = true)

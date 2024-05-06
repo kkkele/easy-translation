@@ -8,6 +8,11 @@ import java.util.Map;
 public class FieldTranslation {
 
     /**
+     * 异步执行的size
+     */
+    private int asyncSize;
+
+    /**
      * 使用after回调触发的event
      * short为2个字节，16位，即最大(11111111)可支持16个翻译事件后触发回调
      */
