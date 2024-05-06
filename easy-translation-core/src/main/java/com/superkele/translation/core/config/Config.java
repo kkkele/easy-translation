@@ -15,6 +15,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -31,7 +32,7 @@ public class Config {
 
     private BeanNameGetter beanNameGetter = clazz -> StrUtil.lowerFirst(clazz.getSimpleName());
 
-    private ThreadPoolExecutor threadPoolExecutor;
+    private ExecutorService threadPoolExecutor;
 
     private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
 
@@ -73,11 +74,11 @@ public class Config {
         registerTranslatorClazz(ContextTranslator.class, MapperTranslator.class, ConditionTranslator.class);
     }
 
-    public ThreadPoolExecutor getThreadPoolExecutor() {
+    public ExecutorService getThreadPoolExecutor() {
         return threadPoolExecutor;
     }
 
-    public Config setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor) {
+    public Config setThreadPoolExecutor(ExecutorService threadPoolExecutor) {
         this.threadPoolExecutor = threadPoolExecutor;
         return this;
     }

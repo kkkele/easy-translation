@@ -19,10 +19,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -35,7 +32,7 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
 
     protected List<ContextHolder> contextHolders = new ArrayList<>();
 
-    protected abstract ThreadPoolExecutor getThreadPoolExecutor();
+    protected abstract ExecutorService getThreadPoolExecutor();
 
     protected abstract boolean getAsyncEnable();
 
@@ -61,7 +58,8 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
         Field[] fields = ReflectUtils.getFields(clazz);
         List<Pair<Field, Mapping>> mappingFields = new ArrayList<>();
         for (Field field : fields) {
-            Optional.ofNullable(AnnotatedElementUtils.getMergedAnnotation(field, Mapping.class))
+            Mapping mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, Mapping.class);
+            Optional.ofNullable(mergedAnnotation)
                     .filter(mapping -> mapping.timing() == TranslateTiming.AFTER_RETURN)
                     .map(mapping -> Pair.of(field, mapping))
                     .ifPresent(mappingFields::add);

@@ -4,6 +4,9 @@ import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.TransMapper;
 import com.superkele.translation.annotation.TransValue;
 import com.superkele.translation.annotation.Translation;
+import com.superkele.translation.core.annotation.MappingHandler;
+import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.context.TransExecutorContext;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.test.context.DefaultTransExecutorContextTest;
@@ -16,6 +19,7 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 public class DefaultTransProcessorTest {
 
@@ -23,19 +27,20 @@ public class DefaultTransProcessorTest {
     DefaultTransExecutorContext context = DefaultTransExecutorContext.builder()
             .invokeObjs(userService)
             .packages("com.superkele.translation.test.processor")
+            .config(new Config()
+                    .setThreadPoolExecutor(Executors.newFixedThreadPool(32)))
             .build();
-    DefaultTranslationProcessor processor = new DefaultTranslationProcessor(context);
+    DefaultTranslationProcessor processor = new LoggerTranslationProcessor(context);
 
     @Test
     public void commonTest() {
-        Operate operate = new Operate();
-        operate.setOperateId(1);
-        operate.setOperateTime("增加");
-        operate.setActionCode(CodeEnum.SUCCESS.code);
-        operate.setUserId(1);
-        System.out.println(operate);
-        processor.process(operate);
-        System.out.println(operate);
+        SyncOperate syncOperate = new SyncOperate();
+        syncOperate.setOperateId(1);
+        syncOperate.setOperateName("测试");
+        syncOperate.setOperateTime("增加");
+        syncOperate.setResCode(CodeEnum.SUCCESS.code);
+        syncOperate.setUserId(1);
+        processor.process(syncOperate);
     }
 
     @Translation(name = "res_code_to_msg")
@@ -60,15 +65,15 @@ public class DefaultTransProcessorTest {
 
 
     @Data
-    public static class Operate {
+    public static class SyncOperate {
         private Integer OperateId;
 
-        private String actionName;
+        private String operateName;
 
-        private String actionCode;
+        private String resCode;
 
-        @Mapping(translator = "res_code_to_msg", mapper = "actionCode")
-        private String actionDesc;
+        @Mapping(translator = "res_code_to_msg", mapper = "resCode")
+        private String resMsg;
 
         private Integer userId;
 
@@ -109,6 +114,25 @@ public class DefaultTransProcessorTest {
                 throw new RuntimeException(e);
             }
             return userFactory.get(id);
+        }
+    }
+
+    public static class LoggerTranslationProcessor extends DefaultTranslationProcessor{
+
+        public LoggerTranslationProcessor(TransExecutorContext context) {
+            super(context);
+        }
+
+        public LoggerTranslationProcessor(TransExecutorContext context, MappingHandler mappingHandler) {
+            super(context, mappingHandler);
+        }
+
+        @Override
+        public void process(Object obj) {
+            System.out.println("before:" + obj);
+            System.out.println("processing~~~~~~~~~~~~~");
+            super.process(obj);
+            System.out.println("after:" + obj);
         }
     }
 }

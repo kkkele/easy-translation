@@ -25,7 +25,7 @@ public @interface Mapping {
     /**
      * 映射的字段，spring环境下支持spel表达式
      */
-    String[] mapper() default "";
+    String[] mapper() default {};
 
     /**
      * 接收的属性内容
@@ -35,12 +35,12 @@ public @interface Mapping {
     /**
      * 其他字段
      */
-    String[] other() default "";
+    String[] other() default {};
 
     /**
      * 执行时机
      */
-    TranslateTiming timing() default TranslateTiming.JSON_SERIALIZE;
+    TranslateTiming timing() default TranslateTiming.AFTER_RETURN;
 
     /**
      * 当不为null时，是否也映射
@@ -65,6 +65,6 @@ public @interface Mapping {
      * 该字段默认是由事件驱动进行翻译的，所以即时您将async设为false,也存在不在主线程中运行的情况
      * 这主要取决于最后触发该事件的翻译字段在哪个线程中
      */
-    String[] after() default "";
+    String[] after() default {};
 
 }
