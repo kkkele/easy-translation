@@ -1,4 +1,4 @@
-package com.superkele.translation.core.handler.support;
+package com.superkele.translation.core.processor.support;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;

@@ -1,4 +1,4 @@
-package com.superkele.translation.core.handler.support;
+package com.superkele.translation.core.processor.support;
 
 import com.superkele.translation.core.annotation.MappingHandler;
 import com.superkele.translation.core.annotation.support.DefaultMappingHandler;

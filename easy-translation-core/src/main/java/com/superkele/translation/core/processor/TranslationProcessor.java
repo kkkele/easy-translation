@@ -1,4 +1,4 @@
-package com.superkele.translation.core.handler;
+package com.superkele.translation.core.processor;
 
 
 public interface TranslationProcessor {

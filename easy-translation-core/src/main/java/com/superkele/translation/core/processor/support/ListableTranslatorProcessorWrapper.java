@@ -1,6 +1,6 @@
-package com.superkele.translation.core.handler.support;
+package com.superkele.translation.core.processor.support;
 
-import com.superkele.translation.core.handler.TranslationProcessor;
+import com.superkele.translation.core.processor.TranslationProcessor;
 
 import java.util.Collection;
 
