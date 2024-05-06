@@ -1,5 +1,6 @@
 package com.superkele.translation.core.annotation.support;
 
+import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.core.annotation.FieldTranslationInvoker;
 import com.superkele.translation.core.annotation.MappingHandler;
@@ -23,14 +24,22 @@ public class DefaultMappingHandler implements MappingHandler {
     public FieldTranslationInvoker convert(Field declaringField, Mapping mapping) {
         Assert.isTrue(translatorFactory.containsTranslator(mapping.translator()), "translator not found: " + mapping.translator());
         TranslateExecutor executor = translatorFactory.findExecutor(mapping.translator());
-        return obj -> {
-            if (obj == null){
+        String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());
+        return (obj, cacheResSupplier, callback) -> {
+            if (obj == null) {
                 return null;
             }
             //当字段不为空也映射关闭时，判断字段情况，当不为空时不进行处理
             if (!mapping.notNullMapping()) {
                 if (ReflectUtils.invokeGetter(obj, declaringField.getName()) != null) {
                     return obj;
+                }
+            }
+            //加载缓存中的值，如果有的话，使用缓存中提供的值
+            if (cacheResSupplier != null) {
+                Object cacheRes = cacheResSupplier.apply(uniqueName);
+                if (cacheRes != null) {
+                    ReflectUtils.invokeSetter(obj, declaringField.getName(), ReflectUtils.invokeGetter(cacheRes, mapping.receive()));
                 }
             }
             String[] mapper = mapping.mapper();
@@ -51,8 +60,11 @@ public class DefaultMappingHandler implements MappingHandler {
             }
             //翻译值
             Object mappingValue = executor.execute(args);
+            if (mappingValue != null) {
+                callback.accept(uniqueName, mappingValue);
+            }
             //set注入
-            if(mappingValue != null){
+            if (mappingValue != null) {
                 ReflectUtils.invokeSetter(obj, declaringField.getName(), ReflectUtils.invokeGetter(mappingValue, mapping.receive()));
             }
             return obj;

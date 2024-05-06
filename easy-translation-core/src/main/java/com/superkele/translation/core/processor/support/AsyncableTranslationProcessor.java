@@ -15,12 +15,14 @@ import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.ReflectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +42,7 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
 
     protected abstract MappingHandler getMappingHandler();
 
+    //todo :待优化项:如果多个字段使用同一个translatorName,且key相同,则只执行一次
 
     public void addContextHolders(ContextHolder contextHolder) {
         contextHolders.remove(contextHolder);
@@ -131,6 +134,8 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
 
         private final List<Future> futures = new CopyOnWriteArrayList<>();
 
+        private final Map<String, Object> translationResCache = new ConcurrentHashMap<>();
+
         private final Set<Short> eventMaskSet;
         private boolean used = false;
         private FieldTranslation fieldTranslation;
@@ -189,7 +194,7 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
             short eventValue = event.getEventValue();
             //获取单个字段翻译器
             FieldTranslationInvoker fieldTranslationInvoker = event.getFieldTranslationInvoker();
-            fieldTranslationInvoker.invoke(obj);
+            fieldTranslationInvoker.invoke(obj, translationResCache::get, translationResCache::put);
             //更新事件
             this.activeEvent.updateAndGet(current -> current | eventValue);
             //获取事件掩码集合，对比触发after事件
