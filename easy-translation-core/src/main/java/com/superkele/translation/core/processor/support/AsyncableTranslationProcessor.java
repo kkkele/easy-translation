@@ -89,6 +89,7 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
             FieldTranslationEvent fieldTranslationEvent = new FieldTranslationEvent();
             final short event = (short) (initEvent << leftShift);
             fieldTranslationEvent.setEventValue(event);
+            fieldTranslationEvent.setAsync(pair.getValue().async());
             fieldTranslationEvent.setFieldTranslationInvoker(getMappingHandler().convert(pair.getKey(), pair.getValue()));
             fieldTranslationMap.put(pair.getKey().getName(), fieldTranslationEvent);
             leftShift++;
@@ -153,6 +154,15 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
             //顺序执行事件
             for (FieldTranslationEvent sortEvent : sortEvents) {
                 translate(obj, sortEvent);
+            }
+            for (Future future : futures) {
+                try {
+                    future.get();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
