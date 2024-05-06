@@ -121,7 +121,7 @@ public class LambdaTranslatorDefinitionReader extends AbstractTranslatorDefiniti
             }
         }
         //如果没有直接标注，则默认第一个参数为mapper,其他为other补充字段
-        if (mapperIndexList.size() == 0) {
+        if (mapperIndexList.size() == 0 && parameters.length >= 1) {
             return new int[1];
         }
         return mapperIndexList.stream().mapToInt(Integer::intValue).toArray();

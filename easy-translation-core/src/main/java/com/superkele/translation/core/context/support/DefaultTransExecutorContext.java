@@ -18,36 +18,9 @@ public class DefaultTransExecutorContext extends AbstractAutoLoadTransExecutorCo
 
     private String[] packages;
 
-    DefaultTransExecutorContext() {
+    protected DefaultTransExecutorContext() {
     }
 
-    public DefaultTransExecutorContext(Object... invokeObjs) {
-        this(null, invokeObjs);
-    }
-
-    public DefaultTransExecutorContext(String... packages) {
-        this(new Config(), null, packages);
-    }
-
-    public DefaultTransExecutorContext(String[] packages, Object[] invokeObjs) {
-        this(new Config(), invokeObjs, packages);
-    }
-
-    public DefaultTransExecutorContext(Config config, Object[] invokeObjs, String[] packages) {
-        this.config = Optional.ofNullable(config).orElse(new Config());
-        this.invokeObjs = invokeObjs;
-        this.packages = new String[]{DEFAULT_PACKAGE};
-        Optional.ofNullable(packages)
-                .ifPresent(arr -> {
-                    String[] res = new String[arr.length + 1];
-                    res[0] = DEFAULT_PACKAGE;
-                    for (int i = 0; i < arr.length; i++) {
-                        res[i + 1] = arr[i];
-                    }
-                    this.packages = res;
-                });
-        refresh();
-    }
 
     public static DefaultTransExecutorContextBuilder builder() {
         return new DefaultTransExecutorContextBuilder();
