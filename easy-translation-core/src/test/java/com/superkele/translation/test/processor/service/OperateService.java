@@ -16,7 +16,7 @@ public class OperateService {
         operate.setName("operate" + id);
         operate.setUserId(new Random().nextInt(1, 3));
         try {
-            TimeUnit.MICROSECONDS.sleep(5);
+            TimeUnit.MILLISECONDS.sleep(5);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -26,7 +26,7 @@ public class OperateService {
     @Translation(name = "operate_name_to_desc")
     public String convertOperateName(String name) {
         try {
-            TimeUnit.MICROSECONDS.sleep(5);
+            TimeUnit.MILLISECONDS.sleep(5);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

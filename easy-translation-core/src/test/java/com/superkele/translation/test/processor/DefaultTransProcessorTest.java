@@ -4,7 +4,6 @@ import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.TransMapper;
 import com.superkele.translation.annotation.TransValue;
 import com.superkele.translation.annotation.Translation;
-import com.superkele.translation.core.annotation.MappingHandler;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.context.TransExecutorContext;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;

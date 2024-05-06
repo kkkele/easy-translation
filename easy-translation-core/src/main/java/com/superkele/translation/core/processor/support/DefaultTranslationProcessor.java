@@ -53,8 +53,4 @@ public class DefaultTranslationProcessor extends AsyncableTranslationProcessor {
         return config.getTimeout();
     }
 
-    @Override
-    protected TransExecutorContext getContext() {
-        return context;
-    }
 }

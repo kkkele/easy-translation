@@ -10,7 +10,7 @@ public class ShopService {
     @Translation(name = "shop_id_to_shop")
     public Shop getShop(Integer id){
         try {
-            TimeUnit.MICROSECONDS.sleep(5);
+            TimeUnit.MILLISECONDS.sleep(5);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

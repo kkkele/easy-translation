@@ -40,6 +40,7 @@ public class DefaultMappingHandler implements MappingHandler {
                 Object cacheRes = cacheResSupplier.apply(uniqueName);
                 if (cacheRes != null) {
                     ReflectUtils.invokeSetter(obj, declaringField.getName(), ReflectUtils.invokeGetter(cacheRes, mapping.receive()));
+                    return obj;
                 }
             }
             String[] mapper = mapping.mapper();

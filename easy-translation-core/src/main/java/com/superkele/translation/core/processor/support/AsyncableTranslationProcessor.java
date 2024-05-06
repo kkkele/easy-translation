@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
  */
 public abstract class AsyncableTranslationProcessor extends FilterTranslationProcessor {
 
+
     private final Map<Class<?>, FieldTranslation> fieldTranslationMap = new ConcurrentHashMap<>();
 
     protected List<ContextHolder> contextHolders = new ArrayList<>();
@@ -56,6 +57,7 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
         OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation);
         onceFieldTranslationHandler.handle(obj);
     }
+
 
     @Override
     protected Boolean predictFilter(Class<?> clazz) {

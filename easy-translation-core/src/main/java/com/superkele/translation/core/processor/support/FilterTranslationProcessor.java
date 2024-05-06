@@ -10,7 +10,6 @@ public abstract class FilterTranslationProcessor extends AbstractTranslationProc
 
     private Map<Class<?>, Boolean> filterCache = new ConcurrentHashMap<>();
 
-    protected abstract TransExecutorContext getContext();
 
     @Override
     public void process(Object obj) {

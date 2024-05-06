@@ -11,7 +11,7 @@ public class UserService {
     @Translation(name = "user_id_to_user")
     public User getUser(Integer id) {
         try {
-            TimeUnit.MICROSECONDS.sleep(5);
+            TimeUnit.MILLISECONDS.sleep(5);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
