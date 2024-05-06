@@ -155,6 +155,7 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
         //todo:增加缓存开关
         //  private final boolean cacheEnabled;
         private CountDownLatch latch;
+
         private boolean used = false;
 
         private FieldTranslation fieldTranslation;
@@ -192,7 +193,7 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
 
         //如果是after事件，需要阻塞直到前事件执行完毕
         private void translate(Object obj, FieldTranslationEvent event) {
-            //如果开启了异步支持
+            //如果没开启异步支持
             if (!getAsyncEnable()) {
                 translateInternal(obj, event);
                 return;
@@ -245,12 +246,12 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
             for (short eventMask : eventMaskSet) {
                 if (!this.activeEventMasks.contains(eventMask)) {
                     if ((this.activeEvent.get() & eventMask) == eventMask) {
+                        this.activeEventMasks.add(eventMask);
                         FieldTranslationEvent[] fieldTranslationEvents = this.fieldTranslation.getAfterEventMaskMap().get(eventMask);
                         //手动依次触发after事件
                         for (FieldTranslationEvent fieldTranslationEvent : fieldTranslationEvents) {
                             translate(obj, fieldTranslationEvent);
                         }
-                        this.activeEventMasks.add(eventMask);
                     }
                 }
             }
