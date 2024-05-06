@@ -45,7 +45,10 @@ public class DefaultTransExecutorContextBuilder {
 
     public DefaultTransExecutorContextBuilder invokeObjs(Object... invokeObjs) {
         Assert.notNull(invokeObjs, "invokeObjs must not be null");
-        this.invokeObjs = Arrays.asList(invokeObjs);
+        this.invokeObjs = new ArrayList<>();
+        for (Object invokeObj : invokeObjs) {
+            this.invokeObjs.add(invokeObj);
+        }
         return this;
     }
 
