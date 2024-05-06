@@ -23,4 +23,8 @@ public interface FieldTranslationInvoker {
     default Object invoke(Object translationTarget, BiConsumer<String, Object> resultCallback) {
         return invoke(translationTarget, null, resultCallback);
     }
+
+    default Object invoke(Object translationTarget) {
+        return invoke(translationTarget, null, null);
+    }
 }

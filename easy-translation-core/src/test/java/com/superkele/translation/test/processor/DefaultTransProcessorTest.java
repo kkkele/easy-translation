@@ -289,9 +289,6 @@ public class DefaultTransProcessorTest {
             super(context);
         }
 
-        public LoggerTranslationProcessor(TransExecutorContext context, MappingHandler mappingHandler) {
-            super(context, mappingHandler);
-        }
 
         @Override
         public void process(Object obj) {

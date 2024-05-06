@@ -4,6 +4,9 @@ import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
+import com.superkele.translation.test.processor.entity.Operate;
+import com.superkele.translation.test.processor.entity.Shop;
+import com.superkele.translation.test.processor.entity.User;
 import com.superkele.translation.test.processor.service.OperateService;
 import com.superkele.translation.test.processor.service.ShopService;
 import com.superkele.translation.test.processor.service.UserService;
@@ -36,8 +39,13 @@ public class ComplexTransProcessorTest {
 
     @Test
     public void test() {
-
-/*        long record2 = TimeRecorder.record(() -> {
+        //jvm预热
+        TimeRecorder.record(() -> {
+            ComplexOperateVO complexOperateVO = new ComplexOperateVO();
+            complexOperateVO.setOperateId(1);
+            processor.process(complexOperateVO);
+        }, 10);
+        TimeRecorder.record(() -> {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
             complexOperateVO.setOperateId(1);
             Operate operate = operateService.getOperate(complexOperateVO.operateId);
@@ -49,25 +57,41 @@ public class ComplexTransProcessorTest {
             complexOperateVO.shopId = user.getShopId();
             Shop shop = shopService.getShop(complexOperateVO.shopId);
             complexOperateVO.shopName = shop.getShopName();
-        }, 1000);
-        System.out.println("syncMethod cost =" + record2 + "ms");*/
+        }, 10);
+        //正式测试
+        long record2 = TimeRecorder.record(() -> {
+            ComplexOperateVO complexOperateVO = new ComplexOperateVO();
+            complexOperateVO.setOperateId(1);
+            Operate operate = operateService.getOperate(complexOperateVO.operateId);
+            complexOperateVO.operateName = operate.getName();
+            complexOperateVO.operateDesc = operateService.convertOperateName(complexOperateVO.operateName);
+            complexOperateVO.userId = operate.getUserId();
+            User user = userService.getUser(complexOperateVO.userId);
+            complexOperateVO.username = user.getUsername();
+            complexOperateVO.shopId = user.getShopId();
+            Shop shop = shopService.getShop(complexOperateVO.shopId);
+            complexOperateVO.shopName = shop.getShopName();
+            if (complexOperateVO.getShopName() == null){
+                throw new RuntimeException("赋值失败");
+            }
+        }, 500);
+        System.out.println("syncMethod cost =" + record2 + "ms");
         long record = TimeRecorder.record(() -> {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
             complexOperateVO.setOperateId(1);
             processor.process(complexOperateVO);
-            System.out.println(complexOperateVO);
             if (complexOperateVO.getShopName() == null){
-                throw new RuntimeException("执行有误");
+                throw new RuntimeException("赋值失败");
             }
-        }, 1);
-        System.out.println("translatorProcessor cost =" + record + "ms");
-
+        }, 500);
+        System.out.println("asyncMethod cost =" + record + "ms");
     }
 
     @Test
-    public void test3(){
-        for (int i = 1; i <= 10000; i++) {
-            System.out.println("第"+i +"次");
+    public void test3() {
+        int i =0;
+        while (true) {
+            System.out.println("第" + (++i) + "次");
             test();
         }
     }
@@ -81,13 +105,13 @@ public class ComplexTransProcessorTest {
 
         private Integer operateId;
 
-        @Mapping(translator = "operate_id_to_operate", mapper = "operateId", sort = 0, receive = "name")
+        @Mapping(translator = "operate_id_to_operate", mapper = "operateId", sort = 0, receive = "name", async = true)
         private String operateName;
 
-        @Mapping(translator = "operate_name_to_desc", mapper = "operateName", sort = 1)
+        @Mapping(translator = "operate_name_to_desc", mapper = "operateName", after = "operateName", sort = 1, async = true)
         private String operateDesc;
 
-        @Mapping(translator = "operate_id_to_operate", mapper = "operateId", sort = 0, receive = "userId")
+        @Mapping(translator = "operate_id_to_operate", mapper = "operateId", sort = 0, receive = "userId", async = true)
         private Integer userId;
 
         @Mapping(translator = "user_id_to_user", mapper = "userId", receive = "username", after = "userId", async = true)

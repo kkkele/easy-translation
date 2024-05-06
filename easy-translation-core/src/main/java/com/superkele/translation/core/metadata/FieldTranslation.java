@@ -23,4 +23,5 @@ public class FieldTranslation {
      */
     private FieldTranslationEvent[] sortEvents;
 
+    private boolean hasSameInvoker;
 }

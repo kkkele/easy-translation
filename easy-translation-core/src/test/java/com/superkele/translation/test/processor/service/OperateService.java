@@ -4,6 +4,7 @@ import com.superkele.translation.annotation.Translation;
 import com.superkele.translation.test.processor.entity.Operate;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class OperateService {
 
@@ -14,11 +15,21 @@ public class OperateService {
         operate.setId(id);
         operate.setName("operate" + id);
         operate.setUserId(new Random().nextInt(1, 3));
+        try {
+            TimeUnit.MICROSECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return operate;
     }
 
     @Translation(name = "operate_name_to_desc")
     public String convertOperateName(String name) {
+        try {
+            TimeUnit.MICROSECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return "解析后的" + name;
     }
 }
