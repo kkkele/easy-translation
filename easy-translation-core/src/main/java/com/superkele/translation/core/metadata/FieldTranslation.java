@@ -8,9 +8,9 @@ import java.util.Map;
 public class FieldTranslation {
 
     /**
-     * 异步执行的size
+     * 需要执行的size
      */
-    private int asyncSize;
+    private int consumeSize;
 
     /**
      * 使用after回调触发的event

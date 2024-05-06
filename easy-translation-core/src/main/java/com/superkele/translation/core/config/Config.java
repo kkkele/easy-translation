@@ -34,10 +34,17 @@ public class Config {
 
     private ExecutorService threadPoolExecutor;
 
+    private volatile long timeout = 5; //seconds
+
     private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
 
     public Config() {
         init();
+    }
+
+    public Config setTimeout(long timeout) {
+        this.timeout = timeout;
+        return this;
     }
 
     public Config setBeanNameGetter(BeanNameGetter beanNameGetter) {
@@ -94,4 +101,6 @@ public class Config {
     public interface DefaultTranslatorNameGenerator {
         String genName(String beanName, String methodName);
     }
+
+
 }

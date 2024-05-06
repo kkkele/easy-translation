@@ -22,8 +22,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * 可异步的字段处理器
@@ -41,6 +39,8 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
     protected abstract TranslateExecutor getTranslateExecutor(String translatorName);
 
     protected abstract MappingHandler getMappingHandler();
+
+    protected abstract long getTimeout();
 
     public void addContextHolders(ContextHolder contextHolder) {
         contextHolders.remove(contextHolder);
@@ -96,19 +96,14 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
             fieldTranslationMap.put(pair.getKey().getName(), fieldTranslationEvent);
             leftShift++;
         }
-        int asyncSize = 0;
         //第二次遍历，划分sort事件和after事件(触发的时机不同，sort事件是按顺序直接触发（一定会），after事件是回调触发（存在不执行的可能）)
         for (Pair<Field, Mapping> pair : mappingFields) {
             String fieldName = pair.getKey().getName();
             Mapping mapping = pair.getValue();
             FieldTranslationEvent fieldTranslationEvent = fieldTranslationMap.get(fieldName);
             if (mapping.after().length == 0) {
-                if (mapping.async()) {
-                    asyncSize++;
-                }
                 sortEvents.add(fieldTranslationEvent);
             } else {
-                asyncSize++;
                 short eventMask = 0;
                 short[] preEvents = new short[mapping.after().length];
                 int count = 0;
@@ -132,7 +127,7 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
         FieldTranslation res = new FieldTranslation();
         res.setSortEvents(sortEvents.toArray(FieldTranslationEvent[]::new));
         res.setAfterEventMaskMap(afterEventsMap);
-        res.setAsyncSize(asyncSize);
+        res.setConsumeSize(mappingFields.size());
         return res;
     }
 
@@ -163,7 +158,7 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
         public OnceFieldTranslationHandler(FieldTranslation fieldTranslation) {
             this.fieldTranslation = fieldTranslation;
             this.eventMaskSet = fieldTranslation.getAfterEventMaskMap().keySet();
-            this.latch = new CountDownLatch(fieldTranslation.getAsyncSize());
+            this.latch = new CountDownLatch(fieldTranslation.getConsumeSize());
         }
 
         public void handle(Object obj) {
@@ -184,9 +179,9 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
             }
             if (getAsyncEnable()) {
                 try {
-                    latch.await();
+                    latch.await(getTimeout(), TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException("方法翻译执行严重超时");
                 }
             }
         }
@@ -198,35 +193,11 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
                 translateInternal(obj, event);
                 return;
             }
-            if (event.getPreEvents() != null && event.getPreEvents().length != 0) {
-                short[] preEvents = event.getPreEvents();
-                CompletableFuture[] preFuture = new CompletableFuture[preEvents.length];
-                for (int i = 0; i < preEvents.length; i++) {
-                    preFuture[i] = futureMap.get(preEvents[i]);
-                }
-                CompletableFuture<Void> completableFuture = CompletableFuture.allOf(preFuture);
-                CompletableFuture nextFuture;
-                if (event.isAsync()) {
-                    nextFuture = completableFuture.thenRunAsync(() -> {
-                        passerCollect.forEach(ContextPasser::passContext);
-                        translateInternal(obj, event);
-                        latch.countDown();
-                    }, getThreadPoolExecutor());
-                } else {
-                    nextFuture = completableFuture.thenRun(() -> {
-                        translateInternal(obj, event);
-                        latch.countDown();
-                    });
-                }
-                futureMap.put(event.getEventValue(), nextFuture);
-                return;
-            }
             if (event.isAsync()) {
                 //使用上下文同步器传递上下文
                 CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                     passerCollect.forEach(ContextPasser::passContext);
                     translateInternal(obj, event);
-                    latch.countDown();
                 }, getThreadPoolExecutor());
                 futureMap.put(event.getEventValue(), future);
             } else {
@@ -240,6 +211,9 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
             //获取单个字段翻译器
             FieldTranslationInvoker fieldTranslationInvoker = event.getFieldTranslationInvoker();
             fieldTranslationInvoker.invoke(obj, translationResCache::get, translationResCache::put);
+            if (getAsyncEnable()) {
+                latch.countDown();
+            }
             //更新事件
             this.activeEvent.updateAndGet(current -> current | eventValue);
             //获取事件掩码集合，对比触发after事件

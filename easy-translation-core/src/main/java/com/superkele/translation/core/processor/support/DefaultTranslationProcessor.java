@@ -8,7 +8,6 @@ import com.superkele.translation.core.context.support.DefaultTransExecutorContex
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class DefaultTranslationProcessor extends AsyncableTranslationProcessor {
 
@@ -16,30 +15,27 @@ public class DefaultTranslationProcessor extends AsyncableTranslationProcessor {
 
     private MappingHandler mappingHandler;
 
-    private ExecutorService threadPoolExecutor;
+
+    private Config config;
 
     public DefaultTranslationProcessor(TransExecutorContext context) {
         this.context = context;
         this.mappingHandler = new DefaultMappingHandler(context);
         if (context instanceof DefaultTransExecutorContext defaultContext) {
             Config config = defaultContext.getConfig();
-            this.threadPoolExecutor = config.getThreadPoolExecutor();
+            this.config = config;
         }
     }
 
-    public DefaultTranslationProcessor(TransExecutorContext context, MappingHandler mappingHandler) {
-        this(context);
-        this.mappingHandler = mappingHandler;
-    }
 
     @Override
     protected ExecutorService getThreadPoolExecutor() {
-        return this.threadPoolExecutor;
+        return this.config.getThreadPoolExecutor();
     }
 
     @Override
     protected boolean getAsyncEnable() {
-        return this.threadPoolExecutor != null;
+        return this.config.getThreadPoolExecutor() != null;
     }
 
     @Override
@@ -50,6 +46,11 @@ public class DefaultTranslationProcessor extends AsyncableTranslationProcessor {
     @Override
     protected MappingHandler getMappingHandler() {
         return mappingHandler;
+    }
+
+    @Override
+    protected long getTimeout() {
+        return config.getTimeout();
     }
 
     @Override
