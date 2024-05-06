@@ -52,7 +52,9 @@ public class DefaultMappingHandler implements MappingHandler {
             //翻译值
             Object mappingValue = executor.execute(args);
             //set注入
-            ReflectUtils.invokeSetter(obj, declaringField.getName(), ReflectUtils.invokeGetter(mappingValue, mapping.receive()));
+            if(mappingValue != null){
+                ReflectUtils.invokeSetter(obj, declaringField.getName(), ReflectUtils.invokeGetter(mappingValue, mapping.receive()));
+            }
             return obj;
         };
     }
