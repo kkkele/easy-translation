@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Optional;
 
 @Configuration
-public class LogAutowiredConfig {
+public class EasyTranslationLoggerConfig {
 
     @Autowired(required = false)
     public void setLog(TranslationProperties properties) {
