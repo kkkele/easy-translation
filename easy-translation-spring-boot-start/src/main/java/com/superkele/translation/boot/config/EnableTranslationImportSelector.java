@@ -8,7 +8,7 @@ import org.springframework.core.type.AnnotationMetadata;
 public class EnableTranslationImportSelector implements ImportSelector {
 
     private static final String TRANSLATION_BASE_CONFIG = TranslationConfig.class.getName();
-    private static final String LOG_IMPL = LogAutowiredConfig.class.getName();
+    private static final String LOG_CONFIG = LogAutowiredConfig.class.getName();
 
     public EnableTranslationImportSelector() {
     }
@@ -16,7 +16,7 @@ public class EnableTranslationImportSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata importingClassMetadata) {
         return new String[]{TRANSLATION_BASE_CONFIG,
-                LOG_IMPL};
+                LOG_CONFIG};
     }
 
 
