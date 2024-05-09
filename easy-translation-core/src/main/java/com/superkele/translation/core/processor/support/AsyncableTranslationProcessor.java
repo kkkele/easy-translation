@@ -24,12 +24,13 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
  * 可异步的字段处理器
  */
-public abstract class AsyncableTranslationProcessor extends FilterTranslationProcessor {
+public abstract class AsyncableTranslationProcessor extends AbstractTranslationProcessor {
 
 
     private final Map<Class<?>, FieldTranslation> fieldTranslationMap = new ConcurrentHashMap<>();
@@ -39,8 +40,6 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
     protected abstract ExecutorService getThreadPoolExecutor();
 
     protected abstract boolean getAsyncEnable();
-
-    protected abstract TranslateExecutor getTranslateExecutor(String translatorName);
 
     protected abstract MappingHandler getMappingHandler();
 
@@ -53,12 +52,13 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
     }
 
     @Override
-    protected void processInternal(Object obj, Class<?> clazz) {
+    protected void processInternal(Object obj, Class<?> clazz, Supplier<Void> callback) {
         FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
         OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation);
         onceFieldTranslationHandler.handle(obj);
+        Optional.ofNullable(callback)
+                .ifPresent(Supplier::get);
     }
-
 
     @Override
     protected Boolean predictFilter(Class<?> clazz) {
@@ -148,14 +148,18 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
         return res;
     }
 
+    protected List<ContextPasser> buildContextPassers() {
+        return contextHolders.stream()
+                .map(ContextPasser::new)
+                .collect(Collectors.toList());
+    }
+
     /**
      * 只能用来处理一次的FieldTranslationHandler
      */
     public class OnceFieldTranslationHandler {
         private final AtomicInteger activeEvent = new AtomicInteger(0);
-        private final List<ContextPasser> passerCollect = contextHolders.stream()
-                .map(ContextPasser::new)
-                .collect(Collectors.toList());
+        private final List<ContextPasser> passerCollect = buildContextPassers();
         /**
          * 已执行的事件集合
          */

@@ -13,7 +13,7 @@ public class LogUtils {
     private static final String YELLOW_COLOR = "\033[33m";
     public static String PREFIX = "[Easy Translation] ";
     public static Logger logger = LoggerFactory.getLogger(LogUtils.class);
-    public static boolean printLog = true;
+    public static boolean printLog = false;
 
 
     public static void debug(String logSupplier, Supplier... params) {

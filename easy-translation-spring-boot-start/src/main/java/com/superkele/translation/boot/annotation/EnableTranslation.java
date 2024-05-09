@@ -1,7 +1,7 @@
 package com.superkele.translation.boot.annotation;
 
 import com.superkele.translation.annotation.TranslatorScan;
-import com.superkele.translation.boot.config.EnableTranslationImportSelector;
+import com.superkele.translation.boot.selector.EnableTranslationImportSelector;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
 
