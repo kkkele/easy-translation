@@ -9,16 +9,16 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class ListableTranslationProcessor extends AsyncableTranslationProcessor {
     @Override
-    public void process(Collection<BeanDescription> obj) {
+    public void processList(Collection<BeanDescription> obj) {
         for (BeanDescription beanDescription : obj) {
             unpackBeanDescription(beanDescription);
         }
     }
 
     @Override
-    public void processAsync(Collection<BeanDescription> obj) {
+    public void processListAsync(Collection<BeanDescription> obj) {
         if (!getAsyncEnable()) {
-            process(obj);
+            processList(obj);
             return;
         }
         List<ContextPasser> contextPassers = buildContextPassers();

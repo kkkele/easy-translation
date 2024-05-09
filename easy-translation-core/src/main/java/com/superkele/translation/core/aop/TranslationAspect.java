@@ -32,9 +32,9 @@ public class TranslationAspect {
             TranslationListTypeHandler listTypeHandler = TranslationListTypeHandlerUtil.getInstance(translationExecute.listTypeHandler());
             List<BeanDescription> unpacking = listTypeHandler.unpacking(collectionObj, translationExecute.type());
             if (translationExecute.async()) {
-                translationProcessor.processAsync(unpacking);
+                translationProcessor.processListAsync(unpacking);
             } else {
-                translationProcessor.process(unpacking);
+                translationProcessor.processList(unpacking);
             }
             return obj;
         }

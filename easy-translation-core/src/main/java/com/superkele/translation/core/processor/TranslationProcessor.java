@@ -11,9 +11,9 @@ public interface TranslationProcessor {
 
     void process(Object obj, Class<?> clazz);
 
-    void process(Collection<BeanDescription> obj);
+    void processList(Collection<BeanDescription> obj);
 
-    void processAsync(Collection<BeanDescription> obj);
+    void processListAsync(Collection<BeanDescription> obj);
 
 
 }
