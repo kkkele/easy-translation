@@ -14,7 +14,7 @@ public class OperateService {
         Operate operate = new Operate();
         operate.setId(id);
         operate.setName("operate" + id);
-        operate.setUserId(new Random().nextInt(1, 3));
+        operate.setUserId(new Random().nextInt());
         try {
             TimeUnit.MILLISECONDS.sleep(5);
         } catch (InterruptedException e) {

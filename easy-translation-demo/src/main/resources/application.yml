@@ -1,0 +1,5 @@
+easy-translation:
+  debug: true
+logging:
+  level:
+    com.superkele: debug

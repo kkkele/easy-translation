@@ -21,8 +21,8 @@ public class DefaultTranslationProcessor extends AsyncableTranslationProcessor {
     public DefaultTranslationProcessor(TransExecutorContext context) {
         this.context = context;
         this.mappingHandler = new DefaultMappingHandler(context);
-        if (context instanceof DefaultTransExecutorContext defaultContext) {
-            Config config = defaultContext.getConfig();
+        if (context instanceof DefaultTransExecutorContext) {
+            Config config = ((DefaultTransExecutorContext) context).getConfig();
             this.config = config;
         }
     }

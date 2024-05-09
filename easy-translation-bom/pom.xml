@@ -31,6 +31,12 @@
                 <artifactId>easy-translation-spring-boot3-start</artifactId>
                 <version>${revision}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.superkele</groupId>
+                <artifactId>easy-translation-spring-boot-start</artifactId>
+                <version>${revision}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

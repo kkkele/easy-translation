@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 public class DefaultTransProcessorTest {
@@ -182,7 +183,12 @@ public class DefaultTransProcessorTest {
         }
 
         public static String getMsgByCode(String code) {
-            return Map.of(SUCCESS.code, SUCCESS.msg, ERROR.code, ERROR.msg).get(code);
+            for (CodeEnum value : CodeEnum.values()) {
+                if (value.code.equals(code)) {
+                    return value.msg;
+                }
+            }
+            return null;
         }
     }
 
@@ -196,9 +202,7 @@ public class DefaultTransProcessorTest {
 
     @Data
     public static class ShopService {
-        Map<Integer, Shop> shopMap = Map.of(1, new Shop(1, "万达广场"),
-                2, new Shop(2, "凤凰百货"),
-                3, new Shop(3, "及萱草十"));
+        Map<Integer, Shop> shopMap = new ConcurrentHashMap<>();
 
         @Translation(name = "shop_id_to_shop")
         public Shop getShopById(Integer shopId) {
@@ -207,7 +211,7 @@ public class DefaultTransProcessorTest {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            return Optional.ofNullable(shopId).map(shopMap::get).orElse(null);
+            return Optional.ofNullable(shopId).map(key -> shopMap.computeIfAbsent(key, k -> new Shop(k, "shop" + k))).orElse(null);
         }
     }
 
@@ -261,9 +265,8 @@ public class DefaultTransProcessorTest {
     }
 
     public static class UserService {
-        Map<Integer, User> userFactory = Map.of(1, new User(1, "superkele", "小牛"),
-                2, new User(2, "admin", "小明"),
-                3, new User(3, "root", "小王"));
+        Map<Integer, User> userFactory = new ConcurrentHashMap<>();
+        ;
 
         @Translation(name = "current_time")
         public static String getCurrentTime() {
@@ -278,7 +281,7 @@ public class DefaultTransProcessorTest {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            return Optional.ofNullable(id).map(userFactory::get).orElse(null);
+            return Optional.ofNullable(id).map(key -> userFactory.computeIfAbsent(key, k -> new User(k, "user" + k, "nick" + k))).orElse(null);
         }
     }
 

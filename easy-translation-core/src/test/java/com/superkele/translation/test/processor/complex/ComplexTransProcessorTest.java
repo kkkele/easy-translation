@@ -98,9 +98,7 @@ public class ComplexTransProcessorTest {
                 throw new RuntimeException("赋值失败");
             }
         }, 100);
-        System.out.println("syncMethod cost =" + record2 + "ms"+ """
-                    
-                    """);
+        System.out.println("syncMethod cost =" + record2 + "ms");
         long record = TimeRecorder.record(() -> {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
             complexOperateVO.setOperateId(1);

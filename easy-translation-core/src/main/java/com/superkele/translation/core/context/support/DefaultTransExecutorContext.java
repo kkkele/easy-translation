@@ -18,7 +18,7 @@ public class DefaultTransExecutorContext extends AbstractAutoLoadTransExecutorCo
 
     private String[] packages;
 
-    protected DefaultTransExecutorContext() {
+    public DefaultTransExecutorContext() {
     }
 
 

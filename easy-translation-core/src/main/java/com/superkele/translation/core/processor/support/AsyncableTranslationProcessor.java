@@ -2,6 +2,7 @@ package com.superkele.translation.core.processor.support;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.Mapping;
@@ -138,9 +139,9 @@ public abstract class AsyncableTranslationProcessor extends FilterTranslationPro
             }
         }
         Map<Short, FieldTranslationEvent[]> afterEventsMap = new HashMap<>();
-        afterEventMapDTO.forEach((eventMask, fieldTranslationEvents) -> afterEventsMap.put(eventMask, fieldTranslationEvents.toArray(FieldTranslationEvent[]::new)));
+        afterEventMapDTO.forEach((eventMask, fieldTranslationEvents) -> afterEventsMap.put(eventMask, ArrayUtil.toArray(fieldTranslationEvents, FieldTranslationEvent.class)));
         FieldTranslation res = new FieldTranslation();
-        res.setSortEvents(sortEvents.toArray(FieldTranslationEvent[]::new));
+        res.setSortEvents(ArrayUtil.toArray(sortEvents, FieldTranslationEvent.class));
         res.setAfterEventMaskMap(afterEventsMap);
         res.setConsumeSize(mappingFields.size());
         res.setHasSameInvoker(cacheEnabled);

@@ -1,5 +1,6 @@
 package com.superkele.translation.core.translator.support;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.translator.definition.ConfigurableTransDefinitionExecutorFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
@@ -21,7 +22,7 @@ public class DefaultTransExecutorFactory extends AbstractAutowireCapableTransExe
 
     @Override
     public String[] getTranslatorNames() {
-        return translatorDefinitionMap.keySet().toArray(String[]::new);
+        return ArrayUtil.toArray(translatorDefinitionMap.keySet(), String.class);
     }
 
     @Override

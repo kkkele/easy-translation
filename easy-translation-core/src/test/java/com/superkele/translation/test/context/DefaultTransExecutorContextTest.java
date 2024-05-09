@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultTransExecutorContextTest {
 
@@ -110,9 +111,7 @@ public class DefaultTransExecutorContextTest {
     }
 
     public static class UserService {
-        Map<Integer, User> userFactory = Map.of(1, new User(1, "superkele", "小牛"),
-                2, new User(2, "admin", "小明"),
-                3, new User(3, "root", "小王"));
+        Map<Integer, User> userFactory = new ConcurrentHashMap<>();
 
         @Translation(name = "current_time")
         public static String getCurrentTime() {
@@ -127,7 +126,7 @@ public class DefaultTransExecutorContextTest {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            return userFactory.get(id);
+            return userFactory.computeIfAbsent(id, k -> new User(id, "username" + id, "nickName" + id));
         }
     }
 }

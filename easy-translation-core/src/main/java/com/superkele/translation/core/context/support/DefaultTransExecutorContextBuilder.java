@@ -2,6 +2,7 @@ package com.superkele.translation.core.context.support;
 
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
@@ -102,8 +103,8 @@ public class DefaultTransExecutorContextBuilder {
         context.setConfig(config);
         packages.remove(DEFAULT_PACKAGE);
         packages.add(DEFAULT_PACKAGE);
-        context.setPackages(packages.toArray(String[]::new));
-        context.setInvokeObjs(invokeObjs.toArray(Object[]::new));
+        context.setPackages(ArrayUtil.toArray(packages, String.class));
+        context.setInvokeObjs(ArrayUtil.toArray(invokeObjs, Object.class));
         for (TranslatorFactoryPostProcessor factoryPostProcessor : factoryPostProcessors) {
             context.addTranslatorFactoryPostProcessor(factoryPostProcessor);
         }

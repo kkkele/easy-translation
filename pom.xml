@@ -20,6 +20,7 @@
         <module>easy-translation-spring-boot-start</module>
         <module>easy-translation-extension</module>
         <module>easy-translation-bom</module>
+        <module>easy-translation-demo</module>
     </modules>
 
     <developers>
@@ -62,6 +63,7 @@
         <javax-api.version>4.0.1</javax-api.version>
         <lombok.version>1.18.30</lombok.version>
         <reflections.version>0.9.11</reflections.version>
+        <slf4j-api.version>2.0.12</slf4j-api.version>
     </properties>
 
 
@@ -106,9 +108,14 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>5.3.31</version>
+                <version>${spring.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

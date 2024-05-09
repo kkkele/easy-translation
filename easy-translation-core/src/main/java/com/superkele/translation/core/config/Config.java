@@ -1,7 +1,6 @@
 package com.superkele.translation.core.config;
 
 import cn.hutool.core.util.StrUtil;
-import com.superkele.translation.core.convert.MethodConvert;
 import com.superkele.translation.core.translator.ConditionTranslator;
 import com.superkele.translation.core.translator.ContextTranslator;
 import com.superkele.translation.core.translator.MapperTranslator;
@@ -16,7 +15,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Easy-Translation 全局配置类
