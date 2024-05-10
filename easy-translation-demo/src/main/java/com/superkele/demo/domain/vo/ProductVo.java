@@ -16,4 +16,5 @@ public class ProductVo extends Product {
 
     @Mapping(translator = "getCatName", mapper = "catId")
     private String catName;
+
 }

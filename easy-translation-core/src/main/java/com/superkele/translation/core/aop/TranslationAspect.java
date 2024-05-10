@@ -27,8 +27,12 @@ public class TranslationAspect {
     @Around("@annotation(translationExecute)")
     public Object translationExecuteHandler(ProceedingJoinPoint joinPoint, TranslationExecute translationExecute) throws Throwable {
         Object obj = joinPoint.proceed();
-        if (obj instanceof Collection) {
-            Collection collectionObj = (Collection) obj;
+        if (obj == null){
+            return null;
+        }
+        Object targetObj = ReflectUtils.invokeGetter(obj, translationExecute.field());
+        if (targetObj instanceof Collection) {
+            Collection collectionObj = (Collection) targetObj;
             TranslationListTypeHandler listTypeHandler = TranslationListTypeHandlerUtil.getInstance(translationExecute.listTypeHandler());
             List<BeanDescription> unpacking = listTypeHandler.unpacking(collectionObj, translationExecute.type());
             if (translationExecute.async()) {
@@ -39,9 +43,9 @@ public class TranslationAspect {
             return obj;
         }
         if (translationExecute.type().equals(Object.class)) {
-            translationProcessor.process(ReflectUtils.invokeGetter(obj, translationExecute.field()));
+            translationProcessor.process(targetObj);
         } else {
-            translationProcessor.process(ReflectUtils.invokeGetter(obj, translationExecute.field()), translationExecute.type());
+            translationProcessor.process(targetObj, translationExecute.type());
         }
         return obj;
     }

@@ -2,6 +2,7 @@ package com.superkele.demo.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.superkele.demo.domain.R;
 import com.superkele.demo.domain.entity.Product;
 import com.superkele.demo.domain.vo.ProductVo;
@@ -30,12 +31,16 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    @TranslationExecute
-    public R<List<ProductVo>> getList(List<Integer> ids) {
+    @TranslationExecute(field = "data")
+    public R<List<ProductVo>> getList() {
+        return R.ok(mapping(ListUtil.of(1,2,3,4,4)));
+    }
+
+    public  List<ProductVo>  mapping(List<Integer> ids){
         List<Product> collect = ids.stream()
                 .map(productService::getById)
                 .collect(Collectors.toList());
         List<ProductVo> productVos = BeanUtil.copyToList(collect, ProductVo.class);
-        return R.ok(productVos);
+        return productVos;
     }
 }
