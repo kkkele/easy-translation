@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,10 +35,36 @@ public class ProductController {
     @GetMapping("/list")
     @TranslationExecute(field = "data")
     public R<List<ProductVo>> getList() {
-        return R.ok(mapping(ListUtil.of(1,2,3,4,4)));
+        return R.ok(mappingToList(ListUtil.of(1, 2, 3, 4, 4)));
     }
 
-    public  List<ProductVo>  mapping(List<Integer> ids){
+    @GetMapping("/array")
+    @TranslationExecute(field = "data")
+    public R<ProductVo[]> getArray() {
+        return R.ok(mappingToArray(1, 2, 3, 4, 5));
+    }
+
+    @GetMapping("/map")
+    @TranslationExecute(field = "data")
+    public R<Map<Integer, ProductVo>> getMap() {
+        return R.ok(mappingToMap(1, 2, 3, 4, 5));
+    }
+
+    public Map<Integer, ProductVo> mappingToMap(Integer... ids) {
+        return Arrays.stream(ids)
+                .map(productService::getById)
+                .map(product -> BeanUtil.copyProperties(product, ProductVo.class))
+                .collect(Collectors.toMap(ProductVo::getProductId,x -> x));
+    }
+
+    public ProductVo[] mappingToArray(Integer... ids) {
+        return Arrays.stream(ids)
+                .map(productService::getById)
+                .map(product -> BeanUtil.copyProperties(product, ProductVo.class))
+                .toArray(ProductVo[]::new);
+    }
+
+    public List<ProductVo> mappingToList(List<Integer> ids) {
         List<Product> collect = ids.stream()
                 .map(productService::getById)
                 .collect(Collectors.toList());
