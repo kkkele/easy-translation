@@ -1,29 +1,45 @@
 package com.superkele.translation.annotation.constant;
 
-import com.superkele.translation.annotation.TranslationListTypeHandler;
+import com.superkele.translation.annotation.TranslationUnpackingHandler;
 import com.superkele.translation.annotation.bean.BeanDescription;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class DefaultTranslationTypeHandler implements TranslationListTypeHandler {
+public class DefaultTranslationTypeHandler implements TranslationUnpackingHandler {
 
     @Override
-    public List<BeanDescription> unpacking(Object collection, Class<?> clazz) {
-        if (collection instanceof Collection) {
-            Collection collectObj = (Collection) collection;
-            if (Object.class.equals(clazz)){
-                return (List<BeanDescription>) collectObj.stream()
-                        .map(obj -> new BeanDescription(obj, obj.getClass()))
-                        .collect(Collectors.toList());
-            }else{
-                return (List<BeanDescription>) collectObj.stream()
-                        .map(obj -> new BeanDescription(obj, clazz))
-                        .collect(Collectors.toList());
-            }
+    public List<BeanDescription> unpackingCollection(Collection collection, Class<?> clazz) {
+        return (List<BeanDescription>) collection.stream()
+                .map(obj -> new BeanDescription(obj, clazz))
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List<BeanDescription> unpackingMap(Map map, Class<?> clazz) {
+        return (List<BeanDescription>) map.values().stream()
+                .map(obj -> new BeanDescription(obj, clazz))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BeanDescription> unpackingArray(Object[] array, Class<?> clazz) {
+        return Arrays.stream(array)
+                .map(obj -> new BeanDescription(obj, clazz))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BeanDescription> unpackingOther(Object object, Class<?> clazz) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public int unpackingType(Object parsingObj) {
+        if (parsingObj instanceof Collection || parsingObj instanceof Map || parsingObj instanceof Object[]) {
+            return 1;
         }
-        return Collections.singletonList(new BeanDescription(collection, clazz));
+        return 0;
     }
 }

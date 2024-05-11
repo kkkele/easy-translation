@@ -1,5 +1,6 @@
 package com.superkele.demo.config;
 
+
 import com.superkele.translation.core.config.TranslationAutoConfigurationCustomizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,4 +21,6 @@ public class EasyTranslationConfig {
                     .setThreadPoolExecutor(threadPoolTaskExecutor.getThreadPoolExecutor());
         };
     }
+
+
 }

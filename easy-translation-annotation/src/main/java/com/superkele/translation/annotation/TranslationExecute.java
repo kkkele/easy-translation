@@ -30,5 +30,5 @@ public @interface TranslationExecute {
     /**
      * 解包返回体为List的情况 用来应对List<List<T>>,Map 等情况
      */
-    Class<? extends TranslationListTypeHandler> listTypeHandler() default DefaultTranslationTypeHandler.class;
+    Class<? extends TranslationUnpackingHandler> listTypeHandler() default DefaultTranslationTypeHandler.class;
 }

@@ -4,20 +4,10 @@ package com.superkele.translation.annotation;
 import java.lang.annotation.*;
 
 /**
- *  <p>
- *      标注在方法上，使其成为一个翻译器。
- *      需要传递的两个参数value和other,
- *      必须是确定的常量，这样才能确保映射的字段顺利找到翻译器
- *  </p>
- *  <hr/>
- *  <p>
- *      annotate the method to make it a translator. The two parameters that need to be passed,
- *      'value' and 'other', must be definite constants,
- *      so as to ensure that the mapped field successfully finds the translator
- *  </p>
+ * 用来标记成为翻译器的静态方法，动态方法，枚举类
  */
 @Inherited
-@Target({ElementType.METHOD,ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Translation {
