@@ -37,8 +37,12 @@ public class DefaultTranslationTypeHandler implements TranslationUnpackingHandle
 
     @Override
     public int unpackingType(Object parsingObj) {
-        if (parsingObj instanceof Collection || parsingObj instanceof Map || parsingObj instanceof Object[]) {
+        if (parsingObj instanceof Collection) {
             return 1;
+        }else if (parsingObj instanceof Map){
+            return 2;
+        }else if (parsingObj instanceof Object[]){
+            return 3;
         }
         return 0;
     }

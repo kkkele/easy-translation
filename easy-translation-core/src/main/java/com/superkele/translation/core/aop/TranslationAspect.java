@@ -22,8 +22,6 @@ public class TranslationAspect {
 
     private final TranslationProcessor translationProcessor;
 
-    private Map<Class<? extends TranslationUnpackingHandler>, TranslationUnpackingHandler> translationListTypeHandlerMap;
-
     @Around("@annotation(translationExecute)")
     public Object translationExecuteHandler(ProceedingJoinPoint joinPoint, TranslationExecute translationExecute) throws Throwable {
         Object obj = joinPoint.proceed();

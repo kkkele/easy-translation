@@ -5,12 +5,15 @@ import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionReader;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
+import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.ReflectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -19,8 +22,12 @@ import java.util.Set;
 
 public abstract class AbstractTranslatorDefinitionReader implements TranslatorDefinitionReader {
 
+
     protected final TranslatorDefinitionRegistry registry;
     protected final Config config;
+    private final SubTypesScanner subTypesScanner = new SubTypesScanner();
+    private final TypeAnnotationsScanner typeAnnotationsScanner = new TypeAnnotationsScanner();
+    private final MethodAnnotationsScanner methodAnnotationsScanner = new MethodAnnotationsScanner();
 
     protected AbstractTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, Config config) {
         this.registry = registry;
@@ -43,11 +50,15 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                     Method[] declaredMethods = obj.getClass()
                             .getDeclaredMethods();
                     Arrays.stream(declaredMethods)
-                            .filter(method -> method.isAnnotationPresent(Translation.class))
                             .filter(method -> !ReflectUtils.isStaticMethod(method) && !ReflectUtils.isAbstractMethod(method))
-                            .forEach(method -> {
-                                TranslatorDefinition translatorDefinition = convertDynamicMethodToTranslatorDefinition(obj, method);
-                                registry.register(getTranslatorName(method), translatorDefinition);
+                            .map(method -> {
+                                Translation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(method, Translation.class);
+                                return Pair.of(method, mergedAnnotation);
+                            })
+                            .filter(pair -> pair.getValue() != null)
+                            .forEach(pair -> {
+                                TranslatorDefinition translatorDefinition = convertDynamicMethodToTranslatorDefinition(obj, pair.getKey());
+                                registry.register(getTranslatorName(pair.getValue(), pair.getKey()), translatorDefinition);
                             });
                 });
     }
@@ -67,16 +78,21 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
         Optional.ofNullable(location)
                 .ifPresent(packageName -> {
                     // 配置Reflections来扫描子类型和方法注解，尽管这里主要关注接口，但这样配置可以保持灵活性
+
                     Reflections reflections = new Reflections(
                             new ConfigurationBuilder()
                                     .forPackages(packageName)
-                                    .setScanners(new MethodAnnotationsScanner())
+                                    .setScanners(methodAnnotationsScanner)
                     );
                     Set<Method> methods = reflections.getMethodsAnnotatedWith(Translation.class);
                     methods.stream()
                             .filter(ReflectUtils::isStaticMethod)
-                            .forEach(method ->
-                                    registry.register(getTranslatorName(method), convertStaticMethodToTranslatorDefinition(method)));
+                            .map(method -> {
+                                Translation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(method, Translation.class);
+                                return Pair.of(method, mergedAnnotation);
+                            })
+                            .forEach(pair ->
+                                    registry.register(getTranslatorName(pair.getValue(), pair.getKey()), convertStaticMethodToTranslatorDefinition(pair.getKey())));
                 });
     }
 
@@ -94,11 +110,15 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
     public void loadEnumTranslatorDefinitions(String location) {
         Optional.ofNullable(location)
                 .ifPresent(packageUrl -> {
-                    Reflections reflections = new Reflections(location, new SubTypesScanner());
-                    reflections.getSubTypesOf(Enum.class)
+                    Reflections reflections = new Reflections(location, typeAnnotationsScanner, subTypesScanner);
+                    reflections.getTypesAnnotatedWith(Translation.class)
                             .stream()
-                            .filter(clazz -> clazz.isAnnotationPresent(Translation.class))
-                            .forEach(clazz -> registry.register(getTranslatorName(clazz), convertEnumToTranslatorDefinition(clazz)));
+                            .filter(clazz -> clazz.isEnum())
+                            .map(clazz -> Pair.of(clazz, AnnotatedElementUtils.getMergedAnnotation(clazz, Translation.class)))
+                            .forEach(pair -> {
+                                Class<? extends Enum> enumClazz = (Class<? extends Enum>) pair.getKey();
+                                registry.register(getTranslatorName(pair.getValue(), enumClazz), convertEnumToTranslatorDefinition(enumClazz));
+                            });
                 });
     }
 
@@ -112,8 +132,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                 });
     }
 
-    protected String getTranslatorName(Method method) {
-        Translation translation = method.getAnnotation(Translation.class);
+    protected String getTranslatorName(Translation translation, Method method) {
         String translatorName = translation.name();
         if (StringUtils.isBlank(translatorName)) {
             translatorName = getDefaultTranslatorName(method);
@@ -121,8 +140,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
         return translatorName;
     }
 
-    protected String getTranslatorName(Class<? extends Enum> clazz) {
-        Translation translation = clazz.getAnnotation(Translation.class);
+    protected String getTranslatorName(Translation translation, Class<? extends Enum> clazz) {
         String translatorName = translation.name();
         if (StringUtils.isBlank(translatorName)) {
             translatorName = config.getBeanNameGetter().getDeclaringBeanName(clazz);

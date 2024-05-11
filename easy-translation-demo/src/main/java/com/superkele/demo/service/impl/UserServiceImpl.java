@@ -2,7 +2,7 @@ package com.superkele.demo.service.impl;
 
 import com.superkele.demo.domain.entity.SysUser;
 import com.superkele.demo.service.UserService;
-import com.superkele.translation.annotation.Translation;
+import com.superkele.translation.boot.annotation.Translator;
 import org.springframework.stereotype.Service;
 
 
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     @Override
-    @Translation(name = "getUser")
+    @Translator("getUser")
     public SysUser getById(Integer id) {
         try {
             Thread.sleep(1);
