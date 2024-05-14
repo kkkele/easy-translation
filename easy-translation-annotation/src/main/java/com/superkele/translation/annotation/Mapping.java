@@ -23,7 +23,7 @@ public @interface Mapping {
     String translator() default "";
 
     /**
-     * 映射的字段，spring环境下支持spel表达式
+     * 映射的字段
      */
     String[] mapper() default {};
 

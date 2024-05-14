@@ -22,6 +22,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @TranslationExecute
     public ProductVo getDetailById(Integer id) {
         ProductVo productVO = new ProductVo();
         Product byId = getById(id);
