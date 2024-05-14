@@ -125,11 +125,11 @@
     <distributionManagement>
         <repository>
             <!--这两个id需要和setting.xml文件中的server字段的id进行对应-->
-            <id>ossrh</id>
+            <id>release</id>
             <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
-            <id>ossrh</id>
+            <id>snapshot</id>
             <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
@@ -177,12 +177,12 @@
                 </executions>
             </plugin>
             <!-- Javadoc -->
-            <plugin>
+<!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.1</version>
                 <configuration>
-                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+                    <javadocExecutable>C:/Program Files/Java/jdk1.8.0_202/bin/javadoc</javadocExecutable>
                     <additionalJOptions>
                         <additionalJOption>-Xdoclint:none</additionalJOption>
                     </additionalJOptions>
@@ -195,7 +195,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
