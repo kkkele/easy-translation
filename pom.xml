@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.superkele</groupId>
+    <groupId>io.github.kkkele</groupId>
     <artifactId>easy-translation</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -88,7 +88,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.superkele</groupId>
+                <groupId>io.github.kkkele</groupId>
                 <artifactId>easy-translation-bom</artifactId>
                 <version>${revision}</version>
                 <type>pom</type>
@@ -121,6 +121,19 @@
 
         </dependencies>
     </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <!--这两个id需要和setting.xml文件中的server字段的id进行对应-->
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 
     <build>
         <plugins>
