@@ -6,7 +6,7 @@
 
 一个配置上非常轻量，使用简单且强大而灵活的**字段翻译**插件。可以理解为**字段自动填充框架**，主要作用就是由其他的字段**自动映射**成所需要的字段。
 
-![easy-translation-core (1)](./assets/easy-translation-core (1).png)
+![easy-translation-core](./assets/easy-translation-core.png)
 
 ## 作用场景
 
