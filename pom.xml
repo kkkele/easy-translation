@@ -134,6 +134,11 @@
         </snapshotRepository>
     </distributionManagement>
 
+    <scm>
+        <url>https://gitee.com/cai-zhiyuDaKeLe/easy-translation</url>
+        <connection>https://gitee.com/cai-zhiyuDaKeLe/easy-translation.git</connection>
+        <developerConnection>https://gitee.com/cai-zhiyuDaKeLe</developerConnection>
+    </scm>
 
     <build>
         <plugins>
@@ -177,12 +182,12 @@
                 </executions>
             </plugin>
             <!-- Javadoc -->
-<!--            <plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.0.1</version>
                 <configuration>
-                    <javadocExecutable>C:/Program Files/Java/jdk1.8.0_202/bin/javadoc</javadocExecutable>
+                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                     <additionalJOptions>
                         <additionalJOption>-Xdoclint:none</additionalJOption>
                     </additionalJOptions>
@@ -195,7 +200,8 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -212,5 +218,6 @@
             </plugin>
         </plugins>
     </build>
+
 
 </project>

@@ -74,7 +74,29 @@
 
   在非spring环境下，需要自行手动创建一些全局对象进行维护
 
-## 快速使用
+## 快速开始
+
+pom.xml添加依赖
+
+```java
+        <dependency>
+            <groupId>io.github.kkkele</groupId>
+            <artifactId>easy-translation-spring-boot-start</artifactId>
+            <version>1.0.0</version> //请自行替换为最新版本
+        </dependency>
+```
+
+启动类或其他任意被spring管理的类上，加上@EnableTranslation注解
+
+```java
+@SpringBootApplication
+@EnableTranslation //可自由选择扫描包的路径
+public class EasyTranslationApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EasyTranslationApplication.class, args);
+    }
+}
+```
 
 在方法上打上**@Translator**注解，并自定义该注解的名称
 
@@ -138,13 +160,10 @@ public class ProductVo extends Product {
     @Mapping(translator = "getUser", mapper = "createBy", receive = "username")
     private String username;
 
-    @Mapping(translator = "getCatName", mapper = "catId")
-    private String catName;
-
 }
 ```
 
-在需要翻译的方法上使用@TranslationExecute注解，即可自动对执行结果进行翻译填充，不论是map，还是数组，还是list，或是您有其他需求，都可以进行拆包填充
+在需要翻译的方法上使用**@TranslationExecute**注解，即可自动对执行结果进行翻译填充，不论是map，还是数组，还是list，或是您有其他需求，都可以进行拆包填充
 
 ```java
     @Override
