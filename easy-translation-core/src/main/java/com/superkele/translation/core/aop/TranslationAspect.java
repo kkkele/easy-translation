@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.core.annotation.Order;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Aspect
+@Order
 public class TranslationAspect {
 
     private final TranslationProcessor translationProcessor;
