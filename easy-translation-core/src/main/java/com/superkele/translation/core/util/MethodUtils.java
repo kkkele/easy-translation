@@ -9,7 +9,6 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,8 +28,9 @@ public class MethodUtils extends ReflectUtil {
 
     private static final Map<Class<?>, Pair<Method, MethodType>> FUNCTION_INTERFACE_CACHE = new ConcurrentHashMap<>();
 
-    private static final Map<Class<?>, Map<String, Method>> METHOD_CACHE = new HashMap<>();
+    private static final Map<Pair<Class<?>, String>, PropertyGetter> PROPERTY_GETTER_CACHE = new ConcurrentHashMap<>();
 
+    private static final Map<Pair<Class<?>, String>, PropertySetter> PROPERTY_SETTER_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 调用Getter方法.
@@ -39,65 +39,60 @@ public class MethodUtils extends ReflectUtil {
     @SuppressWarnings("unchecked")
     public static <E> E invokeGetter(Object obj, String propertyName) {
         Object object = obj;
-        String[] methods = StringUtils.split(propertyName, ".");
-        for (String name : methods) {
-            String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(name);
-            Class<?> objClazz = object.getClass();
-            Map<String, Method> methodMap = METHOD_CACHE.computeIfAbsent(objClazz, k -> new HashMap<>());
-            Method method = methodMap.computeIfAbsent(getterMethodName, methodName -> {
+        PropertyGetter propertyGetter = PROPERTY_GETTER_CACHE.computeIfAbsent(Pair.of(obj.getClass(), propertyName), pair -> {
+            Class<?> key = pair.getKey();
+            String value = pair.getValue();
+            String[] properties = StringUtils.split(value, ".");
+            Method[] getterMethods = new Method[properties.length];
+            for (int i = 0; i < getterMethods.length; i++) {
+                String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(properties[i]);
                 try {
-                    return objClazz.getMethod(methodName);
+                    Method method = key.getMethod(getterMethodName);
+                    key = method.getReturnType();
+                    getterMethods[i] = method;
                 } catch (NoSuchMethodException e) {
                     throw new RuntimeException(e);
                 }
-            });
-            try {
-                object = method.invoke(object);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
             }
-        }
-        return (E) object;
+            return new PropertyGetter(getterMethods);
+        });
+        return (E) propertyGetter.get(object);
     }
-
 
 
     /**
      * 调用Setter方法, 仅匹配方法名。
      * 支持多级，如：对象名.对象名.方法
      */
-    public static <E> void invokeSetter(Object obj, String propertyName, E value) {
+    public static <E> void invokeSetter(Object obj, String propertyName, E setterValue) {
         if (StringUtils.isBlank(propertyName)) {
             return;
         }
-        Object object = obj;
-        int index = StringUtils.lastIndexOf(propertyName, ".");
-        if (index != -1) {
-            String getterProperty = StringUtils.substring(propertyName, 0, index);
-            object = invokeGetter(object, getterProperty);
-        }
-        String setterProperty = StringUtils.substring(propertyName, index + 1);
-        String setterMethodName = SETTER_PREFIX + StringUtils.capitalize(setterProperty);
-        Class<?> objClazz = object.getClass();
-        Map<String, Method> methodMap = METHOD_CACHE.computeIfAbsent(objClazz, k -> new ConcurrentHashMap<>());
-        Method method = methodMap.computeIfAbsent(setterMethodName, methodName -> {
+        PROPERTY_SETTER_CACHE.computeIfAbsent(Pair.of(obj.getClass(), propertyName), pair -> {
+            Class<?> key = pair.getKey();
+            String pName = pair.getValue();
+            String[] properties = StringUtils.split(pName, ".");
+            Method[] getterMethods = new Method[properties.length - 1];
+            for (int i = 0; i < getterMethods.length; i++) {
+                String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(properties[i]);
+                try {
+                    Method method = key.getMethod(getterMethodName);
+                    key = method.getReturnType();
+                    getterMethods[i] = method;
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             try {
-                return objClazz.getMethod(methodName, objClazz.getDeclaredField(setterProperty).getType());
+                String setterName = SETTER_PREFIX + StringUtils.capitalize(properties[properties.length - 1]);
+                Method setterMethod = key.getMethod(setterName, key.getDeclaredField(properties[properties.length - 1]).getType());
+                return new PropertySetter(getterMethods, setterMethod);
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             } catch (NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }
-        });
-        try {
-            method.invoke(object, value);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
+        }).set(obj,setterValue);
     }
 
     public static boolean isStaticMethod(Method method) {
@@ -144,4 +139,56 @@ public class MethodUtils extends ReflectUtil {
         });
     }
 
+    static class PropertyGetter {
+        private final Method[] getterMethods;
+
+        PropertyGetter(Method[] getterMethods) {
+            this.getterMethods = getterMethods;
+        }
+
+        public Object get(Object object) {
+            Object res = object;
+            for (int i = 0; i < getterMethods.length; i++) {
+                try {
+                    res = getterMethods[i].invoke(res);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            return res;
+        }
+    }
+
+    static class PropertySetter {
+        private final Method[] getterMethods;
+
+        private final Method setterMethod;
+
+        PropertySetter(Method[] getterMethods, Method setterMethods) {
+            this.getterMethods = getterMethods;
+            this.setterMethod = setterMethods;
+        }
+
+        public void set(Object object, Object value) {
+            Object res = object;
+            for (int i = 0; i < getterMethods.length; i++) {
+                try {
+                    res = getterMethods[i].invoke(object);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            try {
+                setterMethod.invoke(res, value);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }

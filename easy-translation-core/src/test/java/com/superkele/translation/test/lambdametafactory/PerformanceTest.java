@@ -128,25 +128,27 @@ public class PerformanceTest {
         person.setPerson(son);
         for (int i = 0; i < 10000000; i++) {
             person.getPerson().getName();
-        }
-        for (int i = 0; i < 10000000; i++) {
             Person p = (Person) getPerson.invoke(person);
             getName.invoke(p);
+            MethodUtils.invokeGetter(person, "person.name");
         }
+
         long l1 = System.currentTimeMillis();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 100000; i++) {
             person.getPerson().getName();
         }
         long l2 = System.currentTimeMillis();
         System.out.println("getter cost : " + (l2 - l1) + "ms");
+
         long begin = System.currentTimeMillis();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 100000; i++) {
             getName.invoke(getPerson.invoke(person));
         }
         long end = System.currentTimeMillis();
         System.out.println("method cost : " + (end - begin) + "ms");
+
         long begin1 = System.currentTimeMillis();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 100000; i++) {
             MethodUtils.invokeGetter(person, "person.name");
         }
         long end1 = System.currentTimeMillis();
