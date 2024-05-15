@@ -7,7 +7,7 @@ import com.superkele.translation.core.util.Pair;
 import java.lang.invoke.*;
 import java.lang.reflect.Method;
 
-import static com.superkele.translation.core.util.ReflectUtils.findFunctionInterfaceMethodType;
+import static com.superkele.translation.core.util.MethodUtils.findFunctionInterfaceMethodType;
 
 public class MethodConvert {
 

@@ -7,7 +7,7 @@ import com.superkele.translation.core.annotation.MappingHandler;
 import com.superkele.translation.core.translator.factory.TransExecutorFactory;
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.Assert;
-import com.superkele.translation.core.util.ReflectUtils;
+import com.superkele.translation.core.util.MethodUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -31,7 +31,7 @@ public class DefaultMappingHandler implements MappingHandler {
             }
             //当字段不为空也映射关闭时，判断字段情况，当不为空时不进行处理
             if (!mapping.notNullMapping()) {
-                if (ReflectUtils.invokeGetter(obj, declaringField.getName()) != null) {
+                if (MethodUtils.invokeGetter(obj, declaringField.getName()) != null) {
                     return obj;
                 }
             }
@@ -39,7 +39,7 @@ public class DefaultMappingHandler implements MappingHandler {
             if (cacheResSupplier != null) {
                 Object cacheRes = cacheResSupplier.apply(uniqueName);
                 if (cacheRes != null) {
-                    ReflectUtils.invokeSetter(obj, declaringField.getName(), ReflectUtils.invokeGetter(cacheRes, mapping.receive()));
+                    MethodUtils.invokeSetter(obj, declaringField.getName(), MethodUtils.invokeGetter(cacheRes, mapping.receive()));
                     return obj;
                 }
             }
@@ -51,7 +51,7 @@ public class DefaultMappingHandler implements MappingHandler {
             Object[] args = new Object[MAX_TRANSLATOR_PARAM_LEN];
             for (int i = 0; i < mapperLength; i++) {
                 if (StringUtils.isNotBlank(mapper[i])) {
-                    args[i] = ReflectUtils.invokeGetter(obj, mapper[i]);
+                    args[i] = MethodUtils.invokeGetter(obj, mapper[i]);
                 }
             }
             int j = 0;
@@ -66,7 +66,7 @@ public class DefaultMappingHandler implements MappingHandler {
             }
             //set注入
             if (mappingValue != null) {
-                ReflectUtils.invokeSetter(obj, declaringField.getName(), ReflectUtils.invokeGetter(mappingValue, mapping.receive()));
+                MethodUtils.invokeSetter(obj, declaringField.getName(), MethodUtils.invokeGetter(mappingValue, mapping.receive()));
             }
             return obj;
         };

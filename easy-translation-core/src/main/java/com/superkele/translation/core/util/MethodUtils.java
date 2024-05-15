@@ -5,13 +5,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -22,13 +21,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @SuppressWarnings("rawtypes")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ReflectUtils extends ReflectUtil {
+public class MethodUtils extends ReflectUtil {
 
     private static final String SETTER_PREFIX = "set";
 
     private static final String GETTER_PREFIX = "get";
 
     private static final Map<Class<?>, Pair<Method, MethodType>> FUNCTION_INTERFACE_CACHE = new ConcurrentHashMap<>();
+
+    private static final Map<Class<?>, Map<String, Method>> METHOD_CACHE = new HashMap<>();
 
 
     /**
@@ -38,29 +39,64 @@ public class ReflectUtils extends ReflectUtil {
     @SuppressWarnings("unchecked")
     public static <E> E invokeGetter(Object obj, String propertyName) {
         Object object = obj;
-        for (String name : StringUtils.split(propertyName, ".")) {
+        String[] methods = StringUtils.split(propertyName, ".");
+        for (String name : methods) {
             String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(name);
-            object = invoke(object, getterMethodName);
+            Class<?> objClazz = object.getClass();
+            Map<String, Method> methodMap = METHOD_CACHE.computeIfAbsent(objClazz, k -> new HashMap<>());
+            Method method = methodMap.computeIfAbsent(getterMethodName, methodName -> {
+                try {
+                    return objClazz.getMethod(methodName);
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            try {
+                object = method.invoke(object);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
         }
         return (E) object;
     }
+
+
 
     /**
      * 调用Setter方法, 仅匹配方法名。
      * 支持多级，如：对象名.对象名.方法
      */
     public static <E> void invokeSetter(Object obj, String propertyName, E value) {
+        if (StringUtils.isBlank(propertyName)) {
+            return;
+        }
         Object object = obj;
-        String[] names = StringUtils.split(propertyName, ".");
-        for (int i = 0; i < names.length; i++) {
-            if (i < names.length - 1) {
-                String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(names[i]);
-                object = invoke(object, getterMethodName);
-            } else {
-                String setterMethodName = SETTER_PREFIX + StringUtils.capitalize(names[i]);
-                Method method = getMethodByName(object.getClass(), setterMethodName);
-                invoke(object, method, value);
+        int index = StringUtils.lastIndexOf(propertyName, ".");
+        if (index != -1) {
+            String getterProperty = StringUtils.substring(propertyName, 0, index);
+            object = invokeGetter(object, getterProperty);
+        }
+        String setterProperty = StringUtils.substring(propertyName, index + 1);
+        String setterMethodName = SETTER_PREFIX + StringUtils.capitalize(setterProperty);
+        Class<?> objClazz = object.getClass();
+        Map<String, Method> methodMap = METHOD_CACHE.computeIfAbsent(objClazz, k -> new ConcurrentHashMap<>());
+        Method method = methodMap.computeIfAbsent(setterMethodName, methodName -> {
+            try {
+                return objClazz.getMethod(methodName, objClazz.getDeclaredField(setterProperty).getType());
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
             }
+        });
+        try {
+            method.invoke(object, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
     }
 

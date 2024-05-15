@@ -6,7 +6,7 @@ import com.superkele.translation.core.translator.definition.TranslatorDefinition
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionReader;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
 import com.superkele.translation.core.util.Pair;
-import com.superkele.translation.core.util.ReflectUtils;
+import com.superkele.translation.core.util.MethodUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -50,7 +50,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                     Method[] declaredMethods = obj.getClass()
                             .getDeclaredMethods();
                     Arrays.stream(declaredMethods)
-                            .filter(method -> !ReflectUtils.isStaticMethod(method) && !ReflectUtils.isAbstractMethod(method))
+                            .filter(method -> !MethodUtils.isStaticMethod(method) && !MethodUtils.isAbstractMethod(method))
                             .map(method -> {
                                 Translation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(method, Translation.class);
                                 return Pair.of(method, mergedAnnotation);
@@ -86,7 +86,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                     );
                     Set<Method> methods = reflections.getMethodsAnnotatedWith(Translation.class);
                     methods.stream()
-                            .filter(ReflectUtils::isStaticMethod)
+                            .filter(MethodUtils::isStaticMethod)
                             .map(method -> {
                                 Translation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(method, Translation.class);
                                 return Pair.of(method, mergedAnnotation);

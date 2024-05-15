@@ -13,10 +13,9 @@ import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.thread.ContextPasser;
-import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.Pair;
-import com.superkele.translation.core.util.ReflectUtils;
+import com.superkele.translation.core.util.MethodUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
@@ -62,7 +61,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
 
     @Override
     protected Boolean predictFilter(Class<?> clazz) {
-        Field[] fields = ReflectUtils.getFields(clazz);
+        Field[] fields = MethodUtils.getFields(clazz);
         List<Pair<Field, Mapping>> mappingFields = new ArrayList<>();
         for (Field field : fields) {
             Mapping mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, Mapping.class);
