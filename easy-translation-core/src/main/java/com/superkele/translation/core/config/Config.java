@@ -6,7 +6,7 @@ import com.superkele.translation.core.translator.ContextTranslator;
 import com.superkele.translation.core.translator.MapperTranslator;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.util.Pair;
-import com.superkele.translation.core.util.MethodUtils;
+import com.superkele.translation.core.util.ReflectUtils;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -62,14 +62,14 @@ public class Config {
      * @return
      */
     public Config registerTranslatorClazz(Class<? extends Translator> translatorClazz) {
-        Pair<Method, MethodType> pair = MethodUtils.findFunctionInterfaceMethodType(translatorClazz);
+        Pair<Method, MethodType> pair = ReflectUtils.findFunctionInterfaceMethodType(translatorClazz);
         translatorClazzMap.put(pair.getKey().getParameterCount(), translatorClazz);
         return this;
     }
 
     public Config registerTranslatorClazz(Class<? extends Translator>... translatorClazzArr) {
         for (Class<? extends Translator> translatorClazz : translatorClazzArr) {
-            Pair<Method, MethodType> pair = MethodUtils.findFunctionInterfaceMethodType(translatorClazz);
+            Pair<Method, MethodType> pair = ReflectUtils.findFunctionInterfaceMethodType(translatorClazz);
             translatorClazzMap.put(pair.getKey().getParameterCount(), translatorClazz);
         }
         return this;

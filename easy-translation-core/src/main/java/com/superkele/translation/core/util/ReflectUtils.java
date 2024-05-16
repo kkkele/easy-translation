@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @SuppressWarnings("rawtypes")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MethodUtils extends ReflectUtil {
+public class ReflectUtils extends ReflectUtil {
 
     private static final String SETTER_PREFIX = "set";
 
@@ -38,7 +38,6 @@ public class MethodUtils extends ReflectUtil {
      */
     @SuppressWarnings("unchecked")
     public static <E> E invokeGetter(Object obj, String propertyName) {
-        Object object = obj;
         PropertyGetter propertyGetter = PROPERTY_GETTER_CACHE.computeIfAbsent(Pair.of(obj.getClass(), propertyName), pair -> {
             Class<?> key = pair.getKey();
             String value = pair.getValue();
@@ -48,6 +47,7 @@ public class MethodUtils extends ReflectUtil {
                 String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(properties[i]);
                 try {
                     Method method = key.getMethod(getterMethodName);
+                    method.setAccessible(true);
                     key = method.getReturnType();
                     getterMethods[i] = method;
                 } catch (NoSuchMethodException e) {
@@ -56,7 +56,13 @@ public class MethodUtils extends ReflectUtil {
             }
             return new PropertyGetter(getterMethods);
         });
-        return (E) propertyGetter.get(object);
+        try {
+            return (E) propertyGetter.get(obj);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -65,34 +71,41 @@ public class MethodUtils extends ReflectUtil {
      * 支持多级，如：对象名.对象名.方法
      */
     public static <E> void invokeSetter(Object obj, String propertyName, E setterValue) {
-        if (StringUtils.isBlank(propertyName)) {
-            return;
-        }
-        PROPERTY_SETTER_CACHE.computeIfAbsent(Pair.of(obj.getClass(), propertyName), pair -> {
-            Class<?> key = pair.getKey();
-            String pName = pair.getValue();
-            String[] properties = StringUtils.split(pName, ".");
-            Method[] getterMethods = new Method[properties.length - 1];
-            for (int i = 0; i < getterMethods.length; i++) {
-                String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(properties[i]);
+        try {
+            PROPERTY_SETTER_CACHE.computeIfAbsent(Pair.of(obj.getClass(), propertyName), pair -> {
+                Class<?> key = pair.getKey();
+                String pName = pair.getValue();
+                String[] properties = StringUtils.split(pName, ".");
+                Method[] getterMethods = new Method[properties.length - 1];
+                for (int i = 0; i < getterMethods.length; i++) {
+                    String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(properties[i]);
+                    try {
+                        Method getterMethod = key.getMethod(getterMethodName);
+                        key = getterMethod.getReturnType();
+                        getterMethod.setAccessible(true);
+                        getterMethods[i] = getterMethod;
+                    } catch (NoSuchMethodException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 try {
-                    Method method = key.getMethod(getterMethodName);
-                    key = method.getReturnType();
-                    getterMethods[i] = method;
+                    String property = properties[properties.length - 1];
+                    String setterName = SETTER_PREFIX + StringUtils.capitalize(property);
+                    //获取setter方法
+                    Method setterMethod = key.getMethod(setterName, key.getDeclaredField(property).getType());
+                    setterMethod.setAccessible(true);
+                    return new PropertySetter(getterMethods, setterMethod);
                 } catch (NoSuchMethodException e) {
                     throw new RuntimeException(e);
+                } catch (NoSuchFieldException e) {
+                    throw new RuntimeException(e);
                 }
-            }
-            try {
-                String setterName = SETTER_PREFIX + StringUtils.capitalize(properties[properties.length - 1]);
-                Method setterMethod = key.getMethod(setterName, key.getDeclaredField(properties[properties.length - 1]).getType());
-                return new PropertySetter(getterMethods, setterMethod);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchFieldException e) {
-                throw new RuntimeException(e);
-            }
-        }).set(obj,setterValue);
+            }).set(obj, setterValue);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static boolean isStaticMethod(Method method) {
@@ -146,16 +159,10 @@ public class MethodUtils extends ReflectUtil {
             this.getterMethods = getterMethods;
         }
 
-        public Object get(Object object) {
+        public Object get(Object object) throws InvocationTargetException, IllegalAccessException {
             Object res = object;
             for (int i = 0; i < getterMethods.length; i++) {
-                try {
-                    res = getterMethods[i].invoke(res);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
+                res = getterMethods[i].invoke(res);
             }
             return res;
         }
@@ -171,24 +178,12 @@ public class MethodUtils extends ReflectUtil {
             this.setterMethod = setterMethods;
         }
 
-        public void set(Object object, Object value) {
+        public void set(Object object, Object value) throws InvocationTargetException, IllegalAccessException {
             Object res = object;
             for (int i = 0; i < getterMethods.length; i++) {
-                try {
-                    res = getterMethods[i].invoke(object);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
+                res = getterMethods[i].invoke(object);
             }
-            try {
-                setterMethod.invoke(res, value);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
+            setterMethod.invoke(res, value);
         }
     }
 }

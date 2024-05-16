@@ -2,7 +2,7 @@ package com.superkele.translation.test.lambdametafactory;
 
 import com.superkele.translation.core.convert.MethodConvert;
 import com.superkele.translation.core.translator.ContextTranslator;
-import com.superkele.translation.core.util.MethodUtils;
+import com.superkele.translation.core.util.ReflectUtils;
 import com.superkele.translation.test.util.TimeRecorder;
 import lombok.Data;
 import org.junit.Test;
@@ -50,6 +50,8 @@ public class PerformanceTest {
         try {
             getPerson = Person.class.getMethod("getPerson");
             getName = Person.class.getMethod("getName");
+            getPerson.setAccessible(true);
+            getName.setAccessible(true);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -130,26 +132,26 @@ public class PerformanceTest {
             person.getPerson().getName();
             Person p = (Person) getPerson.invoke(person);
             getName.invoke(p);
-            MethodUtils.invokeGetter(person, "person.name");
+            ReflectUtils.invokeGetter(person, "person.name");
         }
 
         long l1 = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             person.getPerson().getName();
         }
         long l2 = System.currentTimeMillis();
         System.out.println("getter cost : " + (l2 - l1) + "ms");
 
         long begin = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             getName.invoke(getPerson.invoke(person));
         }
         long end = System.currentTimeMillis();
         System.out.println("method cost : " + (end - begin) + "ms");
 
         long begin1 = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
-            MethodUtils.invokeGetter(person, "person.name");
+        for (int i = 0; i < 10000000; i++) {
+            ReflectUtils.invokeGetter(person, "person.name");
         }
         long end1 = System.currentTimeMillis();
         System.out.println("reflect cost : " + (end1 - begin1) + "ms");

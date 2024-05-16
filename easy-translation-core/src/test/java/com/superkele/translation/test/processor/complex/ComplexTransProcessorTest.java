@@ -49,19 +49,21 @@ public class ComplexTransProcessorTest {
     /**
      * 在充分预热之后，执行结果如下，性能消耗微乎其微
      * [0]
-     syncMethod cost =2258ms
 
-     processor cost =2352ms
+     syncMethod cost =2278ms
+     processor cost =2326ms
+
      <hr>
      * [1]
-     syncMethod cost =2261ms
 
-     processor cost =2368ms
+     syncMethod cost =2269ms
+     processor cost =2348ms
+
      <hr>
      * [2]
-     syncMethod cost =2276ms
+     syncMethod cost =2312ms
+     processor cost =2320ms
 
-     processor cost =2348ms
      */
     @Test
     public void test() {
@@ -100,7 +102,7 @@ public class ComplexTransProcessorTest {
             if (complexOperateVO.getShopName() == null){
                 throw new RuntimeException("赋值失败");
             }
-        }, 100);
+        }, 10000);
         System.out.println("syncMethod cost =" + record2 + "ms");
         long record = TimeRecorder.record(() -> {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
@@ -109,7 +111,7 @@ public class ComplexTransProcessorTest {
             if (complexOperateVO.getShopName() == null){
                 throw new RuntimeException("赋值失败");
             }
-        }, 100);
+        }, 10000);
         System.out.println("processor cost =" + record + "ms");
     }
 

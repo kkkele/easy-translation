@@ -15,7 +15,7 @@ import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.thread.ContextPasser;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.Pair;
-import com.superkele.translation.core.util.MethodUtils;
+import com.superkele.translation.core.util.ReflectUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
@@ -23,7 +23,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -51,17 +50,15 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
     }
 
     @Override
-    protected void processInternal(Object obj, Class<?> clazz, Supplier<Void> callback) {
+    protected void processInternal(Object obj, Class<?> clazz) {
         FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
         OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation);
         onceFieldTranslationHandler.handle(obj);
-        Optional.ofNullable(callback)
-                .ifPresent(Supplier::get);
     }
 
     @Override
     protected Boolean predictFilter(Class<?> clazz) {
-        Field[] fields = MethodUtils.getFields(clazz);
+        Field[] fields = ReflectUtils.getFields(clazz);
         List<Pair<Field, Mapping>> mappingFields = new ArrayList<>();
         for (Field field : fields) {
             Mapping mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, Mapping.class);
@@ -97,8 +94,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
         for (Pair<Field, Mapping> pair : mappingFields) {
             Mapping mapping = pair.getValue();
             FieldTranslationEvent fieldTranslationEvent = new FieldTranslationEvent();
-            final short event = (short) (initEvent << leftShift);
-            fieldTranslationEvent.setFieldName(pair.getKey().getName());
+            short event = (short) (initEvent << leftShift);
             fieldTranslationEvent.setEventValue(event);
             fieldTranslationEvent.setAsync(mapping.async());
             fieldTranslationEvent.setFieldTranslationInvoker(getMappingHandler().convert(pair.getKey(), mapping));
@@ -132,7 +128,6 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                     Assert.isTrue(ObjectUtil.isNotNull(preEvent), "after字段必须为加了@Mapping注解(或其对应的组合注解)的字段");
                     eventMask |= preEvent.getEventValue();
                 }
-                fieldTranslationEvent.setPreEvents(Arrays.copyOf(preEvents, count));
                 List<FieldTranslationEvent> afterEvents = afterEventMapDTO.computeIfAbsent(eventMask, key -> new ArrayList<>());
                 afterEvents.add(fieldTranslationEvent);
             }
@@ -164,8 +159,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
          */
         private final boolean cacheEnabled;
         private final CountDownLatch latch;
-        private final Map<Short, AtomicInteger> countMap = new ConcurrentHashMap<>();
-        protected Set<Short> consumed = new ConcurrentHashSet<>();
+        private Set<Short> consumed = new ConcurrentHashSet<>();
         private Map<String, Object> translationResCache;
         private FieldTranslation fieldTranslation;
         private ReentrantLock lock = new ReentrantLock();

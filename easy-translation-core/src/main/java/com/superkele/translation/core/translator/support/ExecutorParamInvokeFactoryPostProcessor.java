@@ -33,16 +33,16 @@ public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactor
         }
     }
 
-    public Object[] reWrapper(Object[] arr, int[] keys, int[] others) {
-        Object[] list = new Object[keys.length + others.length];
+    public Object[] reWrapper(Object[] args, int[] keys, int[] others) {
+        Object[] reWrapper = new Object[keys.length + others.length];
         // 复原原来的位置情况
         //arr的前几个位置全都是mapper，找到对应的key位置填充 ，others同理
         for (int i = 0; i < keys.length; i++) {
-            list[keys[i]] = arr[i];
+            reWrapper[keys[i]] = args[i];
         }
         for (int i = 0; i < others.length; i++) {
-            list[others[i]] = arr[i + keys.length];
+            reWrapper[others[i]] = args[i + keys.length];
         }
-        return list;
+        return reWrapper;
     }
 }

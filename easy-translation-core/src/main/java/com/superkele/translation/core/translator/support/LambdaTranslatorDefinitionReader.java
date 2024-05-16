@@ -9,7 +9,7 @@ import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
 import com.superkele.translation.core.util.Assert;
-import com.superkele.translation.core.util.MethodUtils;
+import com.superkele.translation.core.util.ReflectUtils;
 
 import java.lang.invoke.LambdaConversionException;
 import java.lang.reflect.*;
@@ -58,7 +58,7 @@ public class LambdaTranslatorDefinitionReader extends AbstractTranslatorDefiniti
         Map<Object, Object> map = new HashMap<>();
         Field mapperField = declaredFields[mapperIndex];
         for (Enum enumConstant : enumClass.getEnumConstants()) {
-            map.put(MethodUtils.invokeGetter(enumConstant, mapperField.getName()), MethodUtils.invokeGetter(enumConstant, mappedField.getName()));
+            map.put(ReflectUtils.invokeGetter(enumConstant, mapperField.getName()), ReflectUtils.invokeGetter(enumConstant, mappedField.getName()));
         }
         MapperTranslator mapperTranslator = mapper -> map.get(mapper);
         translatorDefinition.setTranslator(mapperTranslator);
