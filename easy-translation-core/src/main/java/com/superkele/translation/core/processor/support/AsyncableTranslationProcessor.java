@@ -219,13 +219,13 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
             }
             latch.countDown();
             //更新事件
-            this.activeEvent.updateAndGet(current -> current | eventValue);
+            int activeEvent = this.activeEvent.updateAndGet(current -> current | eventValue);
             //获取事件掩码集合，对比触发after事件
             fieldTranslation.getAfterEventMaskMap().forEach((eventMask, fieldTranslationEvents) -> {
                 if (consumed.contains(eventMask)) {
                     return;
                 }
-                if ((this.activeEvent.shortValue() & eventMask) == eventMask) {
+                if ((activeEvent & eventMask) == eventMask) {
                     lock.lock();
                     try {
                         if (consumed.contains(eventMask)) {
