@@ -20,7 +20,7 @@
 
 - **动态方法**
 
-  动态方法由对象执行，这就意味着，你可以原原本本的使用代理对象，所有增强方法的手段都会被得到执行，事务(例如:@Transcational)，缓存（例如:@Cacheable），或是幂等（`Easy-Idempotent`提供的@Idempotent）注解等等，具有极高的兼容性。
+  动态方法由对象执行，这就意味着，你可以原原本本的使用代理对象，所有增强方法的手段都会被得到执行，事务(例如:*@Transcational*)，缓存（例如:*@Cacheable*），或是幂等（`Easy-Idempotent`提供的**@Idempotent**）注解等等，具有极高的兼容性。
 
 - **静态方法**
 
@@ -28,7 +28,7 @@
 
 - **枚举类**
 
-  是的，`Easy-Translation`支持您使用枚举当作翻译器，不过需要您在枚举类上额外标注@TransKey注解当作翻译的key，@TransValue当作翻译的值，
+  是的，`Easy-Translation`支持您使用枚举当作翻译器，不过需要您在枚举类上额外标注*@TransMapper*注解当作翻译的key，*@TransValue*当作翻译的值，
 
   插件会自动为您生成一个方法（底层用map进行了一个存储），从而执行对应的翻译功能。
 
