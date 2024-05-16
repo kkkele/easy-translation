@@ -183,7 +183,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                 translate(obj, sortEvent);
             }
             try {
-                latch.await(getTimeout(), TimeUnit.SECONDS);
+                latch.await(getTimeout(), TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

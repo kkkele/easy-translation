@@ -36,29 +36,29 @@ public class DefaultTransExecutorContextTest {
     }
 
     @Test
-    public void performanceTest(){
+    public void performanceTest() {
         UserService userService = new UserService();
         DefaultTransExecutorContext context = DefaultTransExecutorContext.builder()
                 .invokeObjs(userService)
                 .build();
         TranslateExecutor userIdToUser = context.findExecutor("user_id_to_user");
         //让jvm充分预热
-        for (int i = 0; i< 1000;i ++){
+        for (int i = 0; i < 1000; i++) {
             userIdToUser.execute(1);
-            userIdToUser.execute(1);
+            userService.getUserById(1);
         }
         CompletableFuture[] completableFutures = new CompletableFuture[2];
         completableFutures[0] = CompletableFuture.runAsync(() -> {
             long record = TimeRecorder.record(() -> {
                 userService.getUserById(1);
-            }, 1000);
-            System.out.println("originMethodCost" + record +"ms");
+            }, 1000000);
+            System.out.println("originMethodCost" + record + "ms");
         });
         completableFutures[1] = CompletableFuture.runAsync(() -> {
             long record = TimeRecorder.record(() -> {
                 userIdToUser.execute(1);
-            }, 1000);
-            System.out.println("translateMethodCost" + record +"ms");
+            }, 1000000);
+            System.out.println("translateMethodCost" + record + "ms");
         });
         CompletableFuture.allOf(completableFutures).join();
         /**
@@ -121,12 +121,7 @@ public class DefaultTransExecutorContextTest {
 
         @Translation(name = "user_id_to_user")
         public User getUserById(Integer id) {
-            try {
-                Thread.sleep(6); //模仿IO操作
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            return userFactory.computeIfAbsent(id, k -> new User(id, "username" + id, "nickName" + id));
+            return new User(id, "username" + id, "nickName" + id);
         }
     }
 }
