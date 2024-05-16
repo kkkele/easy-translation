@@ -8,6 +8,7 @@ import lombok.Data;
 import org.junit.Test;
 
 import java.lang.invoke.LambdaConversionException;
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
@@ -25,6 +26,10 @@ public class PerformanceTest {
     Method getPerson;
 
     Method getName;
+
+    MethodHandle getPersonMethodHandle;
+
+    MethodHandle getNameMethodHandle;
 
     {
         try {
@@ -44,14 +49,21 @@ public class PerformanceTest {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    {
         try {
             getPerson = Person.class.getMethod("getPerson");
             getName = Person.class.getMethod("getName");
             getPerson.setAccessible(true);
             getName.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            getPersonMethodHandle = MethodConvert.getMethodHandle(PropertyGetter.class, Person.class.getMethod("getPerson"));
+            getNameMethodHandle = MethodConvert.getMethodHandle(PropertyGetter.class, Person.class.getMethod("getName"));
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (LambdaConversionException e) {
+            throw new RuntimeException(e);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -136,27 +148,40 @@ public class PerformanceTest {
         }
 
         long l1 = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             person.getPerson().getName();
         }
         long l2 = System.currentTimeMillis();
-        System.out.println("getter cost : " + (l2 - l1) + "ms");
+        System.out.println("直接调用 cost : " + (l2 - l1) + "ms");
 
         long begin = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             getName.invoke(getPerson.invoke(person));
         }
         long end = System.currentTimeMillis();
-        System.out.println("method cost : " + (end - begin) + "ms");
+        System.out.println("反射调用 cost : " + (end - begin) + "ms");
 
         long begin1 = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             ReflectUtils.invokeGetter(person, "person.name");
         }
         long end1 = System.currentTimeMillis();
-        System.out.println("reflect cost : " + (end1 - begin1) + "ms");
-    }
+        System.out.println("使用工具类 cost : " + (end1 - begin1) + "ms");
 
+        long r1 = System.currentTimeMillis();
+        for (int i = 0; i < 10000000; i++) {
+            try {
+                PropertyGetter propertyGetter1 = (PropertyGetter) getPersonMethodHandle.invoke(person);
+                Object o = propertyGetter1.get();
+                PropertyGetter propertyGetter2 = (PropertyGetter) getNameMethodHandle.invoke(o);
+                propertyGetter2.get();
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        }
+        long r2 = System.currentTimeMillis();
+        System.out.println("czy优化后 cost : " + (r2 - r1) + "ms");
+    }
 
     public int method1() {
         int a = random.nextInt();
@@ -177,6 +202,7 @@ public class PerformanceTest {
             throw new RuntimeException(e);
         }
     }
+
 
     @Data
     public static class Person {
