@@ -22,9 +22,13 @@ public abstract class ListableTranslationProcessor extends AsyncableTranslationP
             return;
         }
         List<ContextPasser> contextPassers = buildContextPassers();
-        contextPassers.forEach(ContextPasser::passContext);
+        contextPassers.forEach(ContextPasser::setPassValue);
         CompletableFuture[] futureArr = obj.stream()
-                .map(beanDescription -> CompletableFuture.runAsync(() -> unpackBeanDescription(beanDescription), getThreadPoolExecutor()))
+                .map(beanDescription -> CompletableFuture.runAsync(() -> {
+                    contextPassers.forEach(ContextPasser::passContext);
+                    unpackBeanDescription(beanDescription);
+                    contextPassers.forEach(ContextPasser::clearContext);
+                }, getThreadPoolExecutor()))
                 .toArray(CompletableFuture[]::new);
         CompletableFuture.allOf(futureArr).join();
     }

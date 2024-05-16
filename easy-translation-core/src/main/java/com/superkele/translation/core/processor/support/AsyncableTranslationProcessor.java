@@ -201,6 +201,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                 CompletableFuture.runAsync(() -> {
                     passerCollect.forEach(ContextPasser::passContext);
                     translateInternal(obj, event);
+                    passerCollect.forEach(ContextPasser::clearContext);
                 }, getThreadPoolExecutor());
             } else {
                 translateInternal(obj, event);

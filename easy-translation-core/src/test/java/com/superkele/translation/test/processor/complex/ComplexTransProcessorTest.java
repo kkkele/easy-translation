@@ -69,7 +69,7 @@ public class ComplexTransProcessorTest {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
             complexOperateVO.setOperateId(1);
             processor.process(complexOperateVO);
-        }, 20);
+        }, 200);
         TimeRecorder.record(() -> {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
             complexOperateVO.setOperateId(1);
@@ -86,11 +86,11 @@ public class ComplexTransProcessorTest {
         //正式测试
         long record2 = TimeRecorder.record(() -> {
             handProcess();
-        }, 10000);
+        }, 100000);
         System.out.println("syncMethod cost =" + record2 + "ms");
         long record = TimeRecorder.record(() -> {
             processorProcess();
-        }, 10000);
+        }, 100000);
         System.out.println("processor cost =" + record + "ms");
     }
 
