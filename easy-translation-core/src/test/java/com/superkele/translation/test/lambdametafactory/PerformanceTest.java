@@ -1,6 +1,7 @@
 package com.superkele.translation.test.lambdametafactory;
 
 import com.superkele.translation.core.convert.MethodConvert;
+import com.superkele.translation.core.property.support.DefaultMethodHandlePropertyHandler;
 import com.superkele.translation.core.translator.ContextTranslator;
 import com.superkele.translation.core.util.ReflectUtils;
 import com.superkele.translation.test.util.TimeRecorder;
@@ -30,6 +31,9 @@ public class PerformanceTest {
     MethodHandle getPersonMethodHandle;
 
     MethodHandle getNameMethodHandle;
+
+    DefaultMethodHandlePropertyHandler defaultMethodHandlePropertyHandler = new DefaultMethodHandlePropertyHandler();
+
 
     {
         try {
@@ -145,6 +149,7 @@ public class PerformanceTest {
             Person p = (Person) getPerson.invoke(person);
             getName.invoke(p);
             ReflectUtils.invokeGetter(person, "person.name");
+            defaultMethodHandlePropertyHandler.invokeGetter(person, "person.name");
         }
 
         long l1 = System.currentTimeMillis();
@@ -170,14 +175,7 @@ public class PerformanceTest {
 
         long r1 = System.currentTimeMillis();
         for (int i = 0; i < 10000000; i++) {
-            try {
-                PropertyGetter propertyGetter1 = (PropertyGetter) getPersonMethodHandle.invoke(person);
-                Object o = propertyGetter1.get();
-                PropertyGetter propertyGetter2 = (PropertyGetter) getNameMethodHandle.invoke(o);
-                propertyGetter2.get();
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
-            }
+            defaultMethodHandlePropertyHandler.invokeGetter(person, "person.name");
         }
         long r2 = System.currentTimeMillis();
         System.out.println("czy优化后 cost : " + (r2 - r1) + "ms");
