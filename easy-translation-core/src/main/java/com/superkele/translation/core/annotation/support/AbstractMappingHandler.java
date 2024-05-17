@@ -17,13 +17,13 @@ public abstract class AbstractMappingHandler implements MappingHandler {
 
     private final TransExecutorFactory translatorFactory;
 
-    protected abstract PropertyGetter getPropertyGetter();
-
-    protected abstract PropertySetter getPropertySetter();
-
     public AbstractMappingHandler(TransExecutorFactory translatorFactory) {
         this.translatorFactory = translatorFactory;
     }
+
+    protected abstract PropertyGetter getPropertyGetter();
+
+    protected abstract PropertySetter getPropertySetter();
 
     @Override
     public FieldTranslationInvoker convert(Field declaringField, Mapping mapping) {
@@ -67,7 +67,7 @@ public abstract class AbstractMappingHandler implements MappingHandler {
             }
             //翻译值
             Object mappingValue = executor.execute(args);
-            if (mappingValue != null) {
+            if (callback != null) {
                 callback.accept(uniqueName, mappingValue);
             }
             //set注入
