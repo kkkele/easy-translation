@@ -47,12 +47,12 @@ public class EasyTranslationBaseConfig {
     }
 
     @Bean
-    public ConfigurableTransExecutorContext defaultTransExecutorContext() {
+    public DefaultTransExecutorContext defaultTransExecutorContext() {
         return new DefaultTransExecutorContext();
     }
 
     @Bean
-    public TranslationProcessor defaultTranslationProcessor(ConfigurableTransExecutorContext defaultTransExecutorContext, Config defaultTranslationConfig) {
+    public DefaultTranslationProcessor defaultTranslationProcessor(DefaultTransExecutorContext defaultTransExecutorContext, Config defaultTranslationConfig) {
         return new DefaultTranslationProcessor(defaultTransExecutorContext, defaultTranslationConfig);
     }
 

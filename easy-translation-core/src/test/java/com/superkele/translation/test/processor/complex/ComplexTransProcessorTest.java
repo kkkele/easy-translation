@@ -14,9 +14,6 @@ import com.superkele.translation.test.util.TimeRecorder;
 import lombok.Data;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.concurrent.Executors;
 
 
@@ -49,19 +46,21 @@ public class ComplexTransProcessorTest {
     /**
      * 在充分预热之后，执行结果如下，性能消耗微乎其微
      * [0]
-     syncMethod cost =2258ms
 
-     processor cost =2352ms
+     syncMethod cost =2278ms
+     processor cost =2326ms
+
      <hr>
      * [1]
-     syncMethod cost =2261ms
 
-     processor cost =2368ms
+     syncMethod cost =2269ms
+     processor cost =2348ms
+
      <hr>
      * [2]
-     syncMethod cost =2276ms
+     syncMethod cost =2312ms
+     processor cost =2320ms
 
-     processor cost =2348ms
      */
     @Test
     public void test() {
@@ -70,7 +69,7 @@ public class ComplexTransProcessorTest {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
             complexOperateVO.setOperateId(1);
             processor.process(complexOperateVO);
-        }, 20);
+        }, 200);
         TimeRecorder.record(() -> {
             ComplexOperateVO complexOperateVO = new ComplexOperateVO();
             complexOperateVO.setOperateId(1);
@@ -86,31 +85,69 @@ public class ComplexTransProcessorTest {
         }, 20);
         //正式测试
         long record2 = TimeRecorder.record(() -> {
-            ComplexOperateVO complexOperateVO = new ComplexOperateVO();
-            complexOperateVO.setOperateId(1);
-            Operate operate = operateService.getOperate(complexOperateVO.operateId);
-            complexOperateVO.operateName = operate.getName();
-            complexOperateVO.operateDesc = operateService.convertOperateName(complexOperateVO.operateName);
-            complexOperateVO.userId = operate.getUserId();
-            User user = userService.getUser(complexOperateVO.userId);
-            complexOperateVO.username = user.getUsername();
-            complexOperateVO.shopId = user.getShopId();
-            Shop shop = shopService.getShop(complexOperateVO.shopId);
-            complexOperateVO.shopName = shop.getShopName();
-            if (complexOperateVO.getShopName() == null){
-                throw new RuntimeException("赋值失败");
-            }
-        }, 100);
+            handProcess();
+        }, 100000);
         System.out.println("syncMethod cost =" + record2 + "ms");
         long record = TimeRecorder.record(() -> {
-            ComplexOperateVO complexOperateVO = new ComplexOperateVO();
-            complexOperateVO.setOperateId(1);
-            processor.process(complexOperateVO);
-            if (complexOperateVO.getShopName() == null){
-                throw new RuntimeException("赋值失败");
-            }
-        }, 100);
+            processorProcess();
+        }, 100000);
         System.out.println("processor cost =" + record + "ms");
+    }
+
+    private void handProcess() {
+        ComplexOperateVO complexOperateVO = new ComplexOperateVO();
+        complexOperateVO.setOperateId(1);
+        Operate operate = operateService.getOperate(complexOperateVO.operateId);
+        complexOperateVO.operateName = operate.getName();
+        complexOperateVO.operateDesc = operateService.convertOperateName(complexOperateVO.operateName);
+        complexOperateVO.userId = operate.getUserId();
+        User user = userService.getUser(complexOperateVO.userId);
+        complexOperateVO.username = user.getUsername();
+        complexOperateVO.shopId = user.getShopId();
+        Shop shop = shopService.getShop(complexOperateVO.shopId);
+        complexOperateVO.shopName = shop.getShopName();
+        if (complexOperateVO.getUserId() == null){
+            throw new RuntimeException("赋值失败");
+        }
+        if (complexOperateVO.getUsername() == null){
+            throw new RuntimeException("赋值失败");
+        }
+        if (complexOperateVO.getOperateDesc() == null){
+            throw new RuntimeException("赋值失败");
+        }
+        if (complexOperateVO.getOperateName() == null){
+            throw new RuntimeException("赋值失败");
+        }
+        if (complexOperateVO.getShopName() == null){
+            throw new RuntimeException("赋值失败");
+        }
+        if (complexOperateVO.getShopId() == null){
+            throw new RuntimeException("赋值失败");
+        }
+    }
+
+    private void processorProcess() {
+        ComplexOperateVO complexOperateVO = new ComplexOperateVO();
+        complexOperateVO.setOperateId(1);
+        processor.process(complexOperateVO);
+        if (complexOperateVO.getUserId() == null){
+            throw new RuntimeException("赋值失败");
+        }
+        if (complexOperateVO.getUsername() == null){
+            throw new RuntimeException("赋值失败");
+        }
+        if (complexOperateVO.getOperateDesc() == null){
+            throw new RuntimeException("赋值失败");
+        }
+        if (complexOperateVO.getOperateName() == null){
+            throw new RuntimeException("赋值失败");
+        }
+        if (complexOperateVO.getShopName() == null){
+            throw new RuntimeException("赋值失败");
+        }
+        if (complexOperateVO.getShopId() == null){
+            throw new RuntimeException("赋值失败");
+        }
     }
 
     /**
@@ -136,9 +173,7 @@ public class ComplexTransProcessorTest {
         //正式执行
         while (true) {
             long record = TimeRecorder.record(() -> {
-                ComplexOperateVO complexOperateVO = new ComplexOperateVO();
-                complexOperateVO.setOperateId(1);
-                asyncProcessor.process(complexOperateVO);
+                processorProcess();
             }, 100);
             System.out.println("processor cost =" + record + "ms");
         }

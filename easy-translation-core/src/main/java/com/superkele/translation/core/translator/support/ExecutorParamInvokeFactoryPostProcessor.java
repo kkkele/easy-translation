@@ -1,5 +1,6 @@
 package com.superkele.translation.core.translator.support;
 
+import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.ConfigurableTransDefinitionExecutorFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
@@ -28,21 +29,21 @@ public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactor
                 }
                 i++;
             }
-            definition.setTranslateExecutor(args ->
-                    definition.getTranslator().doTranslate(reWrapper(args, mapperIndex, otherIndex)));
+            Translator translator = definition.getTranslator();
+            definition.setTranslateExecutor(args -> translator.doTranslate(reWrapper(args, mapperIndex, otherIndex)));
         }
     }
 
-    public Object[] reWrapper(Object[] arr, int[] keys, int[] others) {
-        Object[] list = new Object[keys.length + others.length];
+    public Object[] reWrapper(Object[] args, int[] keys, int[] others) {
+        Object[] reWrapperArgs = new Object[keys.length + others.length];
         // 复原原来的位置情况
         //arr的前几个位置全都是mapper，找到对应的key位置填充 ，others同理
         for (int i = 0; i < keys.length; i++) {
-            list[keys[i]] = arr[i];
+            reWrapperArgs[keys[i]] = args[i];
         }
         for (int i = 0; i < others.length; i++) {
-            list[others[i]] = arr[i + keys.length];
+            reWrapperArgs[others[i]] = args[i + keys.length];
         }
-        return list;
+        return reWrapperArgs;
     }
 }

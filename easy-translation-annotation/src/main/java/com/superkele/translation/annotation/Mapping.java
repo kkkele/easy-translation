@@ -1,6 +1,7 @@
 package com.superkele.translation.annotation;
 
 
+import com.superkele.translation.annotation.constant.DefaultNullPointerExceptionHandler;
 import com.superkele.translation.annotation.constant.TranslateTiming;
 
 import java.lang.annotation.*;
@@ -67,4 +68,6 @@ public @interface Mapping {
      */
     String[] after() default {};
 
+
+    Class<? extends NullPointerExceptionHandler> nullPointerHandler() default DefaultNullPointerExceptionHandler.class;
 }

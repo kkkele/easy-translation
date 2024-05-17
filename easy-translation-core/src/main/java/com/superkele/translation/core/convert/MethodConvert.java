@@ -1,7 +1,6 @@
 package com.superkele.translation.core.convert;
 
 
-
 import com.superkele.translation.core.util.Pair;
 
 import java.lang.invoke.*;
@@ -44,29 +43,46 @@ public class MethodConvert {
         }
     }
 
+
     /**
-     * 转换动态方法
+     * 将方法转为任意接口句柄
      */
-    public static <T> T convertToInterface(Class<T> targetInterface,
-                                           String targetMethodName,
-                                           MethodType interfaceMethodType,
-                                           Object convertObject,
-                                           Method convertedMethod)
+    public static MethodHandle getMethodHandle(Class<?> targetInterface,
+                                               String targetMethodName,
+                                               MethodType interfaceMethodType,
+                                               Method convertedMethod)
             throws IllegalAccessException, LambdaConversionException {
         MethodHandle convertedMethodHandle = LOOKUP.unreflect(convertedMethod);
         CallSite callSite = LambdaMetafactory.metafactory(
                 LOOKUP,
                 targetMethodName,
-                MethodType.methodType(targetInterface, convertObject.getClass()),
+                MethodType.methodType(targetInterface, convertedMethod.getDeclaringClass()),
                 interfaceMethodType,
                 convertedMethodHandle,
                 MethodType.methodType(convertedMethod.getReturnType(), convertedMethod.getParameterTypes()));
-        try {
-            return (T) callSite.getTarget().invoke(convertObject);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
+        return callSite.getTarget();
     }
+
+    /**
+     * 将方法转为任意FunctionInterface句柄
+     */
+    public static MethodHandle getMethodHandle(Class<?> targetInterface,
+                                        Method convertedMethod)
+            throws IllegalAccessException, LambdaConversionException {
+/*        Pair<Method, MethodType> pairs = findFunctionInterfaceMethodType(targetInterface);
+        return getMethodHandle(targetInterface, pairs.getKey().getName(), pairs.getValue(), convertedMethod);*/
+        MethodHandle convertedMethodHandle = LOOKUP.unreflect(convertedMethod);
+        Pair<Method, MethodType> pairs = findFunctionInterfaceMethodType(targetInterface);
+        CallSite callSite = LambdaMetafactory.metafactory(
+                LOOKUP,
+                pairs.getKey().getName(),
+                MethodType.methodType(targetInterface, convertedMethod.getDeclaringClass()),
+                pairs.getValue(),
+                convertedMethodHandle,
+                MethodType.methodType(convertedMethod.getReturnType(), convertedMethod.getParameterTypes()));
+        return callSite.getTarget();
+    }
+
 
     /**
      * 转换静态方法

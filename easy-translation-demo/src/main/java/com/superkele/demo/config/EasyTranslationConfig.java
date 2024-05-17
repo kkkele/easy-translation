@@ -17,7 +17,7 @@ public class EasyTranslationConfig {
     @Bean
     public TranslationAutoConfigurationCustomizer translationAutoConfigurationCustomizer() {
         return config -> {
-            config.setTimeout(1)
+            config.setTimeout(1000)
                     .setThreadPoolExecutor(threadPoolTaskExecutor.getThreadPoolExecutor());
         };
     }

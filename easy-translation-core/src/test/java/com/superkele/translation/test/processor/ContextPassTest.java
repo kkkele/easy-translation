@@ -30,10 +30,6 @@ public class ContextPassTest {
     static DefaultTranslationProcessor asyncProcessor = new DefaultTranslationProcessor(asyncContext);
 
     static{
-        ContextHolder contextHolder = new ContextHolder();
-        contextHolder.setConsumer(obj -> LOGIN_USER.set((User) obj));
-        contextHolder.setSupplier(ContextPassTest::getLoginUser);
-        asyncProcessor.addContextHolders(contextHolder);
     }
 
 

@@ -15,21 +15,11 @@ public class OperateService {
         operate.setId(id);
         operate.setName("operate" + id);
         operate.setUserId(new Random().nextInt());
-        try {
-            TimeUnit.MILLISECONDS.sleep(5);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return operate;
     }
 
     @Translation(name = "operate_name_to_desc")
     public String convertOperateName(String name) {
-        try {
-            TimeUnit.MILLISECONDS.sleep(5);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return "解析后的" + name;
     }
 }

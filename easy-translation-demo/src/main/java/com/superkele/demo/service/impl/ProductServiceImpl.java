@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.superkele.demo.domain.entity.Product;
 import com.superkele.demo.domain.vo.ProductVo;
+import com.superkele.demo.domain.vo.ProductVoV2;
 import com.superkele.demo.service.ProductService;
 import com.superkele.translation.annotation.TranslationExecute;
 import org.springframework.stereotype.Service;
@@ -22,11 +23,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @TranslationExecute
     public ProductVo getDetailById(Integer id) {
         ProductVo productVO = new ProductVo();
         Product byId = getById(id);
         BeanUtil.copyProperties(byId, productVO);
+        return productVO;
+    }
+
+    @Override
+    @TranslationExecute
+    public ProductVoV2 getDetailByIdV2(Integer id) {
+        Product byId = getById(id);
+        ProductVoV2 productVO = new ProductVoV2();
+        productVO.setProduct(null);
         return productVO;
     }
 }

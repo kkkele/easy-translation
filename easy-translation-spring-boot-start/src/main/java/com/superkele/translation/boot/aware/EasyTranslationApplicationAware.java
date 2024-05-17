@@ -1,13 +1,12 @@
 package com.superkele.translation.boot.aware;
 
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.ArrayUtil;
 import com.superkele.translation.boot.global.TranslationGlobalInformation;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.context.ConfigurableTransExecutorContext;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
 import com.superkele.translation.core.util.LogUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
@@ -16,6 +15,7 @@ import java.util.Arrays;
 
 
 @Component("EasyTranslationApplicationAware")
+@Cacheable
 public class EasyTranslationApplicationAware implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

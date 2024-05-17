@@ -1,18 +1,16 @@
 package com.superkele.translation.core.util;
 
+import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ReflectUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -24,11 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReflectUtils extends ReflectUtil {
 
-    private static final String SETTER_PREFIX = "set";
 
-    private static final String GETTER_PREFIX = "get";
+    private static final Map<Class<?>, Pair<Method, MethodType>> FUNCTION_INTERFACE_CACHE = new WeakConcurrentMap<>();
 
-    private static final Map<Class<?>, Pair<Method, MethodType>> FUNCTION_INTERFACE_CACHE = new ConcurrentHashMap<>();
 
 
     /**
@@ -37,31 +33,26 @@ public class ReflectUtils extends ReflectUtil {
      */
     @SuppressWarnings("unchecked")
     public static <E> E invokeGetter(Object obj, String propertyName) {
-        Object object = obj;
-        for (String name : StringUtils.split(propertyName, ".")) {
-            String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(name);
-            object = invoke(object, getterMethodName);
+        Object res = obj;
+        String[] properties = StringUtils.split(propertyName, ".");
+        for (String property : properties) {
+            res = getFieldValue(res, property);
         }
-        return (E) object;
+        return (E) res;
     }
+
 
     /**
      * 调用Setter方法, 仅匹配方法名。
      * 支持多级，如：对象名.对象名.方法
      */
-    public static <E> void invokeSetter(Object obj, String propertyName, E value) {
-        Object object = obj;
-        String[] names = StringUtils.split(propertyName, ".");
-        for (int i = 0; i < names.length; i++) {
-            if (i < names.length - 1) {
-                String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(names[i]);
-                object = invoke(object, getterMethodName);
-            } else {
-                String setterMethodName = SETTER_PREFIX + StringUtils.capitalize(names[i]);
-                Method method = getMethodByName(object.getClass(), setterMethodName);
-                invoke(object, method, value);
-            }
+    public static <E> void invokeSetter(Object obj, String propertyName, E setterValue) {
+        Object res = obj;
+        String[] properties = StringUtils.split(propertyName, ".");
+        for (int i = 0; i < properties.length - 1; i++) {
+            res = getFieldValue(res, properties[i]);
         }
+        setFieldValue(res, properties[properties.length - 1], setterValue);
     }
 
     public static boolean isStaticMethod(Method method) {
@@ -73,7 +64,6 @@ public class ReflectUtils extends ReflectUtil {
         Assert.notNull(method, "method can not be null");
         return Modifier.isAbstract(method.getModifiers());
     }
-
 
     /**
      * 获取函数式接口的lambda方法的MethodType

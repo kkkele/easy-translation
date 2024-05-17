@@ -32,7 +32,7 @@ public class Config {
 
     private ExecutorService threadPoolExecutor;
 
-    private volatile long timeout = 5; //seconds
+    private volatile long timeout = 3000; //ms
 
     private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
 
