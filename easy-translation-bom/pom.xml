@@ -11,7 +11,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>1.1.0-SNAPSHOT</revision>
+        <revision>1.1.0</revision>
     </properties>
 
     <dependencyManagement>
@@ -28,13 +28,13 @@
             </dependency>
             <dependency>
                 <groupId>io.github.kkkele</groupId>
-                <artifactId>easy-translation-spring-boot3-start</artifactId>
+                <artifactId>easy-translation-spring-boot3-starter</artifactId>
                 <version>${revision}</version>
             </dependency>
 
             <dependency>
                 <groupId>io.github.kkkele</groupId>
-                <artifactId>easy-translation-spring-boot-start</artifactId>
+                <artifactId>easy-translation-spring-boot-starter</artifactId>
                 <version>${revision}</version>
             </dependency>
         </dependencies>

@@ -35,7 +35,7 @@
 
         <dependency>
             <groupId>io.github.kkkele</groupId>
-            <artifactId>easy-translation-spring-boot-start</artifactId>
+            <artifactId>easy-translation-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>

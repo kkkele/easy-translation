@@ -11,9 +11,9 @@
 
     <artifactId>easy-translation-core</artifactId>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>easy-translation-core</name>
+    <description>轻量级的翻译插件核心模块</description>
+    <url>https://gitee.com/cai-zhiyuDaKeLe/easy-translation</url>
 
     <dependencyManagement>
         <dependencies>

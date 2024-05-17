@@ -9,7 +9,11 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>easy-translation-spring-boot3-start</artifactId>
+    <artifactId>easy-translation-spring-boot-starter</artifactId>
+
+    <name>easy-translation-spring-boot-starter</name>
+    <description>easy-translation-springboot版</description>
+    <url>https://gitee.com/cai-zhiyuDaKeLe/easy-translation</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,23 +24,26 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot3.version}</version>
-                <scope>import</scope>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-
-        <!--core-->
         <dependency>
             <groupId>io.github.kkkele</groupId>
             <artifactId>easy-translation-core</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
 
-        <!-- aop -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
@@ -59,17 +66,6 @@
             <artifactId>spring-web</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
 </project>
