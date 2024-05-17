@@ -13,4 +13,5 @@ public class Product {
     private Integer catId;
 
     private Integer createBy;
+
 }

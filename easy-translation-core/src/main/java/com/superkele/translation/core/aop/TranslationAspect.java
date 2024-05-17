@@ -5,7 +5,7 @@ import com.superkele.translation.annotation.TranslationUnpackingHandler;
 import com.superkele.translation.annotation.bean.BeanDescription;
 import com.superkele.translation.core.processor.TranslationProcessor;
 import com.superkele.translation.core.util.ReflectUtils;
-import com.superkele.translation.core.util.TranslationListTypeHandlerUtil;
+import com.superkele.translation.core.util.HandlerUtil;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -31,7 +31,7 @@ public class TranslationAspect {
             return null;
         }
         Object targetObj = ReflectUtils.invokeGetter(obj, translationExecute.field());
-        TranslationUnpackingHandler listTypeHandler = TranslationListTypeHandlerUtil.getInstance(translationExecute.listTypeHandler());
+        TranslationUnpackingHandler listTypeHandler = HandlerUtil.getInstance(translationExecute.listTypeHandler());
         int unpackingType = listTypeHandler.unpackingType(targetObj);
         if (unpackingType > 0) {
             List<BeanDescription> unpacking = null;

@@ -6,6 +6,7 @@ import cn.hutool.core.collection.ListUtil;
 import com.superkele.demo.domain.R;
 import com.superkele.demo.domain.entity.Product;
 import com.superkele.demo.domain.vo.ProductVo;
+import com.superkele.demo.domain.vo.ProductVoV2;
 import com.superkele.demo.service.ProductService;
 import com.superkele.translation.annotation.TranslationExecute;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,11 @@ public class ProductController {
     @TranslationExecute(field = "data")
     public R<ProductVo> getDetailById(@PathVariable Integer id) {
         return R.ok(productService.getDetailById(id));
+    }
+
+    @GetMapping("/v2/{id}")
+    public R<ProductVoV2> getDetailByIdV2(@PathVariable Integer id) {
+        return R.ok(productService.getDetailByIdV2(id));
     }
 
     @GetMapping("/list")

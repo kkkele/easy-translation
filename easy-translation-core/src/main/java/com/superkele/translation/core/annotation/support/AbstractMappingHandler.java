@@ -2,6 +2,7 @@ package com.superkele.translation.core.annotation.support;
 
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.Mapping;
+import com.superkele.translation.annotation.NullPointerExceptionHandler;
 import com.superkele.translation.core.annotation.FieldTranslationInvoker;
 import com.superkele.translation.core.annotation.MappingHandler;
 import com.superkele.translation.core.property.PropertyGetter;
@@ -9,6 +10,7 @@ import com.superkele.translation.core.property.PropertySetter;
 import com.superkele.translation.core.translator.factory.TransExecutorFactory;
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.Assert;
+import com.superkele.translation.core.util.HandlerUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -57,7 +59,13 @@ public abstract class AbstractMappingHandler implements MappingHandler {
             Object[] args = new Object[mapperLength + otherLength];
             for (int i = 0; i < mapperLength; i++) {
                 if (StringUtils.isNotBlank(mapper[i])) {
-                    args[i] = getPropertyGetter().invokeGetter(obj, mapper[i]);
+                    try {
+                        args[i] = getPropertyGetter().invokeGetter(obj, mapper[i]);
+                    } catch (NullPointerException e) {
+                        NullPointerExceptionHandler nullPointerExceptionHandler = HandlerUtil.getNullPointerExceptionHandler(mapping.nullPointerHandler());
+                        nullPointerExceptionHandler.handle(e);
+                        return obj;
+                    }
                 }
             }
             int j = 0;
