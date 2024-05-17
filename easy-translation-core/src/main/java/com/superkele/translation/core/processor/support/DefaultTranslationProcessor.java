@@ -1,17 +1,19 @@
 package com.superkele.translation.core.processor.support;
 
 import com.superkele.translation.core.annotation.MappingHandler;
+import com.superkele.translation.core.annotation.support.AbstractMappingHandler;
 import com.superkele.translation.core.annotation.support.DefaultMappingHandler;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.context.TransExecutorContext;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
-import com.superkele.translation.core.translator.handle.TranslateExecutor;
+import com.superkele.translation.core.property.PropertyGetter;
+import com.superkele.translation.core.property.PropertySetter;
 
 import java.util.concurrent.ExecutorService;
 
 public class DefaultTranslationProcessor extends ListableTranslationProcessor {
 
-    private MappingHandler mappingHandler;
+    private DefaultMappingHandler mappingHandler;
 
     private Config config;
 
@@ -32,6 +34,16 @@ public class DefaultTranslationProcessor extends ListableTranslationProcessor {
     @Override
     protected ExecutorService getThreadPoolExecutor() {
         return this.config.getThreadPoolExecutor();
+    }
+
+    public DefaultTranslationProcessor replacePropertyGetter(PropertyGetter propertyGetter) {
+        this.mappingHandler = mappingHandler;
+        return this;
+    }
+
+    public DefaultTranslationProcessor replacePropertySetter(PropertySetter propertySetter) {
+        this.mappingHandler = mappingHandler;
+        return this;
     }
 
     @Override

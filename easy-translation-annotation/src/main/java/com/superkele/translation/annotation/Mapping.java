@@ -67,4 +67,6 @@ public @interface Mapping {
      */
     String[] after() default {};
 
+
+    Class<? extends NullPointerExceptionHandler> exceptionHandler() default NullPointerExceptionHandler.class;
 }
