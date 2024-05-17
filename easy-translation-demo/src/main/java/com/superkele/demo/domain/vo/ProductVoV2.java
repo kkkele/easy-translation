@@ -14,9 +14,9 @@ public class ProductVoV2 {
     @Mapping(translator = "getUser", mapper = "product.createBy", receive = "nickName", nullPointerHandler = IgnoreNullPointerExceptionHandler.class)
     private String nickName;
 
-    @Mapping(translator = "getUser", mapper = "product.createBy", receive = "username", nullPointerHandler = IgnoreNullPointerExceptionHandler.class)
+    @Mapping(translator = "getUser", mapper = "product.createBy", receive = "username")
     private String username;
 
-    @Mapping(translator = "getCatName", mapper = "product.catId", nullPointerHandler = IgnoreNullPointerExceptionHandler.class)
+    @Mapping(translator = "getCatName", mapper = "product.catId")
     private String catName;
 }

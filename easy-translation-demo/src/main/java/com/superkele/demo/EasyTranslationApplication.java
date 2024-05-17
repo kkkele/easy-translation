@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@EnableTranslation
+@EnableTranslation({"com.superkele","io.github"})
 public class EasyTranslationApplication {
     public static void main(String[] args) {
         SpringApplication.run(EasyTranslationApplication.class, args);

@@ -2,19 +2,19 @@
 
 ---
 
-> 使用maven
+> 使用maven，推荐使用1.1.0以上版本
 
 - spring-boot 3以下的版本
 
 ```xml
 <dependency>
     <groupId>io.github.kkkele</groupId>
-    <artifactId>easy-translation-spring-boot-start</artifactId>
+    <artifactId>easy-translation-spring-boot-starter</artifactId>
     <version>${last.version}</version>
 </dependency>
 ```
 
-- spring-boot3 以上的版本 （开发中）
+- spring-boot3 以上的版本
 
   ```xml
   <dependency>
@@ -38,18 +38,18 @@
 
   
 
-> gradle
+> gradle，推荐使用1.1.0以上版本
 
 - spring-boot 3以下的版本
 
   ```gradle
-  implementation group: 'io.github.kkkele', name: 'easy-translation-spring-boot-start', version: '${last.version}'
+  implementation group: 'io.github.kkkele', name: 'easy-translation-spring-boot-starter', version: '${last.version}'
   ```
 
-- spring-boot3 以上的版本 （开发中）
+- spring-boot3 以上的版本 
 
   ```gradle
-  implementation group: 'io.github.kkkele', name: 'easy-translation-spring-boot3-start', version: '${last.version}'
+  implementation group: 'io.github.kkkele', name: 'easy-translation-spring-boot3-starter', version: '${last.version}'
   ```
 
 - 非spring-boot环境

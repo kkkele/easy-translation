@@ -9,6 +9,7 @@ import com.superkele.demo.domain.vo.ProductVo;
 import com.superkele.demo.domain.vo.ProductVoV2;
 import com.superkele.demo.service.ProductService;
 import com.superkele.translation.annotation.TranslationExecute;
+import com.superkele.translation.annotation.constant.DefaultTranslationTypeHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +46,7 @@ public class ProductController {
     }
 
     @GetMapping("/array")
-    @TranslationExecute(field = "data")
+    @TranslationExecute(field = "data",listTypeHandler = DefaultTranslationTypeHandler.class)
     public R<ProductVo[]> getArray() {
         return R.ok(mappingToArray(1, 2, 3, 4, 5));
     }

@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 public @interface Translation {
 
     /**
-     * <p>转换器名称，当value为空时，默认赋值为方法名</p>
+     * <p>转换器名称</p>
      * <p>translator name</p>
      */
     String name() default "";
