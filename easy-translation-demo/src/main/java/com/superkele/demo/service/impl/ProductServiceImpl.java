@@ -7,6 +7,7 @@ import com.superkele.demo.domain.vo.ProductVo;
 import com.superkele.demo.domain.vo.ProductVoV2;
 import com.superkele.demo.service.ProductService;
 import com.superkele.translation.annotation.TranslationExecute;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 

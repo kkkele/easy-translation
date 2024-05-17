@@ -4,15 +4,14 @@ public interface TranslatorDefinitionReader {
 
     TranslatorDefinitionRegistry getRegistry();
 
-    void loadVirtualTranslatorDefinitions(Object invokeObj);
+    TranslatorLoader getTranslatorLoader();
 
-    void loadVirtualTranslatorDefinitions(Object[] invokeObjs);
+    void loadDynamicTranslatorDefinitions(Object invokeObj);
 
-    void loadStaticTranslatorDefinitions(String location);
+    void loadDynamicTranslatorDefinitions(Object[] invokeObjs);
 
-    void loadStaticTranslatorDefinitions(String[] locations);
+    void loadTranslatorDefinitions(String location);
 
-    void loadEnumTranslatorDefinitions(String location);
+    void loadTranslatorDefinitions(String[] locations);
 
-    void loadEnumTranslatorDefinitions(String[] locations);
 }

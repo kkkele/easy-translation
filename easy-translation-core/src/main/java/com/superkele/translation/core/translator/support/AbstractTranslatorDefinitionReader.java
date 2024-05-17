@@ -5,6 +5,7 @@ import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionReader;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
+import com.superkele.translation.core.translator.definition.TranslatorLoader;
 import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.ReflectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,28 +15,27 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public abstract class AbstractTranslatorDefinitionReader implements TranslatorDefinitionReader {
 
 
     protected final TranslatorDefinitionRegistry registry;
-    protected final Config config;
     private final SubTypesScanner subTypesScanner = new SubTypesScanner();
     private final TypeAnnotationsScanner typeAnnotationsScanner = new TypeAnnotationsScanner();
     private final MethodAnnotationsScanner methodAnnotationsScanner = new MethodAnnotationsScanner();
+    private TranslatorLoader translatorLoader;
 
-    protected AbstractTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, Config config) {
+    protected AbstractTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, TranslatorLoader translatorLoader) {
         this.registry = registry;
-        this.config = config;
+        this.translatorLoader = translatorLoader;
     }
 
     protected AbstractTranslatorDefinitionReader(TranslatorDefinitionRegistry registry) {
-        this(registry, new Config());
+        this(registry, new DefaultTranslatorLoader());
     }
 
     @Override
@@ -44,7 +44,12 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
     }
 
     @Override
-    public void loadVirtualTranslatorDefinitions(Object invokeObj) {
+    public TranslatorLoader getTranslatorLoader() {
+        return this.translatorLoader;
+    }
+
+    @Override
+    public void loadDynamicTranslatorDefinitions(Object invokeObj) {
         Optional.ofNullable(invokeObj)
                 .ifPresent(obj -> {
                     Method[] declaredMethods = obj.getClass()
@@ -52,6 +57,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                     Arrays.stream(declaredMethods)
                             .filter(method -> !ReflectUtils.isStaticMethod(method) && !ReflectUtils.isAbstractMethod(method))
                             .map(method -> {
+                                AnnotationUtils.getAnnotation(method, Translation.class);
                                 Translation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(method, Translation.class);
                                 return Pair.of(method, mergedAnnotation);
                             })
@@ -64,21 +70,30 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
     }
 
     @Override
-    public void loadVirtualTranslatorDefinitions(Object[] invokeObjs) {
+    public void loadDynamicTranslatorDefinitions(Object[] invokeObjs) {
         Optional.ofNullable(invokeObjs)
                 .ifPresent(invokeObjArr -> {
                     for (Object invokeObj : invokeObjArr) {
-                        loadVirtualTranslatorDefinitions(invokeObj);
+                        loadDynamicTranslatorDefinitions(invokeObj);
                     }
                 });
     }
 
     @Override
+    public void loadTranslatorDefinitions(String location) {
+        Map<Class<?>, Set<Method>> translatorMap = getTranslatorLoader()
+                .getTranslator(location);
+
+    }
+
+    public void loadTranslatorDefinitions(String[] locations) {
+
+    }
+
     public void loadStaticTranslatorDefinitions(String location) {
         Optional.ofNullable(location)
                 .ifPresent(packageName -> {
                     // 配置Reflections来扫描子类型和方法注解，尽管这里主要关注接口，但这样配置可以保持灵活性
-
                     Reflections reflections = new Reflections(
                             new ConfigurationBuilder()
                                     .forPackages(packageName)
@@ -96,7 +111,6 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                 });
     }
 
-    @Override
     public void loadStaticTranslatorDefinitions(String[] locations) {
         Optional.ofNullable(locations)
                 .ifPresent(packageUrls -> {
@@ -106,7 +120,6 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                 });
     }
 
-    @Override
     public void loadEnumTranslatorDefinitions(String location) {
         Optional.ofNullable(location)
                 .ifPresent(packageUrl -> {
@@ -122,7 +135,6 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                 });
     }
 
-    @Override
     public void loadEnumTranslatorDefinitions(String[] locations) {
         Optional.ofNullable(locations)
                 .ifPresent(packageUrls -> {
@@ -143,16 +155,16 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
     protected String getTranslatorName(Translation translation, Class<? extends Enum> clazz) {
         String translatorName = translation.name();
         if (StringUtils.isBlank(translatorName)) {
-            translatorName = config.getBeanNameGetter().getDeclaringBeanName(clazz);
+            translatorName = getDefaultTranslatorName(clazz);
         }
         return translatorName;
     }
 
 
-    protected String getDefaultTranslatorName(Method method) {
-        String beanName = config.getBeanNameGetter().getDeclaringBeanName(method.getDeclaringClass());
-        return config.getDefaultTranslatorNameGenerator().genName(beanName, method.getName());
-    }
+    protected abstract String getDefaultTranslatorName(Method method);
+
+    protected abstract String getDefaultTranslatorName(Class<?> clazz);
+
 
     /**
      * 将枚举类转化成TranslatorDefinition

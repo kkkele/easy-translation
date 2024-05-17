@@ -7,6 +7,7 @@ import com.superkele.translation.core.convert.MethodConvert;
 import com.superkele.translation.core.translator.MapperTranslator;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
+import com.superkele.translation.core.translator.definition.TranslatorLoader;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.ReflectUtils;
@@ -15,16 +16,32 @@ import java.lang.invoke.LambdaConversionException;
 import java.lang.reflect.*;
 import java.util.*;
 
-public class LambdaTranslatorDefinitionReader extends AbstractTranslatorDefinitionReader {
+public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinitionReader {
 
-    public LambdaTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, Config config) {
-        super(registry, config);
+    private final Config config;
+
+
+    public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, TranslatorLoader translatorLoader, Config config) {
+        super(registry, translatorLoader);
+        this.config = config;
     }
 
-    public LambdaTranslatorDefinitionReader(TranslatorDefinitionRegistry registry) {
+    public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, Config config) {
         super(registry);
+        this.config = config;
     }
 
+
+    @Override
+    protected String getDefaultTranslatorName(Method method) {
+        String beanName = config.getBeanNameGetter().getDeclaringBeanName(method.getDeclaringClass());
+        return config.getDefaultTranslatorNameGenerator().genName(beanName, method.getName());
+    }
+
+    @Override
+    protected String getDefaultTranslatorName(Class<?> clazz) {
+        return config.getBeanNameGetter().getDeclaringBeanName(clazz);
+    }
 
     /**
      * 枚举翻译暂且只支持一个mapper参数

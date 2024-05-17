@@ -3,3 +3,7 @@ easy-translation:
 logging:
   level:
     com.superkele: debug
+
+idempotent:
+  enable-log: true
+  usingType: local

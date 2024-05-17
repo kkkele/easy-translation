@@ -2,7 +2,9 @@ package com.superkele.demo.service.impl;
 
 import com.superkele.demo.domain.entity.SysUser;
 import com.superkele.demo.service.UserService;
+import com.superkele.idempotent.annotations.Idempotent;
 import com.superkele.translation.boot.annotation.Translator;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 
@@ -11,6 +13,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Translator("getUser")
+    @Cacheable(cacheNames = "getById",key = "#id")
     public SysUser getById(Integer id) {
         try {
             Thread.sleep(1);

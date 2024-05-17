@@ -6,7 +6,7 @@ import com.superkele.translation.core.translator.definition.ConfigurableTransDef
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.support.DefaultTransExecutorFactory;
 import com.superkele.translation.core.translator.support.ExecutorParamInvokeFactoryPostProcessor;
-import com.superkele.translation.core.translator.support.LambdaTranslatorDefinitionReader;
+import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -17,7 +17,7 @@ public abstract class AbstractAutoLoadTransExecutorContext extends AbstractRefre
 
     @Override
     protected void loadTranslatorDefinition(DefaultTransExecutorFactory translatorFactory) {
-        LambdaTranslatorDefinitionReader definitionReader = new LambdaTranslatorDefinitionReader(translatorFactory, getConfig());
+        DefaultTranslatorDefinitionReader definitionReader = new DefaultTranslatorDefinitionReader(translatorFactory, getConfig());
         if (getLocations() != null) {
             /**
              * 装载静态方法
@@ -32,7 +32,7 @@ public abstract class AbstractAutoLoadTransExecutorContext extends AbstractRefre
             /**
              * 装载动态方法
              */
-            definitionReader.loadVirtualTranslatorDefinitions(getRegisterObjs());
+            definitionReader.loadDynamicTranslatorDefinitions(getRegisterObjs());
         }
     }
 
