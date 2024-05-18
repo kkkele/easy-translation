@@ -5,16 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.kkkele</groupId>
-        <artifactId>easy-translation</artifactId>
+        <artifactId>easy-translation-extension</artifactId>
         <version>${revision}</version>
     </parent>
-    <packaging>pom</packaging>
 
-    <modules>
-        <module>easy-translation-perf-record</module>
-    </modules>
+    <artifactId>easy-translation-perf-record</artifactId>
 
-    <artifactId>easy-translation-extension</artifactId>
-
-
+    <dependencies>
+        <dependency>
+            <groupId>io.github.kkkele</groupId>
+            <artifactId>easy-translation-core</artifactId>
+        </dependency>
+    </dependencies>
 </project>
