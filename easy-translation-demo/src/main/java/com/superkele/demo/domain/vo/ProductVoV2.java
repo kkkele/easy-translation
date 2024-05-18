@@ -19,4 +19,9 @@ public class ProductVoV2 {
 
     @Mapping(translator = "getCatName", mapper = "product.catId")
     private String catName;
+
+    private int status;
+
+    @Mapping(translator = "getStatus", mapper = "status")
+    private String StatusDesc;
 }
