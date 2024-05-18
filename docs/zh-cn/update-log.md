@@ -5,9 +5,14 @@
 </style>
 
 
-
-
 # 更新日志
+
+## v1.1.1@2024-05-18
+
+- refactor：重构TranslatorDefinitionReader写法，将其功能拆分为两个对象去完成
+- bugfix：重写Reflections框架，为其增加扫描组合注解的能力。
+- bugfix：修复代理类的Bean翻译器无法找到的问题。
+- refactor：小重构DefaultTransExecutorContext类。
 
 ## v1.1.0@2024-05-17
 

@@ -21,6 +21,7 @@ public class EasyTranslationConfig {
         return config -> {
             config.setTimeout(1000)
                     .setThreadPoolExecutor(threadPoolTaskExecutor.getThreadPoolExecutor());
+            config.registerTranslatorClazz(ThreeParamTranslator.class);
         };
     }
 

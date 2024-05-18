@@ -34,6 +34,7 @@ public class ProductController {
         return R.ok(productService.getDetailById(id));
     }
 
+
     @GetMapping("/v2/{id}")
     public R<ProductVoV2> getDetailByIdV2(@PathVariable Integer id) {
         return R.ok(productService.getDetailByIdV2(id));

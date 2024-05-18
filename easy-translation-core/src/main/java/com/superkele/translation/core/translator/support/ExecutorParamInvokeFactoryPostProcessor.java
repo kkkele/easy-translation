@@ -1,5 +1,6 @@
 package com.superkele.translation.core.translator.support;
 
+import cn.hutool.core.convert.Convert;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.ConfigurableTransDefinitionExecutorFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
@@ -30,11 +31,11 @@ public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactor
                 i++;
             }
             Translator translator = definition.getTranslator();
-            definition.setTranslateExecutor(args -> translator.doTranslate(reWrapper(args, mapperIndex, otherIndex)));
+            definition.setTranslateExecutor(args -> translator.doTranslate(reWrapper(args, mapperIndex, otherIndex, parameterTypes)));
         }
     }
 
-    public Object[] reWrapper(Object[] args, int[] keys, int[] others) {
+    public Object[] reWrapper(Object[] args, int[] keys, int[] others, Class<?>[] parameterTypes) {
         Object[] reWrapperArgs = new Object[keys.length + others.length];
         // 复原原来的位置情况
         //arr的前几个位置全都是mapper，找到对应的key位置填充 ，others同理
@@ -42,7 +43,7 @@ public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactor
             reWrapperArgs[keys[i]] = args[i];
         }
         for (int i = 0; i < others.length; i++) {
-            reWrapperArgs[others[i]] = args[i + keys.length];
+            reWrapperArgs[others[i]] = Convert.convert(parameterTypes[others[i]], args[i + keys.length]);
         }
         return reWrapperArgs;
     }

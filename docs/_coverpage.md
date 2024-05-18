@@ -1,8 +1,8 @@
 <!-- _coverpage.md -->
 
-# EasyTranslation <small>1.1.0</small>
+# EasyTranslation <small>1.1.1</small>
 
-> 一个使用非常简单但功能强大的字段自动填充（翻译）插件
+> 一个使用非常简单但功能强大的字段自动填充（翻译）框架
 
 - 简单
 - 强大

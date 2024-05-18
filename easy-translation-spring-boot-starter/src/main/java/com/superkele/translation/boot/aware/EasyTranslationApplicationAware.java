@@ -7,7 +7,6 @@ import com.superkele.translation.core.context.support.DefaultTransExecutorContex
 import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
 import com.superkele.translation.core.util.LogUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;

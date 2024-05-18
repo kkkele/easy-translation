@@ -70,4 +70,5 @@ public @interface Mapping {
 
 
     Class<? extends NullPointerExceptionHandler> nullPointerHandler() default DefaultNullPointerExceptionHandler.class;
+
 }
