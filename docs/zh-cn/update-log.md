@@ -9,6 +9,7 @@
 
 ## v1.1.1@2024-05-18
 
+- feat：增加other字段自动转为对应方法参数类型
 - refactor：重构TranslatorDefinitionReader写法，将其功能拆分为两个对象去完成
 - bugfix：重写Reflections框架，为其增加扫描组合注解的能力。
 - bugfix：修复代理类的Bean翻译器无法找到的问题。

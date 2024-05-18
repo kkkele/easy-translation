@@ -69,6 +69,10 @@ public @interface Mapping {
     String[] after() default {};
 
 
+    /**
+     * 当翻译时，属性为空导致了空指针异常的解决方案
+     * @return
+     */
     Class<? extends NullPointerExceptionHandler> nullPointerHandler() default DefaultNullPointerExceptionHandler.class;
 
 }

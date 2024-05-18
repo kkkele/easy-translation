@@ -119,12 +119,12 @@ other为辅助判断条件，它不会进行任何的操作，将原原本本的
     }
 
     @Translation(name = "getStrV3")
-    public String getByCondition(Integer id, String other, String other2) {
+    public String getByCondition(Integer id, Integer other, String other2) {
         return StrUtil.join(",",id,other,other2);
     }
 
     @Translation(name = "getStrV4")
-    public String getByCondition(String other, @TransMapper Integer id, String other2) {
+    public String getByCondition(String other, @TransMapper Integer id, Boolean other2) {
         return StrUtil.join(",",id,other,other2);
     }
 ```
@@ -143,12 +143,13 @@ public class TestVo {
     @Mapping(translator = "getStrV3", mapper = "id",other = {"1","2"})
     private String user1;
 
-    @Mapping(translator = "getStrV4", mapper = "id",other = {"1","2"})
+    @Mapping(translator = "getStrV4", mapper = "id",other = {"1","false"})
     private String user2;
 
 
 
 }
+
 ```
 
 写一个controller进行访问
@@ -180,7 +181,7 @@ GET http://localhost:8080/sysUser/200
     "id": 200,
     "user0": "200,1",
     "user1": "200,1,2",
-    "user2": "200,1,2"
+    "user2": "200,1,false"
   }
 }
 ```
