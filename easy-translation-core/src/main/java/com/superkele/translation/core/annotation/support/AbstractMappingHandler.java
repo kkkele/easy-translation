@@ -56,7 +56,7 @@ public abstract class AbstractMappingHandler implements MappingHandler {
             int mapperLength = mapper.length;
             int otherLength = other.length;
             //组建参数
-            Object[] args = new Object[mapperLength + otherLength];
+            Object[] args = new Object[16];
             for (int i = 0; i < mapperLength; i++) {
                 if (StringUtils.isNotBlank(mapper[i])) {
                     try {
