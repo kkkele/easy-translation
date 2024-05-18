@@ -4,6 +4,7 @@ package com.superkele.translation.core.context.support;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.translator.definition.ConfigurableTransDefinitionExecutorFactory;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
+import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 import com.superkele.translation.core.translator.support.DefaultTransExecutorFactory;
 import com.superkele.translation.core.translator.support.ExecutorParamInvokeFactoryPostProcessor;
 import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
@@ -15,8 +16,19 @@ public abstract class AbstractAutoLoadTransExecutorContext extends AbstractRefre
 
     protected List<TranslatorFactoryPostProcessor> translatorFactoryPostProcessors = new CopyOnWriteArrayList<>();
 
+    protected List<TranslatorPostProcessor> translatorPostProcessors = new CopyOnWriteArrayList<>();
+
     protected abstract DefaultTranslatorDefinitionReader getDefinitionReader();
 
+    public void addTranslatorPostProcessor(TranslatorPostProcessor translatorPostProcessor) {
+        translatorPostProcessors.remove(translatorPostProcessor);
+        translatorPostProcessors.add(translatorPostProcessor);
+    }
+
+    @Override
+    protected void loadTranslatorPostProcessors(ConfigurableTransDefinitionExecutorFactory translatorFactory) {
+        translatorPostProcessors.forEach(translatorFactory::addTranslatorPostProcessor);
+    }
 
     @Override
     protected void loadTranslatorDefinition(DefaultTransExecutorFactory translatorFactory) {

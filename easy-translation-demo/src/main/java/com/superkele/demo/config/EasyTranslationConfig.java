@@ -1,7 +1,11 @@
 package com.superkele.demo.config;
 
 
+import com.superkele.extension.perfrecord.PerfRecordTranslatorFactoryPostProcessor;
+import com.superkele.extension.perfrecord.PerfRecordTranslatorPostProcessor;
 import com.superkele.translation.core.config.TranslationAutoConfigurationCustomizer;
+import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
+import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -25,5 +29,14 @@ public class EasyTranslationConfig {
         };
     }
 
+    @Bean
+    public TranslatorPostProcessor performanceRecordTranslatorPostProcessor() {
+        return new PerfRecordTranslatorPostProcessor();
+    }
+
+    @Bean
+    public TranslatorFactoryPostProcessor performanceRecordTranslatorFactoryPostProcessor() {
+        return new PerfRecordTranslatorFactoryPostProcessor();
+    }
 
 }

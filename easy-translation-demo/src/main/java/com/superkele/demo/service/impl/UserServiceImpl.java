@@ -24,18 +24,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Translation(name = "getUser")
-    @Cacheable(cacheNames = "user", key = "#id")
     public SysUser getById(Integer id) {
-        try {
-            Thread.sleep(1);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         SysUser sysUser = new SysUser();
         sysUser.setUserId(id);
         sysUser.setUsername("username" + DateUtil.date());
         sysUser.setNickName("nickName" + DateUtil.date());
-        System.out.println("getUser:"+RequestContextHolder.getRequestAttributes());
         return sysUser;
     }
 

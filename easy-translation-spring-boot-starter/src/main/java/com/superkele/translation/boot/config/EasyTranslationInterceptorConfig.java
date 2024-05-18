@@ -42,8 +42,7 @@ public class EasyTranslationInterceptorConfig {
     public void addTranslatorPostProcessor(DefaultTransExecutorContext defaultTransExecutorContext, List<TranslatorPostProcessor> postProcessors) {
         if (postProcessors != null)
             postProcessors.forEach(postProcessor -> {
-                defaultTransExecutorContext.getTranslatorFactory()
-                        .addTranslatorPostProcessor(postProcessor);
+                defaultTransExecutorContext.addTranslatorPostProcessor(postProcessor);
                 LogUtils.debug("add translatorPostProcessor: {}", () -> postProcessor);
             });
     }

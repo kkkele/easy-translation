@@ -12,12 +12,12 @@ import static com.superkele.translation.core.constant.TranslationConstant.DEFAUL
  */
 public class DefaultTransExecutorContext extends AbstractAutoLoadTransExecutorContext {
 
-
     private Config config;
 
     private Object[] invokeObjs;
 
     private DefaultTranslatorDefinitionReader definitionReader;
+
 
 
     @Override
