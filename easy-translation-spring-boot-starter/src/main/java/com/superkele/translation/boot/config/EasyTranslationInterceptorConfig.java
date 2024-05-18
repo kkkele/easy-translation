@@ -6,15 +6,12 @@ import com.superkele.translation.core.config.TranslationAutoConfigurationCustomi
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.core.thread.ContextHolder;
-import com.superkele.translation.core.thread.ContextPasser;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
-import com.superkele.translation.core.util.LogUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
-import java.util.Optional;
 
 @Configuration
 public class EasyTranslationInterceptorConfig {

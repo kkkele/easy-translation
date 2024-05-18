@@ -1,13 +1,10 @@
 package com.superkele.translation.boot.config;
 
 
-import com.superkele.translation.boot.aware.EasyTranslationApplicationAware;
 import com.superkele.translation.boot.config.properties.TranslationProperties;
 import com.superkele.translation.boot.scanner.TranslationScanPostProcessor;
 import com.superkele.translation.core.aop.TranslationAspect;
 import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.config.TranslationAutoConfigurationCustomizer;
-import com.superkele.translation.core.context.ConfigurableTransExecutorContext;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
 import com.superkele.translation.core.processor.TranslationProcessor;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
@@ -18,7 +15,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
 import java.util.Optional;
 
 @EnableConfigurationProperties({TranslationProperties.class})

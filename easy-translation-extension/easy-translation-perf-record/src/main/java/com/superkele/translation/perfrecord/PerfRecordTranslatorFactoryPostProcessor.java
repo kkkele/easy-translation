@@ -1,4 +1,4 @@
-package com.superkele.extension.perfrecord;
+package com.superkele.translation.perfrecord;
 
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.core.translator.definition.ConfigurableTransDefinitionExecutorFactory;
@@ -6,9 +6,13 @@ import com.superkele.translation.core.translator.definition.TranslatorDefinition
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.LogUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Arrays;
 
+@Slf4j
+@ConditionalOnProperty(prefix = "easy-translation.debug", name = "debug", havingValue = "true")
 public class PerfRecordTranslatorFactoryPostProcessor implements TranslatorFactoryPostProcessor {
     @Override
     public void postProcess(ConfigurableTransDefinitionExecutorFactory factory) {

@@ -5,7 +5,6 @@ import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.context.ConfigurableTransExecutorContext;
 import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
 import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
-import com.superkele.translation.core.util.LogUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

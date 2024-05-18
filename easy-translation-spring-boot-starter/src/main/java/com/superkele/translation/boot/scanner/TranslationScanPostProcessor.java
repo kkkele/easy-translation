@@ -3,7 +3,6 @@ package com.superkele.translation.boot.scanner;
 import cn.hutool.core.collection.ListUtil;
 import com.superkele.translation.annotation.TranslatorScan;
 import com.superkele.translation.boot.global.TranslationGlobalInformation;
-import com.superkele.translation.core.util.LogUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotatedElementUtils;

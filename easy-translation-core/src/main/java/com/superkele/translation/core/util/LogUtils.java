@@ -1,5 +1,6 @@
 package com.superkele.translation.core.util;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +13,8 @@ public class LogUtils {
     private static final String RESET_COLOR = "\033[0m";
     private static final String YELLOW_COLOR = "\033[33m";
     public static String PREFIX = "[Easy Translation] ";
-    public static Logger logger = LoggerFactory.getLogger(LogUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(LogUtils.class);
+
     public static boolean printLog = false;
 
 
@@ -22,7 +24,7 @@ public class LogUtils {
             for (int i = 0; i < params.length; i++) {
                 args[i] = params[i].get();
             }
-            logger.debug(GREEN_COLOR + PREFIX + logSupplier + RESET_COLOR, args);
+            log.debug(GREEN_COLOR + PREFIX + logSupplier + RESET_COLOR, args);
         }
     }
 
@@ -32,7 +34,7 @@ public class LogUtils {
             for (int i = 0; i < params.length; i++) {
                 args[i] = params[i].get();
             }
-            logger.info(PREFIX + logSupplier, args);
+            log.info(PREFIX + logSupplier, args);
         }
     }
 
@@ -42,7 +44,7 @@ public class LogUtils {
             for (int i = 0; i < params.length; i++) {
                 args[i] = params[i].get();
             }
-            logger.warn(YELLOW_COLOR + PREFIX + logSupplier + RESET_COLOR, args);
+            log.warn(YELLOW_COLOR + PREFIX + logSupplier + RESET_COLOR, args);
         }
     }
 
@@ -52,7 +54,7 @@ public class LogUtils {
             for (int i = 0; i < params.length; i++) {
                 args[i] = params[i].get();
             }
-            logger.error(RED_COLOR + PREFIX + logSupplier + RESET_COLOR, args);
+            log.error(RED_COLOR + PREFIX + logSupplier + RESET_COLOR, args);
         }
     }
 }

@@ -1,10 +1,8 @@
-package com.superkele.extension.perfrecord;
+package com.superkele.translation.perfrecord;
 
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.LogUtils;
-
-import java.util.Arrays;
 
 
 public class PerfRecordTranslatorPostProcessor implements TranslatorPostProcessor {
