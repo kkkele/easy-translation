@@ -4,6 +4,7 @@ package com.superkele.demo.service.impl;
 import com.superkele.demo.domain.entity.ProductCategory;
 import com.superkele.demo.service.ProductCategoryService;
 import com.superkele.translation.annotation.Translation;
+import com.superkele.translation.boot.annotation.Translator;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +19,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
         return productCategory;
     }
 
-    @Translation(name = "getCatName")
-    @Cacheable(cacheNames = "productCategory")
+    @Translator("getCatName")
     public String getNameById(Integer id) {
         return getById(id).getCatName();
     }

@@ -8,7 +8,6 @@ import com.superkele.translation.core.translator.MapperTranslator;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorLoader;
-import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.ReflectUtils;
 
@@ -18,17 +17,21 @@ import java.util.*;
 
 public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinitionReader {
 
-    private final Config config;
+    private Config config = new Config();
 
-    public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, TranslatorLoader translatorLoader, Config config, String[] locations) {
-        super(registry, translatorLoader, locations);
-        this.config = config;
+    public DefaultTranslatorDefinitionReader(String... locations) {
+        super(locations);
     }
 
-    public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, Config config, String... locations) {
-        super(registry, locations);
-        this.config = config;
+    public DefaultTranslatorDefinitionReader(TranslatorLoader translatorLoader, String[] locations) {
+        super(translatorLoader, locations);
     }
+
+    public DefaultTranslatorDefinitionReader setConfig(Config config) {
+        this.config = config;
+        return this;
+    }
+
 
 
     @Override
@@ -142,5 +145,6 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         }
         return mapperIndexList.stream().mapToInt(Integer::intValue).toArray();
     }
+
 
 }

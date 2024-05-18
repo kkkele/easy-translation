@@ -9,20 +9,18 @@ import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.ReflectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.*;
 
 public abstract class AbstractTranslatorDefinitionReader implements TranslatorDefinitionReader {
 
 
-    protected final TranslatorDefinitionRegistry registry;
-    private TranslatorLoader translatorLoader;
-    private Map<Class<?>, Set<Method>> translatorMap = new HashMap<>();
+    protected TranslatorLoader translatorLoader;
+    protected Map<Class<?>, Set<Method>> translatorMap = new HashMap<>();
 
-    protected AbstractTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, TranslatorLoader translatorLoader, String[] locations) {
-        this.registry = registry;
+    protected AbstractTranslatorDefinitionReader(TranslatorLoader translatorLoader, String[] locations) {
         this.translatorLoader = translatorLoader;
         for (String location : locations) {
             Map<Class<?>, Set<Method>> translator = this.translatorLoader.getTranslator(location);
@@ -30,14 +28,15 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
         }
     }
 
-    protected AbstractTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, String... locations) {
-        this(registry, new DefaultTranslatorLoader(), locations);
+    protected AbstractTranslatorDefinitionReader(String... locations) {
+        this(new DefaultTranslatorLoader(), locations);
     }
 
     @Override
-    public TranslatorDefinitionRegistry getRegistry() {
-        return registry;
+    public Set<Class<?>> getTranslatorDeclaringClasses() {
+        return translatorMap.keySet();
     }
+
 
     @Override
     public TranslatorLoader getTranslatorLoader() {
@@ -45,38 +44,57 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
     }
 
     @Override
-    public void loadDynamicTranslatorDefinitions(Object invokeObj) {
+    public void loadDynamicTranslatorDefinitions(Object invokeObj, TranslatorDefinitionRegistry registry) {
         Optional.ofNullable(invokeObj)
-                .filter(obj -> translatorMap.containsKey(obj.getClass()))
-                .ifPresent(obj -> {
-                    Set<Method> methods = translatorMap.get(obj.getClass());
+                .map(obj -> {
+                    Class<?> clazz = obj.getClass();
+                    if (Proxy.isProxyClass(clazz)) {
+                        clazz = clazz.getInterfaces()[0];
+                    } else if (StringUtils.contains(clazz.getName(), "$Enhancer")) {
+                        do {
+                            clazz = clazz.getSuperclass();
+                        } while (StringUtils.contains(clazz.getName(), "$Enhancer"));
+                    }
+                    return Pair.of(obj,clazz);
+                })
+                .filter(pair -> translatorMap.containsKey(pair.getValue()))
+                .ifPresent(pair -> {
+                    Object obj = pair.getKey();
+                    Class<?> clazz = pair.getValue();
+                    Set<Method> methods = translatorMap.get(clazz);
+                    if (methods == null) {
+                        return;
+                    }
                     methods.stream()
-                            .filter(method -> !ReflectUtils.isStaticMethod(method) && !ReflectUtils.isAbstractMethod(method))
+                            .filter(method -> !ReflectUtils.isStaticMethod(method))
                             .map(method -> {
                                 Translation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(method, Translation.class);
                                 return Pair.of(method, mergedAnnotation);
                             })
-                            .forEach(pair -> {
-                                TranslatorDefinition translatorDefinition = convertDynamicMethodToTranslatorDefinition(obj, pair.getKey());
-                                registry.register(getTranslatorName(pair.getValue(), pair.getKey()), translatorDefinition);
+                            .forEach(methodAnnotationPair -> {
+                                TranslatorDefinition translatorDefinition = convertDynamicMethodToTranslatorDefinition(obj, methodAnnotationPair.getKey());
+                                registry.register(getTranslatorName(methodAnnotationPair.getValue(), methodAnnotationPair.getKey()), translatorDefinition);
                             });
                 });
     }
 
     @Override
-    public void loadDynamicTranslatorDefinitions(Object[] invokeObjs) {
+    public void loadDynamicTranslatorDefinitions(Object[] invokeObjs, TranslatorDefinitionRegistry registry) {
         Optional.ofNullable(invokeObjs)
                 .ifPresent(invokeObjArr -> {
                     for (Object invokeObj : invokeObjArr) {
-                        loadDynamicTranslatorDefinitions(invokeObj);
+                        loadDynamicTranslatorDefinitions(invokeObj, registry);
                     }
                 });
     }
 
     @Override
-    public void loadStaticTranslatorDefinitions() {
+    public void loadStaticTranslatorDefinitions(TranslatorDefinitionRegistry registry) {
         translatorMap.forEach((clazz, methods) -> {
             if (clazz.isEnum()) {
+                return;
+            }
+            if (methods == null) {
                 return;
             }
             methods.stream()
@@ -91,7 +109,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
     }
 
     @Override
-    public void loadEnumTranslatorDefinitions() {
+    public void loadEnumTranslatorDefinitions(TranslatorDefinitionRegistry registry) {
         translatorMap.forEach((clazz, methods) -> {
             Optional.of(clazz)
                     .filter(Class::isEnum)

@@ -15,24 +15,26 @@ public abstract class AbstractAutoLoadTransExecutorContext extends AbstractRefre
 
     protected List<TranslatorFactoryPostProcessor> translatorFactoryPostProcessors = new CopyOnWriteArrayList<>();
 
+    protected abstract DefaultTranslatorDefinitionReader getDefinitionReader();
+
+
     @Override
     protected void loadTranslatorDefinition(DefaultTransExecutorFactory translatorFactory) {
-        DefaultTranslatorDefinitionReader definitionReader = new DefaultTranslatorDefinitionReader(translatorFactory, getConfig(),getLocations());
-        if (getLocations() != null) {
-            /**
-             * 装载静态方法
-             */
-            definitionReader.loadStaticTranslatorDefinitions();
-            /**
-             * 装载枚举类
-             */
-            definitionReader.loadEnumTranslatorDefinitions();
-        }
+        DefaultTranslatorDefinitionReader definitionReader = getDefinitionReader();
+        definitionReader.setConfig(getConfig());
+        /**
+         * 装载静态方法
+         */
+        definitionReader.loadStaticTranslatorDefinitions(translatorFactory);
+        /**
+         * 装载枚举类
+         */
+        definitionReader.loadEnumTranslatorDefinitions(translatorFactory);
         if (getRegisterObjs() != null) {
             /**
              * 装载动态方法
              */
-            definitionReader.loadDynamicTranslatorDefinitions(getRegisterObjs());
+            definitionReader.loadDynamicTranslatorDefinitions(getRegisterObjs(), translatorFactory);
         }
     }
 
@@ -77,8 +79,6 @@ public abstract class AbstractAutoLoadTransExecutorContext extends AbstractRefre
         translatorFactoryPostProcessors.remove(translatorFactoryPostProcessor);
         translatorFactoryPostProcessors.add(translatorFactoryPostProcessor);
     }
-
-    protected abstract String[] getLocations();
 
     protected abstract Object[] getRegisterObjs();
 

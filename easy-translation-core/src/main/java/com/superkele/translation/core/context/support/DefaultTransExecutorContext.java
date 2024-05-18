@@ -1,6 +1,7 @@
 package com.superkele.translation.core.context.support;
 
 import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
 
 import java.util.Optional;
 
@@ -16,19 +17,17 @@ public class DefaultTransExecutorContext extends AbstractAutoLoadTransExecutorCo
 
     private Object[] invokeObjs;
 
-    private String[] packages;
+    private DefaultTranslatorDefinitionReader definitionReader;
 
-    public DefaultTransExecutorContext() {
-    }
-
-
-    public static DefaultTransExecutorContextBuilder builder() {
-        return new DefaultTransExecutorContextBuilder();
-    }
 
     @Override
-    public String[] getLocations() {
-        return this.packages;
+    protected DefaultTranslatorDefinitionReader getDefinitionReader() {
+        return definitionReader;
+    }
+
+    public DefaultTransExecutorContext setDefinitionReader(DefaultTranslatorDefinitionReader definitionReader) {
+        this.definitionReader = definitionReader;
+        return this;
     }
 
     @Override
@@ -51,8 +50,4 @@ public class DefaultTransExecutorContext extends AbstractAutoLoadTransExecutorCo
         return this;
     }
 
-    public DefaultTransExecutorContext setPackages(String[] packages) {
-        this.packages = packages;
-        return this;
-    }
 }

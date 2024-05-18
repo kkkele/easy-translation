@@ -19,7 +19,7 @@ public class ProductServiceImpl implements ProductService {
         product.setProductId(id);
         product.setProductName("productName:" + id);
         product.setCatId(RandomUtil.randomInt());
-        product.setCreateBy(RandomUtil.randomInt());
+        product.setCreateBy(1);
         return product;
     }
 
@@ -36,7 +36,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductVoV2 getDetailByIdV2(Integer id) {
         Product byId = getById(id);
         ProductVoV2 productVO = new ProductVoV2();
-        productVO.setProduct(null);
+        productVO.setProduct(byId);
         return productVO;
     }
 }
