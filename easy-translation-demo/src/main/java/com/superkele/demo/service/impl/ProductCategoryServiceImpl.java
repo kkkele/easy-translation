@@ -7,6 +7,7 @@ import com.superkele.translation.annotation.Translation;
 import com.superkele.translation.boot.annotation.Translator;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
 
 @Service
 public class ProductCategoryServiceImpl implements ProductCategoryService {
@@ -21,6 +22,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Translator("getCatName")
     public String getNameById(Integer id) {
+        System.out.println("getCatName:"+ RequestContextHolder.getRequestAttributes());
         return getById(id).getCatName();
     }
 }

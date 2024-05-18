@@ -264,7 +264,7 @@ public class AppUserVo {
 
 可以使用`@Mapping`的receive属性
 
-**【重要】**调用同一翻译器，且mapper，ohter等参数一致的情况下，只会调用依次翻译器。
+**【重要】**调用同一翻译器，且mapper，ohter等参数一致的情况下，如果该翻译器已经执行且获取到了结果，则不会重复执行。
 
 例如
 

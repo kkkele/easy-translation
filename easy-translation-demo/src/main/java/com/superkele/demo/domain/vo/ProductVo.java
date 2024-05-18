@@ -8,13 +8,13 @@ import lombok.Data;
 public class ProductVo extends Product {
 
 
-    @Mapping(translator = "getUser", mapper = "createBy", receive = "nickName")
+    @Mapping(translator = "getUser", mapper = "createBy", receive = "nickName",async = true)
     private String nickName;
 
-    @Mapping(translator = "getUser", mapper = "createBy", receive = "username")
+    @Mapping(translator = "getUser", mapper = "createBy", receive = "username",async = true)
     private String username;
 
-    @Mapping(translator = "getCatName", mapper = "catId")
+    @Mapping(translator = "getCatName", mapper = "catId",async = true)
     private String catName;
 
 }

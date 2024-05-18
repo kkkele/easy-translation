@@ -8,6 +8,7 @@ import com.superkele.translation.annotation.TransMapper;
 import com.superkele.translation.annotation.Translation;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.Date;
 
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
         sysUser.setUserId(id);
         sysUser.setUsername("username" + DateUtil.date());
         sysUser.setNickName("nickName" + DateUtil.date());
+        System.out.println("getUser:"+RequestContextHolder.getRequestAttributes());
         return sysUser;
     }
 
