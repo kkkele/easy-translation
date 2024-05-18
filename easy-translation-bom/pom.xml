@@ -11,7 +11,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>1.1.0</revision>
+        <revision>1.1.1</revision>
     </properties>
 
     <dependencyManagement>
