@@ -20,14 +20,13 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
 
     private final Config config;
 
-
-    public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, TranslatorLoader translatorLoader, Config config) {
-        super(registry, translatorLoader);
+    public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, TranslatorLoader translatorLoader, Config config, String[] locations) {
+        super(registry, translatorLoader, locations);
         this.config = config;
     }
 
-    public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, Config config) {
-        super(registry);
+    public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, Config config, String... locations) {
+        super(registry, locations);
         this.config = config;
     }
 

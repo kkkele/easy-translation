@@ -10,8 +10,7 @@ public interface TranslatorDefinitionReader {
 
     void loadDynamicTranslatorDefinitions(Object[] invokeObjs);
 
-    void loadTranslatorDefinitions(String location);
+    void loadStaticTranslatorDefinitions();
 
-    void loadTranslatorDefinitions(String[] locations);
-
+    void loadEnumTranslatorDefinitions();
 }

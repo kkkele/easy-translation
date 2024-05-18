@@ -17,16 +17,16 @@ public abstract class AbstractAutoLoadTransExecutorContext extends AbstractRefre
 
     @Override
     protected void loadTranslatorDefinition(DefaultTransExecutorFactory translatorFactory) {
-        DefaultTranslatorDefinitionReader definitionReader = new DefaultTranslatorDefinitionReader(translatorFactory, getConfig());
+        DefaultTranslatorDefinitionReader definitionReader = new DefaultTranslatorDefinitionReader(translatorFactory, getConfig(),getLocations());
         if (getLocations() != null) {
             /**
              * 装载静态方法
              */
-            definitionReader.loadStaticTranslatorDefinitions(getLocations());
+            definitionReader.loadStaticTranslatorDefinitions();
             /**
              * 装载枚举类
              */
-            definitionReader.loadEnumTranslatorDefinitions(getLocations());
+            definitionReader.loadEnumTranslatorDefinitions();
         }
         if (getRegisterObjs() != null) {
             /**
