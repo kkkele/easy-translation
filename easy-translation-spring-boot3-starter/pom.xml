@@ -68,6 +68,11 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>io.github.kkkele</groupId>
+            <artifactId>easy-translation-execute-callback</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

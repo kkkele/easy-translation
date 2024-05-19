@@ -25,7 +25,7 @@ public abstract class AbstractAutowireCapableTransExecutorFactory extends Abstra
     public TranslateExecutor applyTranslatorPostProcessorBeforeInit(TranslateExecutor translator, String translatorName) {
         TranslateExecutor result = translator;
         for (TranslatorPostProcessor translatorPostProcessor : getTranslatorPostProcessors()) {
-            result = translatorPostProcessor.postProcessorBeforeInit(translator, translatorName);
+            result = translatorPostProcessor.postProcessorBeforeInit(result, translatorName);
             if (result == null) {
                 return result;
             }
@@ -37,7 +37,7 @@ public abstract class AbstractAutowireCapableTransExecutorFactory extends Abstra
     public TranslateExecutor applyTranslatorPostProcessorAfterInit(TranslateExecutor translator, String translatorName) {
         TranslateExecutor result = translator;
         for (TranslatorPostProcessor translatorPostProcessor : getTranslatorPostProcessors()) {
-            result = translatorPostProcessor.postProcessorAfterInit(translator, translatorName);
+            result = translatorPostProcessor.postProcessorAfterInit(result, translatorName);
             if (result == null) {
                 return result;
             }

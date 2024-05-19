@@ -1,2 +1,2 @@
-  com.superkele.translation.perfrecord.PerfRecordTranslatorFactoryPostProcessor
-  com.superkele.translation.perfrecord.PerfRecordTranslatorPostProcessor
+  com.superkele.translation.extension.perfrecord.PerfRecordTranslatorFactoryPostProcessor
+  com.superkele.translation.extension.perfrecord.PerfRecordTranslatorPostProcessor

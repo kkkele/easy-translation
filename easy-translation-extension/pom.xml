@@ -12,6 +12,7 @@
 
     <modules>
         <module>easy-translation-perf-record</module>
+        <module>easy-translation-execute-callback</module>
     </modules>
 
     <artifactId>easy-translation-extension</artifactId>

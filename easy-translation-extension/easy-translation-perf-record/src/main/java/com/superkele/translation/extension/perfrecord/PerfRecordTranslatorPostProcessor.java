@@ -1,4 +1,4 @@
-package com.superkele.translation.perfrecord;
+package com.superkele.translation.extension.perfrecord;
 
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
@@ -21,6 +21,6 @@ public class PerfRecordTranslatorPostProcessor implements TranslatorPostProcesso
 
     @Override
     public TranslateExecutor postProcessorAfterInit(TranslateExecutor translator, String translatorName) {
-        return null;
+        return translator;
     }
 }

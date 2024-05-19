@@ -42,6 +42,12 @@
                 <artifactId>easy-translation-perf-record</artifactId>
                 <version>${revision}</version>
             </dependency>
+
+            <dependency>
+                <groupId>io.github.kkkele</groupId>
+                <artifactId>easy-translation-execute-callback</artifactId>
+                <version>${revision}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
