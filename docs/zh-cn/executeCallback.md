@@ -105,3 +105,7 @@ public class CallbackConfig {
 在类中，添加了两个CallbackRegister Bean，第一个printerResCallbackRegister将会作用在所有的注册器上。
 
 而第二个Bean只会作用在getUser注册器上。
+
+## 效果
+
+![image-20240519164927346](./assets/image-20240519164927346.png)

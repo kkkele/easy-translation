@@ -5,11 +5,11 @@
   <parent>
     <groupId>io.github.kkkele</groupId>
     <artifactId>easy-translation</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
   </parent>
   <groupId>io.github.kkkele</groupId>
   <artifactId>easy-translation-core</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
   <name>easy-translation-core</name>
   <description>轻量级的翻译插件核心模块</description>
   <url>https://gitee.com/cai-zhiyuDaKeLe/easy-translation</url>
