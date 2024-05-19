@@ -5,11 +5,11 @@
   <parent>
     <groupId>io.github.kkkele</groupId>
     <artifactId>easy-translation</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
   </parent>
   <groupId>io.github.kkkele</groupId>
   <artifactId>easy-translation-spring-boot3-starter</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.2</version>
   <name>easy-translation-spring-boot3-starter</name>
   <description>easy-translation-springboot3版</description>
   <url>https://gitee.com/cai-zhiyuDaKeLe/easy-translation</url>

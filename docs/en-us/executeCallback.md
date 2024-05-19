@@ -1,14 +1,14 @@
-# 翻译器回调执行
+# Translation Callback
 
-> 本页面展示的为SpringBoot环境下是如何使用的，在非SpringBoot请看其他文档
+> This page shows how to use SpringBoot in a non-SpringBoot environment, please see other documentation
 
-如果开发者希望在翻译器执行完后，调用一个回调方法，再次处理翻译结果或者是做其他诸如日志之类的动作。
+If the developer wants to call a callback method after the translator has finished executing, process the translation again or do some other action such as logging.
 
-你可以引入该插件。
+You can introduce this plugin.
 
 ## Maven
 
-**【重要】**如果开发者使用了easy-translation-spring-boot-starter或者easy-translation-spring-boot3-starter，则无需引入，因为已经继承了相关依赖。
+**[Important]** If the developer uses easy-translation-spring-boot-starter or easy-translation-spring-boot3-starter, there is no need to introduce it because the dependencies are already inherited.
 
 ```xml
 <dependency>
@@ -20,7 +20,7 @@
 
 ## gradle
 
-**【重要】**如果开发者使用了easy-translation-spring-boot-starter或者easy-translation-spring-boot3-starter，则无需引入，因为已经继承了相关依赖。
+**[Important]** If the developer uses easy-translation-spring-boot-starter or easy-translation-spring-boot3-starter, there is no need to introduce it because the dependencies are already inherited.
 
 ```gradle
 implementation group: 'io.github.kkkele', name: 'easy-translation-execute-callback', version: ${last.version}
@@ -55,13 +55,13 @@ public interface TranslateExecuteCallBack<T> {
 }
 ```
 
-开发者需要实现CallbackRegister接口，并交由Spring容器管理。
+Developers need to implement the CallbackRegister interface and let the Spring container manage it.
 
-CallbackRegister的callBack需要开发者实现一个回调方法，对翻译的结果进行处理。
+The CallbackRegister's callBack requires the developer to implement a callback method to process the translated result.
 
-而CallbackRegister的match需要开发者提供一个正则表达式，匹配该正则表达式的翻译器将会在创建阶段添加该回调方法。
+CallbackRegister's match requires the developer to provide a regular expression, and the translator matching the regular expression will add the callback method during the creation phase.
 
-举个例子
+For example
 
 ```java
 @Configuration
@@ -102,10 +102,10 @@ public class CallbackConfig {
 
 ```
 
-在类中，添加了两个CallbackRegister Bean，第一个printerResCallbackRegister将会作用在所有的注册器上。
+In the class, added two CallbackRegister Bean, first printerResCallbackRegister will effect on all of the registry.
 
-而第二个Bean只会作用在getUser注册器上。
+The second Bean works only on the getUser registry.
 
-## 效果
+## Effect
 
 ![image-20240519164927346](./assets/image-20240519164927346.png)

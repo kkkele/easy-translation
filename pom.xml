@@ -46,7 +46,7 @@
     </licenses>
 
     <properties>
-        <revision>1.2.1</revision>
+        <revision>1.2.2</revision>
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
         <maven-war-plugin.version>3.2.2</maven-war-plugin.version>
