@@ -4,6 +4,7 @@ import com.superkele.translation.annotation.TransMapper;
 import com.superkele.translation.annotation.TransValue;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.convert.MethodConvert;
+import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.translator.MapperTranslator;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
@@ -93,6 +94,9 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         definition.setParameterTypes(method.getParameterTypes());
         definition.setInvokeObj(null);
         Class<? extends Translator> translatorClazz = config.getTranslatorClazzMap().get(method.getParameterCount());
+        if (translatorClazz == null){
+            throw new TranslationException("Do not find the translator type with "+method.getParameterCount()+"params ,see https://kkkele.github.io/easy-translation/#/zh-cn/config/ for more information");
+        }
         definition.setTranslatorClass(translatorClazz);
         definition.setMapperIndex(getIndexPair(method));
         //关键，设置translator和translatorHandler
@@ -115,6 +119,9 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         definition.setParameterTypes(method.getParameterTypes());
         definition.setInvokeObj(invokeObj);
         Class<? extends Translator> translatorClazz = config.getTranslatorClazzMap().get(method.getParameterCount());
+        if (translatorClazz == null){
+            throw new TranslationException("Do not find the translator type with "+method.getParameterCount()+" params ,see https://kkkele.github.io/easy-translation/#/zh-cn/config/ for more information");
+        }
         definition.setTranslatorClass(translatorClazz);
         definition.setMapperIndex(getIndexPair(method));
         //关键，设置translator和translatorHandler

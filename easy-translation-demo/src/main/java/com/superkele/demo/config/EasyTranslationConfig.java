@@ -21,7 +21,10 @@ public class EasyTranslationConfig {
         return config -> {
             config.setTimeout(1000)
                     .setThreadPoolExecutor(threadPoolTaskExecutor.getThreadPoolExecutor());
-            config.registerTranslatorClazz(ThreeParamTranslator.class);
+            config
+                    //.registerTranslatorClazz(ThreeParamTranslator.class)
+                    .setDefaultTranslatorNameGenerator((beanName, methodName) -> beanName + "." + methodName)
+                    .setBeanNameGetter(clazz -> clazz.getSimpleName());
         };
     }
 
