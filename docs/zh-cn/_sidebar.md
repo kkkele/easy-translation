@@ -8,8 +8,9 @@
     * [字段翻译填充](zh-cn/fieldAutoFill.md)
     * [执行翻译](zh-cn/translateExecute.md)
 * **扩展**
-    * [上下文Holder](zh-cn/contextHolder.md)
-    * todo
+    * [多线程保持上下文](zh-cn/contextHolder.md)
+    * [翻译器回调执行](zh-cn/executeCallback.md)
+    * [性能分析器](zh-cn/performanceRecord.md)
 * **测试说明**
 
 <style>

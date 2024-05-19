@@ -12,7 +12,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import java.util.Arrays;
 
 
-@ConditionalOnProperty(prefix = "easy-translation.debug", name = "debug", havingValue = "true")
 @Slf4j
 public class PerfRecordTranslatorFactoryPostProcessor implements TranslatorFactoryPostProcessor {
     @Override
@@ -23,7 +22,7 @@ public class PerfRecordTranslatorFactoryPostProcessor implements TranslatorFacto
                     TranslateExecutor translateExecutor = translatorDefinition.getTranslateExecutor();
                     int length = translatorDefinition.getParameterTypes().length;
                     translatorDefinition.setTranslateExecutor(args -> {
-                        LogUtils.info(log::info,"{} 接收参数 {}", () -> name, () -> {
+                        LogUtils.info(log::debug,"{} 接收参数 {}", () -> name, () -> {
                             StringBuilder sb = new StringBuilder();
                             sb.append("[");
                             Object[] arr = Arrays.copyOf(args,length);
