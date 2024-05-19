@@ -6,11 +6,14 @@ import com.superkele.translation.core.translator.definition.TranslatorDefinition
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Arrays;
 
+
 @ConditionalOnProperty(prefix = "easy-translation.debug", name = "debug", havingValue = "true")
+@Slf4j
 public class PerfRecordTranslatorFactoryPostProcessor implements TranslatorFactoryPostProcessor {
     @Override
     public void postProcess(ConfigurableTransDefinitionExecutorFactory factory) {
@@ -20,7 +23,7 @@ public class PerfRecordTranslatorFactoryPostProcessor implements TranslatorFacto
                     TranslateExecutor translateExecutor = translatorDefinition.getTranslateExecutor();
                     int length = translatorDefinition.getParameterTypes().length;
                     translatorDefinition.setTranslateExecutor(args -> {
-                        LogUtils.debug("{} 接收参数 {}", () -> name, () -> {
+                        LogUtils.info(log::info,"{} 接收参数 {}", () -> name, () -> {
                             StringBuilder sb = new StringBuilder();
                             sb.append("[");
                             Object[] arr = Arrays.copyOf(args,length);

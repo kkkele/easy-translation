@@ -37,13 +37,6 @@
         <dependency>
             <groupId>io.github.kkkele</groupId>
             <artifactId>easy-translation-core</artifactId>
-            <!-- 其他依赖 -->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId> <!-- 或其他非Logback的SLF4J绑定 -->
-                </exclusion>
-            </exclusions>
         </dependency>
 
 

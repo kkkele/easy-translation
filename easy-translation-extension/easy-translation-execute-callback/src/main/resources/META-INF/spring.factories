@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.superkele.translation.extension.executecallback.CallbackTranslatorPostProcessor,\
+  com.superkele.translation.extension.executecallback.CallbackTranslatorPostProcessor\

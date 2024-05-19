@@ -3,13 +3,15 @@ package com.superkele.translation.boot.scanner;
 import cn.hutool.core.collection.ListUtil;
 import com.superkele.translation.annotation.TranslatorScan;
 import com.superkele.translation.boot.global.TranslationGlobalInformation;
+import com.superkele.translation.core.util.LogUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.List;
 
-
+@Slf4j
 public class TranslationScanPostProcessor implements BeanPostProcessor {
 
     @Override
@@ -19,7 +21,7 @@ public class TranslationScanPostProcessor implements BeanPostProcessor {
         if (translatorScan != null) {
             TranslationGlobalInformation.addPackage(translatorScan.basePackages());
             TranslationGlobalInformation.addPackage(clazz.getPackage().getName());
-            LogUtils.debug("增加包扫描:{}", () -> {
+            LogUtils.debug(log::debug,"增加包扫描:{}", () -> {
                 List<String> packages = ListUtil.toList(translatorScan.basePackages());
                 packages.add(clazz.getPackage().getName());
                 return packages;

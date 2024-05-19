@@ -58,13 +58,12 @@
         <spring-boot3.version>3.0.6</spring-boot3.version>
         <spring5.version>5.3.31</spring5.version>
         <spring6.version>6.1.4</spring6.version>
-        <spring-boot.version>2.7.6</spring-boot.version>
+        <spring-boot.version>2.7.16</spring-boot.version>
         <hutool.version>5.8.18</hutool.version>
         <redisson.version>3.20.1</redisson.version>
         <javax-api.version>4.0.1</javax-api.version>
         <lombok.version>1.18.30</lombok.version>
         <reflections.version>0.9.11</reflections.version>
-        <slf4j-api.version>2.0.6</slf4j-api.version>
         <aspectj.version>1.9.19</aspectj.version>
     </properties>
 
@@ -105,12 +104,6 @@
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
                 <version>${reflections.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api.version}</version>
             </dependency>
 
             <dependency>

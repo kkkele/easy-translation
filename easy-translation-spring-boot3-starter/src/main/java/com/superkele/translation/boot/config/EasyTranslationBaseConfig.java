@@ -10,6 +10,7 @@ import com.superkele.translation.core.processor.TranslationProcessor;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.core.util.LogUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @EnableConfigurationProperties({TranslationProperties.class})
 @RequiredArgsConstructor
 @Configuration
+@Slf4j
 public class EasyTranslationBaseConfig {
 
     @Autowired
@@ -27,7 +29,7 @@ public class EasyTranslationBaseConfig {
         Optional.ofNullable(properties)
                 .ifPresent(p -> {
                     LogUtils.printLog = p.isDebug();
-                    LogUtils.debug("debug mode enabled");
+                    LogUtils.debug(log::debug,"debug mode enabled");
                 });
     }
 

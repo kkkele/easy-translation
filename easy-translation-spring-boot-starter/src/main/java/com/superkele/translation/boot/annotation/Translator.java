@@ -6,13 +6,13 @@ import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
 @Inherited
+@Target({ElementType.METHOD,ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Translation
 public @interface Translator {
 
-    @AliasFor(annotation = Translation.class, attribute = "name")
+    @AliasFor(annotation = Translation.class,attribute = "name")
     String value() default "";
 }

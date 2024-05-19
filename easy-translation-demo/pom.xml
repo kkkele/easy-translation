@@ -20,7 +20,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot3.version}</version>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -35,7 +35,7 @@
 
         <dependency>
             <groupId>io.github.kkkele</groupId>
-            <artifactId>easy-translation-spring-boot3-starter</artifactId>
+            <artifactId>easy-translation-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -47,6 +47,12 @@
         <dependency>
             <groupId>io.github.kkkele</groupId>
             <artifactId>easy-translation-perf-record</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
         </dependency>
     </dependencies>
 
