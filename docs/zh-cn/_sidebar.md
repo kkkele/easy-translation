@@ -11,7 +11,7 @@
     * [多线程保持上下文](zh-cn/contextHolder.md)
     * [翻译器回调执行](zh-cn/executeCallback.md)
     * [性能分析器](zh-cn/performanceRecord.md)
-* **测试说明**
+* **[未来规划](zh-cn/feature_guide.md)**
 
 <style>
     li{
