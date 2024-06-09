@@ -1,6 +1,6 @@
 package com.superkele.translation.core.translator.support;
 
-import com.superkele.translation.core.invoker.enums.InvokeBeanScope;
+import com.superkele.translation.core.translator.definition.InvokeBeanScope;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
