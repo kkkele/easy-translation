@@ -27,9 +27,8 @@ public abstract class AbstractAutowireCapableTranslatorFactory extends AbstractT
         TranslatorDecorator translateDecorator = definition.getTranslateDecorator();
         Translator origin = null;
         // 根据beanType选择不同的创建方式
-        switch (definition.getBeanType()) {
-            case SINGLETON:
-            case PROTOTYPE:
+        switch (definition.getTranslatorType()) {
+            case DYNAMIC_METHOD:
                 Object beanInvoker = getBeanInvoker(definition.getInvokeBeanName());
                 origin = createTranslator(beanInvoker, definition.getMethodHandle());
                 break;

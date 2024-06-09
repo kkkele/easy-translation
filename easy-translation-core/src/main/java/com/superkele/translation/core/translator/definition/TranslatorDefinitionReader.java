@@ -1,19 +1,16 @@
 package com.superkele.translation.core.translator.definition;
 
+import com.superkele.translation.core.translator.Resource;
+
 import java.util.Set;
 
 public interface TranslatorDefinitionReader {
 
-    TranslatorLoader getTranslatorLoader();
+    TranslatorDefinitionRegistry getRegistry();
 
-    Set<Class<?>> getTranslatorDeclaringClasses();
+    void loadTranslatorDefinitions(String basePath);
 
-    void loadDynamicTranslatorDefinitions(Object invokeObj,TranslatorDefinitionRegistry registry);
+    void loadTranslatorDefinitions(String[] basePath);
 
-    void loadDynamicTranslatorDefinitions(Object[] invokeObjs,TranslatorDefinitionRegistry registry);
-
-    void loadStaticTranslatorDefinitions(TranslatorDefinitionRegistry registry);
-
-    void loadEnumTranslatorDefinitions(TranslatorDefinitionRegistry registry);
-
+    void loadTranslatorDefinitions(Resource resource);
 }

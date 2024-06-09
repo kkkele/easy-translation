@@ -1,8 +1,8 @@
 package com.superkele.translation.core.invoker;
 
-import com.superkele.translation.core.invoker.enums.TransInvokeBeanType;
+import com.superkele.translation.core.invoker.enums.TranslatorType;
 
 public interface InvokeBeanRegister {
 
-    void register(String beanName, TransInvokeBeanType beanType, Object bean);
+    void register(String beanName, TranslatorType beanType, Object bean);
 }

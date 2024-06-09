@@ -9,7 +9,6 @@ import com.superkele.translation.core.property.PropertyGetter;
 import com.superkele.translation.core.property.PropertySetter;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
-import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.HandlerUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +19,6 @@ public abstract class AbstractMappingHandler implements MappingHandler {
 
     private final TranslatorFactory translatorFactory;
 
-    private final TranslateExecutor translateExecutor;
 
     public AbstractMappingHandler(TranslatorFactory translatorFactory) {
         this.translatorFactory = translatorFactory;
@@ -44,7 +42,7 @@ public abstract class AbstractMappingHandler implements MappingHandler {
                     return obj;
                 }
             }
-            Translator executor = translatorFactory.findTranslator(mapping.translator());
+            Translator translator = translatorFactory.findTranslator(mapping.translator());
             //加载缓存中的值，如果有的话，使用缓存中提供的值
             if (cacheResSupplier != null) {
                 Object cacheRes = cacheResSupplier.apply(uniqueName);
@@ -77,7 +75,7 @@ public abstract class AbstractMappingHandler implements MappingHandler {
                 args[i++] = other[j++];
             }
             //翻译值
-            Object mappingValue = executor.execute(args);
+            Object mappingValue = translator.doTranslate(args);
             if (callback != null) {
                 callback.accept(uniqueName, mappingValue);
             }

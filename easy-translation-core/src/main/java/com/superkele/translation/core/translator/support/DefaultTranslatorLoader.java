@@ -1,7 +1,5 @@
 package com.superkele.translation.core.translator.support;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.superkele.translation.annotation.Translation;
@@ -35,6 +33,7 @@ public class DefaultTranslatorLoader implements TranslatorLoader {
                 .forEach(clazz -> res.put(clazz, null));
         Map<? extends Class<?>, List<Method>> groupBy = methodsAnnotatedWith.stream()
                 .collect(Collectors.groupingBy(Method::getDeclaringClass));
+        //如果enum存在其他Translator方法，则 key,null 会被 k,v覆盖
         groupBy.forEach((k, v) -> res.put(k, new HashSet<>(v)));
         return res;
     }

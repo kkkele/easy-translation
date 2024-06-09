@@ -49,4 +49,5 @@ public class DefaultTranslatorFactory extends AbstractAutowireCapableTranslatorF
     protected Object getBeanInvoker(String beanName) {
         return invokeBeanRegistry.getBean(beanName);
     }
+
 }

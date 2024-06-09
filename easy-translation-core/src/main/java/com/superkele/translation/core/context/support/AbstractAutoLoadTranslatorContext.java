@@ -18,7 +18,6 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
 
     protected List<TranslatorPostProcessor> translatorPostProcessors = new CopyOnWriteArrayList<>();
 
-    protected abstract DefaultTranslatorDefinitionReader getDefinitionReader();
 
     public void addTranslatorPostProcessor(TranslatorPostProcessor translatorPostProcessor) {
         translatorPostProcessors.remove(translatorPostProcessor);
@@ -32,22 +31,9 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
 
     @Override
     protected void loadTranslatorDefinition(DefaultTranslatorFactory translatorFactory) {
-        DefaultTranslatorDefinitionReader definitionReader = getDefinitionReader();
+        DefaultTranslatorDefinitionReader definitionReader = new DefaultTranslatorDefinitionReader(translatorFactory);
         definitionReader.setConfig(getConfig());
-        /**
-         * 装载静态方法
-         */
-        definitionReader.loadStaticTranslatorDefinitions(translatorFactory);
-        /**
-         * 装载枚举类
-         */
-        definitionReader.loadEnumTranslatorDefinitions(translatorFactory);
-        if (getRegisterObjs() != null) {
-            /**
-             * 装载动态方法
-             */
-            definitionReader.loadDynamicTranslatorDefinitions(getRegisterObjs(), translatorFactory);
-        }
+        definitionReader.loadTranslatorDefinitions(getBasePackages());
     }
 
     @Override
@@ -92,7 +78,7 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
         translatorFactoryPostProcessors.add(translatorFactoryPostProcessor);
     }
 
-    protected abstract Object[] getRegisterObjs();
-
     protected abstract Config getConfig();
+
+    protected abstract String[] getBasePackages();
 }

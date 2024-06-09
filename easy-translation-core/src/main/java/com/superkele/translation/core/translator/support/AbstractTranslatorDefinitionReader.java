@@ -1,6 +1,7 @@
 package com.superkele.translation.core.translator.support;
 
 import com.superkele.translation.annotation.Translation;
+import com.superkele.translation.core.translator.Resource;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionReader;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
@@ -11,38 +12,83 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractTranslatorDefinitionReader implements TranslatorDefinitionReader {
 
 
-    protected TranslatorLoader translatorLoader;
-    protected Map<Class<?>, Set<Method>> translatorMap = new HashMap<>();
+    private final TranslatorDefinitionRegistry registry;
+    protected TranslatorLoader translatorLoader = new DefaultTranslatorLoader();
 
-    protected AbstractTranslatorDefinitionReader(TranslatorLoader translatorLoader, String[] locations) {
-        this.translatorLoader = translatorLoader;
-        for (String location : locations) {
-            Map<Class<?>, Set<Method>> translator = this.translatorLoader.getTranslator(location);
-            this.translatorMap.putAll(translator);
-        }
-    }
-
-    protected AbstractTranslatorDefinitionReader(String... locations) {
-        this(new DefaultTranslatorLoader(), locations);
+    protected AbstractTranslatorDefinitionReader(TranslatorDefinitionRegistry registry) {
+        this.registry = registry;
     }
 
     @Override
-    public Set<Class<?>> getTranslatorDeclaringClasses() {
-        return translatorMap.keySet();
+    public TranslatorDefinitionRegistry getRegistry() {
+        return registry;
+    }
+
+    @Override
+    public void loadTranslatorDefinitions(String basePath) {
+        Map<Class<?>, Set<Method>> translatorMap = translatorLoader.getTranslator(basePath);
+        translatorMap.forEach((clazz, methods) -> {
+            loadEnumTranslatorDefinitions(clazz);
+            Optional.ofNullable(methods)
+                    .ifPresent(methodSet -> {
+                        Map<Boolean, List<Method>> staticMethodMap = methodSet.stream()
+                                .collect(Collectors.groupingBy(ReflectUtils::isStaticMethod));
+                        Optional.ofNullable(staticMethodMap.get(true))
+                                .ifPresent(staticMethodList -> {
+                                    loadStaticMethodTranslatorDefinitions(clazz, staticMethodList);
+                                });
+                        Optional.ofNullable(staticMethodMap.get(false))
+                                .ifPresent(dynamicMethodList -> {
+                                    loadDynamicMethodTranslatorDefinitions(clazz, dynamicMethodList);
+                                });
+                    });
+        });
+    }
+
+    protected void loadStaticMethodTranslatorDefinitions(Class<?> clazz, Collection<Method> methods) {
+        methods.stream()
+                .map(method -> {
+                    Translation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(method, Translation.class);
+                    return Pair.of(method, mergedAnnotation);
+                })
+                .forEach(pair -> {
+                    TranslatorDefinition translatorDefinition = convertStaticMethodToTranslatorDefinition(clazz, pair.getKey());
+                    registry.register(getTranslatorName(pair.getValue(), pair.getKey()), translatorDefinition);
+                });
+    }
+
+    protected void loadDynamicMethodTranslatorDefinitions(Class<?> clazz, Collection<Method> methods) {
+        methods.stream()
+                .map(method -> {
+                    Translation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(method, Translation.class);
+                    return Pair.of(method, mergedAnnotation);
+                })
+                .forEach(methodAnnotationPair -> {
+                    TranslatorDefinition translatorDefinition = convertDynamicMethodToTranslatorDefinition(clazz, methodAnnotationPair.getKey(), methodAnnotationPair.getValue());
+                    registry.register(getTranslatorName(methodAnnotationPair.getValue(), methodAnnotationPair.getKey()), translatorDefinition);
+                });
     }
 
 
     @Override
-    public TranslatorLoader getTranslatorLoader() {
-        return this.translatorLoader;
+    public void loadTranslatorDefinitions(String[] basePath) {
+        Optional.ofNullable(basePath)
+                .ifPresent(paths -> Arrays.stream(paths)
+                        .distinct()
+                        .forEach(this::loadTranslatorDefinitions));
     }
 
+    @Override
+    public void loadTranslatorDefinitions(Resource resource) {
+        //todo 增加读文件或者定义远程接口方式实现
+    }
+/*
     @Override
     public void loadDynamicTranslatorDefinitions(Object invokeObj, TranslatorDefinitionRegistry registry) {
         Optional.ofNullable(invokeObj)
@@ -55,7 +101,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                             clazz = clazz.getSuperclass();
                         } while (StringUtils.contains(clazz.getName(), "$Enhancer"));
                     }
-                    return Pair.of(obj,clazz);
+                    return Pair.of(obj, clazz);
                 })
                 .filter(pair -> translatorMap.containsKey(pair.getValue()))
                 .ifPresent(pair -> {
@@ -76,49 +122,16 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                                 registry.register(getTranslatorName(methodAnnotationPair.getValue(), methodAnnotationPair.getKey()), translatorDefinition);
                             });
                 });
-    }
+    }*/
 
-    @Override
-    public void loadDynamicTranslatorDefinitions(Object[] invokeObjs, TranslatorDefinitionRegistry registry) {
-        Optional.ofNullable(invokeObjs)
-                .ifPresent(invokeObjArr -> {
-                    for (Object invokeObj : invokeObjArr) {
-                        loadDynamicTranslatorDefinitions(invokeObj, registry);
-                    }
+    protected void loadEnumTranslatorDefinitions(Class<?> clazz) {
+        Optional.of(clazz)
+                .filter(Class::isEnum)
+                .map(enumClazz -> Pair.of(enumClazz, AnnotatedElementUtils.getMergedAnnotation(enumClazz, Translation.class)))
+                .ifPresent(pair -> {
+                    Class<? extends Enum> key = (Class<? extends Enum>) pair.getKey();
+                    registry.register(getTranslatorName(pair.getValue(), key), convertEnumToTranslatorDefinition(key));
                 });
-    }
-
-    @Override
-    public void loadStaticTranslatorDefinitions(TranslatorDefinitionRegistry registry) {
-        translatorMap.forEach((clazz, methods) -> {
-            if (clazz.isEnum()) {
-                return;
-            }
-            if (methods == null) {
-                return;
-            }
-            methods.stream()
-                    .filter(ReflectUtils::isStaticMethod)
-                    .map(method -> {
-                        Translation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(method, Translation.class);
-                        return Pair.of(method, mergedAnnotation);
-                    })
-                    .forEach(pair ->
-                            registry.register(getTranslatorName(pair.getValue(), pair.getKey()), convertStaticMethodToTranslatorDefinition(pair.getKey())));
-        });
-    }
-
-    @Override
-    public void loadEnumTranslatorDefinitions(TranslatorDefinitionRegistry registry) {
-        translatorMap.forEach((clazz, methods) -> {
-            Optional.of(clazz)
-                    .filter(Class::isEnum)
-                    .map(enumClazz -> Pair.of(enumClazz, AnnotatedElementUtils.getMergedAnnotation(enumClazz, Translation.class)))
-                    .ifPresent(pair -> {
-                        Class<? extends Enum> key = (Class<? extends Enum>) pair.getKey();
-                        registry.register(getTranslatorName(pair.getValue(), key), convertEnumToTranslatorDefinition(key));
-                    });
-        });
     }
 
 
@@ -155,16 +168,16 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
     /**
      * 将类中的静态方法转为TranslatorDefinition
      *
+     * @param clazz
      * @param method 静态方法
      * @return
      */
-    protected abstract TranslatorDefinition convertStaticMethodToTranslatorDefinition(Method method);
+    protected abstract TranslatorDefinition convertStaticMethodToTranslatorDefinition(Class<?> clazz, Method method);
 
     /**
      * 将对象中的方法转为TranslatorDefinition
      *
-     * @param invokeObj
      * @return
      */
-    protected abstract TranslatorDefinition convertDynamicMethodToTranslatorDefinition(Object invokeObj, Method method);
+    protected abstract TranslatorDefinition convertDynamicMethodToTranslatorDefinition(Class<?> clazz, Method method, Translation value);
 }

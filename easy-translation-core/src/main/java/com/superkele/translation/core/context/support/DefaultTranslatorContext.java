@@ -1,6 +1,7 @@
 package com.superkele.translation.core.context.support;
 
 import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.invoker.InvokeBeanFactory;
 import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
 
 /**
@@ -8,42 +9,39 @@ import com.superkele.translation.core.translator.support.DefaultTranslatorDefini
  */
 public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext {
 
+
+    private String[] basePackages;
+
+    private InvokeBeanFactory invokeBeanFactory;
+
     private Config config;
 
-    private Object[] invokeObjs;
-
-    private DefaultTranslatorDefinitionReader definitionReader;
-
-
-
-    @Override
-    protected DefaultTranslatorDefinitionReader getDefinitionReader() {
-        return definitionReader;
+    public DefaultTranslatorContext(String[] basePackages, InvokeBeanFactory invokeBeanFactory, Config config) {
+        this.basePackages = basePackages;
+        this.invokeBeanFactory = invokeBeanFactory;
+        this.config = config;
     }
 
-    public DefaultTranslatorContext setDefinitionReader(DefaultTranslatorDefinitionReader definitionReader) {
-        this.definitionReader = definitionReader;
-        return this;
+    public DefaultTranslatorContext(String[] basePackages, InvokeBeanFactory invokeBeanFactory) {
+        this(basePackages, invokeBeanFactory, new Config());
     }
 
-    @Override
-    public Object[] getRegisterObjs() {
-        return this.invokeObjs;
+    public DefaultTranslatorContext(String[] basePackages) {
+        this(basePackages, null, new Config());
     }
 
     @Override
     public Config getConfig() {
-        return this.config;
+        return config;
     }
 
-    public DefaultTranslatorContext setConfig(Config config) {
-        this.config = config;
-        return this;
+    @Override
+    protected String[] getBasePackages() {
+        return basePackages;
     }
 
-    public DefaultTranslatorContext setInvokeObjs(Object[] invokeObjs) {
-        this.invokeObjs = invokeObjs;
-        return this;
+    @Override
+    protected InvokeBeanFactory getInvokeBeanFactory() {
+        return invokeBeanFactory;
     }
-
 }

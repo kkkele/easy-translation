@@ -1,7 +1,8 @@
 package com.superkele.translation.core.translator.definition;
 
 import com.superkele.translation.core.decorator.TranslatorDecorator;
-import com.superkele.translation.core.invoker.enums.TransInvokeBeanType;
+import com.superkele.translation.core.invoker.enums.InvokeBeanScope;
+import com.superkele.translation.core.invoker.enums.TranslatorType;
 import com.superkele.translation.core.translator.Translator;
 import lombok.Data;
 
@@ -13,7 +14,12 @@ public class TranslatorDefinition {
     /**
      * 提供invokeObj的Bean类型
      */
-    private TransInvokeBeanType beanType;
+    private TranslatorType translatorType;
+
+    /**
+     * 默认单例scope
+     */
+    private InvokeBeanScope scope = InvokeBeanScope.SINGLETON;
 
     /**
      * 翻译器方法返回值类型

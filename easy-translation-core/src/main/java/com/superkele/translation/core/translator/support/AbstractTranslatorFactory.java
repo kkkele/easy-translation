@@ -1,6 +1,6 @@
 package com.superkele.translation.core.translator.support;
 
-import com.superkele.translation.core.invoker.enums.TransInvokeBeanType;
+import com.superkele.translation.core.invoker.enums.InvokeBeanScope;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
@@ -23,8 +23,7 @@ public abstract class AbstractTranslatorFactory extends DefaultSingletonTranslat
         }
         TranslatorDefinition definition = findTranslatorDefinition(translatorName);
         translator = createTranslator(translatorName, definition);
-        //只要你不是原型InvokeBean对象，都可以进入单例桶
-        if (definition.getBeanType() != TransInvokeBeanType.PROTOTYPE) {
+        if (definition.getScope() == InvokeBeanScope.SINGLETON) {
             addSingleton(translatorName, translator);
         }
         return translator;

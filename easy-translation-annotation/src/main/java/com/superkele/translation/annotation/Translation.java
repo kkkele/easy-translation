@@ -1,6 +1,8 @@
 package com.superkele.translation.annotation;
 
 
+import com.superkele.translation.annotation.constant.DefaultBeanNameResolver;
+
 import java.lang.annotation.*;
 
 /**
@@ -17,5 +19,9 @@ public @interface Translation {
      * <p>translator name</p>
      */
     String name() default "";
+
+    String invokeBeanName() default "";
+
+    Class<? extends BeanNameResolver> beanNameResolver() default DefaultBeanNameResolver.class;
 
 }
