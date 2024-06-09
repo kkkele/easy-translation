@@ -16,6 +16,9 @@ public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext 
 
     private Config config;
 
+    public DefaultTranslatorContext() {
+    }
+
     public DefaultTranslatorContext(String[] basePackages, InvokeBeanFactory invokeBeanFactory, Config config) {
         this.basePackages = basePackages;
         this.invokeBeanFactory = invokeBeanFactory;
@@ -35,13 +38,28 @@ public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext 
         return config;
     }
 
+    public DefaultTranslatorContext setConfig(Config config) {
+        this.config = config;
+        return this;
+    }
+
     @Override
     protected String[] getBasePackages() {
         return basePackages;
     }
 
+    public DefaultTranslatorContext setBasePackages(String[] basePackages) {
+        this.basePackages = basePackages;
+        return this;
+    }
+
     @Override
     protected InvokeBeanFactory getInvokeBeanFactory() {
         return invokeBeanFactory;
+    }
+
+    public DefaultTranslatorContext setInvokeBeanFactory(InvokeBeanFactory invokeBeanFactory) {
+        this.invokeBeanFactory = invokeBeanFactory;
+        return this;
     }
 }

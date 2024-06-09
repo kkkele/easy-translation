@@ -12,5 +12,5 @@ public interface InvokeBeanFactory {
 
     Object getBean(Class<?> clazz);
 
-    Map<String, Object> getBeanOfType(String beanName);
+    Map<String, Object> getBeansOfType(Class<?> clazz);
 }

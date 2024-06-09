@@ -25,17 +25,9 @@ public class EasyTranslationApplicationAware implements ApplicationContextAware 
             DefaultTranslatorContext defaultTransExecutorContext = (DefaultTranslatorContext) executorContext;
             Config defaultTranslationConfig = applicationContext.getBean("defaultTranslationConfig", Config.class);
             String[] packages = TranslationGlobalInformation.getPackages().stream().toArray(String[]::new);
-            DefaultTranslatorDefinitionReader reader = new DefaultTranslatorDefinitionReader(packages);
-            Set<Class<?>> translatorDeclaringClasses = reader.getTranslatorDeclaringClasses();
-            Object[] invokeObjs = translatorDeclaringClasses.stream()
-                    .map(clazz -> applicationContext.getBeanNamesForType(clazz))
-                    .flatMap(Arrays::stream)
-                    .filter(beanName -> !"EasyTranslationApplicationAware".equals(beanName))
-                    .map(applicationContext::getBean)
-                    .toArray(Object[]::new);
-            defaultTransExecutorContext.setDefinitionReader(reader);
+            defaultTransExecutorContext.setBasePackages(packages);
             defaultTransExecutorContext.setConfig(defaultTranslationConfig);
-            defaultTransExecutorContext.setInvokeObjs(invokeObjs);
+            // todo 待完成 defaultTransExecutorContext.setInvokeBeanFactory();
         }
         executorContext.refresh();
         LogUtils.debug(log::debug,"executorContext refresh success");

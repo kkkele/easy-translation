@@ -16,11 +16,11 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 public abstract class AbstractAutowireCapableTranslatorFactory extends AbstractTranslatorFactory
         implements AutowireCapableTranslatorFactory {
-
 
     @Override
     public Translator createTranslator(String translatorName, TranslatorDefinition definition) {
@@ -29,8 +29,10 @@ public abstract class AbstractAutowireCapableTranslatorFactory extends AbstractT
         // 根据beanType选择不同的创建方式
         switch (definition.getTranslatorType()) {
             case DYNAMIC_METHOD:
-                Object beanInvoker = getBeanInvoker(definition.getInvokeBeanName());
-                origin = createTranslator(beanInvoker, definition.getMethodHandle());
+                Object translatorInvoker = Optional.ofNullable(getBeanInvoker(definition.getInvokeBeanName()))
+                        .orElse(getBeanInvoker(definition.getInvokeBeanClazz()));
+                Assert.notNull(translatorInvoker, "invokerBeanName: [" + definition.getInvokeBeanName() + "] is not find");
+                origin = createTranslator(translatorInvoker, definition.getMethodHandle());
                 break;
             case STATIC_METHOD:
                 origin = createTranslator(definition.getMethodHandle());
@@ -74,6 +76,7 @@ public abstract class AbstractAutowireCapableTranslatorFactory extends AbstractT
 
     protected abstract Object getBeanInvoker(String beanName);
 
+    protected abstract Object getBeanInvoker(Class<?> clazz);
 
     /**
      * 将动态方法转为Translator
