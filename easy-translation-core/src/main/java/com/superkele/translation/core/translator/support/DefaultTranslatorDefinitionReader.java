@@ -13,6 +13,7 @@ import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.ReflectUtils;
 
 import java.lang.invoke.LambdaConversionException;
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -32,7 +33,6 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         this.config = config;
         return this;
     }
-
 
 
     @Override
@@ -71,18 +71,11 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         Assert.notNull(mappedField, "Enum translator must have one and only one value field");
         Assert.isTrue(mapperIndex != -1, "Enum translator must have  one and only one  mapper field");
         TranslatorDefinition translatorDefinition = new TranslatorDefinition();
+        translatorDefinition.setInvokeBeanClazz(enumClass);
+        // todo  translatorDefinition.setInvokeBeanName();
         translatorDefinition.setReturnType(mappedField.getType());
         translatorDefinition.setParameterTypes(new Class[]{declaredFields[mapperIndex].getType()});
         translatorDefinition.setTranslatorClass(MapperTranslator.class);
-        translatorDefinition.setInvokeObj(null);
-        Map<Object, Object> map = new HashMap<>();
-        Field mapperField = declaredFields[mapperIndex];
-        for (Enum enumConstant : enumClass.getEnumConstants()) {
-            map.put(ReflectUtils.invokeGetter(enumConstant, mapperField.getName()), ReflectUtils.invokeGetter(enumConstant, mappedField.getName()));
-        }
-        MapperTranslator mapperTranslator = mapper -> map.get(mapper);
-        translatorDefinition.setTranslator(mapperTranslator);
-        translatorDefinition.setTranslateExecutor(null);
         translatorDefinition.setMapperIndex(new int[1]);
         return translatorDefinition;
     }
@@ -92,18 +85,15 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         TranslatorDefinition definition = new TranslatorDefinition();
         definition.setReturnType(method.getReturnType());
         definition.setParameterTypes(method.getParameterTypes());
-        definition.setInvokeObj(null);
         Class<? extends Translator> translatorClazz = config.getTranslatorClazzMap().get(method.getParameterCount());
-        if (translatorClazz == null){
-            throw new TranslationException("Do not find the translator type with "+method.getParameterCount()+"params ,see https://kkkele.github.io/easy-translation/#/zh-cn/config/ for more information");
+        if (translatorClazz == null) {
+            throw new TranslationException("Do not find the translator type with " + method.getParameterCount() + "params ,see https://kkkele.github.io/easy-translation/#/zh-cn/config/ for more information");
         }
         definition.setTranslatorClass(translatorClazz);
         definition.setMapperIndex(getIndexPair(method));
-        //关键，设置translator和translatorHandler
         try {
-            Translator translator = MethodConvert.convertToFunctionInterface(translatorClazz, method);
-            definition.setTranslator(translator);
-            definition.setTranslateExecutor(args -> translator.doTranslate(args));
+            MethodHandle methodHandle = MethodConvert.getMethodHandle(translatorClazz, method);
+            definition.setMethodHandle(methodHandle);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (LambdaConversionException e) {
@@ -117,18 +107,16 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         TranslatorDefinition definition = new TranslatorDefinition();
         definition.setReturnType(method.getReturnType());
         definition.setParameterTypes(method.getParameterTypes());
-        definition.setInvokeObj(invokeObj);
         Class<? extends Translator> translatorClazz = config.getTranslatorClazzMap().get(method.getParameterCount());
-        if (translatorClazz == null){
-            throw new TranslationException("Do not find the translator type with "+method.getParameterCount()+" params ,see https://kkkele.github.io/easy-translation/#/zh-cn/config/ for more information");
+        if (translatorClazz == null) {
+            throw new TranslationException("Do not find the translator type with " + method.getParameterCount() + " params ,see https://kkkele.github.io/easy-translation/#/zh-cn/config/ for more information");
         }
         definition.setTranslatorClass(translatorClazz);
         definition.setMapperIndex(getIndexPair(method));
         //关键，设置translator和translatorHandler
         try {
-            Translator translator = MethodConvert.convertToFunctionInterface(translatorClazz, invokeObj, method);
-            definition.setTranslator(translator);
-            definition.setTranslateExecutor(args -> translator.doTranslate(args));
+            MethodHandle methodHandle = MethodConvert.getMethodHandle(translatorClazz, method);
+            definition.setMethodHandle(methodHandle);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (LambdaConversionException e) {

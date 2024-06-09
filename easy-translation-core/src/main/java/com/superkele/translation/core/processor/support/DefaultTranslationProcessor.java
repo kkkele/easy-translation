@@ -1,11 +1,10 @@
 package com.superkele.translation.core.processor.support;
 
 import com.superkele.translation.core.annotation.MappingHandler;
-import com.superkele.translation.core.annotation.support.AbstractMappingHandler;
 import com.superkele.translation.core.annotation.support.DefaultMappingHandler;
 import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.context.TransExecutorContext;
-import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
+import com.superkele.translation.core.context.TranslatorContext;
+import com.superkele.translation.core.context.support.DefaultTranslatorContext;
 import com.superkele.translation.core.property.PropertyGetter;
 import com.superkele.translation.core.property.PropertySetter;
 
@@ -17,15 +16,15 @@ public class DefaultTranslationProcessor extends ListableTranslationProcessor {
 
     private Config config;
 
-    public DefaultTranslationProcessor(TransExecutorContext context) {
+    public DefaultTranslationProcessor(TranslatorContext context) {
         this.mappingHandler = new DefaultMappingHandler(context);
-        if (context instanceof DefaultTransExecutorContext) {
-            Config config = ((DefaultTransExecutorContext) context).getConfig();
+        if (context instanceof DefaultTranslatorContext) {
+            Config config = ((DefaultTranslatorContext) context).getConfig();
             this.config = config;
         }
     }
 
-    public DefaultTranslationProcessor(TransExecutorContext context, Config config) {
+    public DefaultTranslationProcessor(TranslatorContext context, Config config) {
         this.mappingHandler = new DefaultMappingHandler(context);
         this.config = config;
     }

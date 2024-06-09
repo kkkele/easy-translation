@@ -2,7 +2,7 @@ package com.superkele.translation.core.translator.factory;
 
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 
-public interface ConfigurableTransExecutorFactory extends TransExecutorFactory {
+public interface ConfigurableTranslatorFactory extends TranslatorFactory {
 
     String[] getTranslatorNames();
 

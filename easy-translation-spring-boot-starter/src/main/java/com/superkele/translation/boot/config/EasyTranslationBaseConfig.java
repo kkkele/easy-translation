@@ -5,7 +5,7 @@ import com.superkele.translation.boot.config.properties.TranslationProperties;
 import com.superkele.translation.boot.scanner.TranslationScanPostProcessor;
 import com.superkele.translation.core.aop.TranslationAspect;
 import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
+import com.superkele.translation.core.context.support.DefaultTranslatorContext;
 import com.superkele.translation.core.processor.TranslationProcessor;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.core.util.LogUtils;
@@ -45,12 +45,12 @@ public class EasyTranslationBaseConfig {
     }
 
     @Bean
-    public DefaultTransExecutorContext defaultTransExecutorContext() {
-        return new DefaultTransExecutorContext();
+    public DefaultTranslatorContext defaultTransExecutorContext() {
+        return new DefaultTranslatorContext();
     }
 
     @Bean
-    public DefaultTranslationProcessor defaultTranslationProcessor(DefaultTransExecutorContext defaultTransExecutorContext, Config defaultTranslationConfig) {
+    public DefaultTranslationProcessor defaultTranslationProcessor(DefaultTranslatorContext defaultTransExecutorContext, Config defaultTranslationConfig) {
         return new DefaultTranslationProcessor(defaultTransExecutorContext, defaultTranslationConfig);
     }
 

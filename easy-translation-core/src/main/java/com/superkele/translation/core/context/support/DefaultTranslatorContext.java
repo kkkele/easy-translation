@@ -3,14 +3,10 @@ package com.superkele.translation.core.context.support;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
 
-import java.util.Optional;
-
-import static com.superkele.translation.core.constant.TranslationConstant.DEFAULT_PACKAGE;
-
 /**
  * 默认翻译器上下文
  */
-public class DefaultTransExecutorContext extends AbstractAutoLoadTransExecutorContext {
+public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext {
 
     private Config config;
 
@@ -25,7 +21,7 @@ public class DefaultTransExecutorContext extends AbstractAutoLoadTransExecutorCo
         return definitionReader;
     }
 
-    public DefaultTransExecutorContext setDefinitionReader(DefaultTranslatorDefinitionReader definitionReader) {
+    public DefaultTranslatorContext setDefinitionReader(DefaultTranslatorDefinitionReader definitionReader) {
         this.definitionReader = definitionReader;
         return this;
     }
@@ -40,12 +36,12 @@ public class DefaultTransExecutorContext extends AbstractAutoLoadTransExecutorCo
         return this.config;
     }
 
-    public DefaultTransExecutorContext setConfig(Config config) {
+    public DefaultTranslatorContext setConfig(Config config) {
         this.config = config;
         return this;
     }
 
-    public DefaultTransExecutorContext setInvokeObjs(Object[] invokeObjs) {
+    public DefaultTranslatorContext setInvokeObjs(Object[] invokeObjs) {
         this.invokeObjs = invokeObjs;
         return this;
     }

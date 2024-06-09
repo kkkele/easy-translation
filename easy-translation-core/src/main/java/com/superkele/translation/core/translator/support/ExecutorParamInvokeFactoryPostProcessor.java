@@ -2,7 +2,7 @@ package com.superkele.translation.core.translator.support;
 
 import cn.hutool.core.convert.Convert;
 import com.superkele.translation.core.translator.Translator;
-import com.superkele.translation.core.translator.definition.ConfigurableTransDefinitionExecutorFactory;
+import com.superkele.translation.core.translator.definition.ConfigurableTranslatorFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 
@@ -11,7 +11,7 @@ import com.superkele.translation.core.translator.definition.TranslatorFactoryPos
  */
 public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactoryPostProcessor {
     @Override
-    public void postProcess(ConfigurableTransDefinitionExecutorFactory factory) {
+    public void postProcess(ConfigurableTranslatorFactory factory) {
         String[] translatorNames = factory.getTranslatorNames();
         for (String translatorName : translatorNames) {
             TranslatorDefinition definition = factory.findTranslatorDefinition(translatorName);
@@ -30,8 +30,8 @@ public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactor
                 }
                 i++;
             }
-            Translator translator = definition.getTranslator();
-            definition.setTranslateExecutor(args -> translator.doTranslate(reWrapper(args, mapperIndex, otherIndex, parameterTypes)));
+            definition.setTranslateDecorator(translator ->
+                    args -> translator.doTranslate(reWrapper(args, mapperIndex, otherIndex, parameterTypes)));
         }
     }
 

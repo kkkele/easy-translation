@@ -7,7 +7,8 @@ import com.superkele.translation.core.annotation.FieldTranslationInvoker;
 import com.superkele.translation.core.annotation.MappingHandler;
 import com.superkele.translation.core.property.PropertyGetter;
 import com.superkele.translation.core.property.PropertySetter;
-import com.superkele.translation.core.translator.factory.TransExecutorFactory;
+import com.superkele.translation.core.translator.Translator;
+import com.superkele.translation.core.translator.factory.TranslatorFactory;
 import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.HandlerUtil;
@@ -17,9 +18,11 @@ import java.lang.reflect.Field;
 
 public abstract class AbstractMappingHandler implements MappingHandler {
 
-    private final TransExecutorFactory translatorFactory;
+    private final TranslatorFactory translatorFactory;
 
-    public AbstractMappingHandler(TransExecutorFactory translatorFactory) {
+    private final TranslateExecutor translateExecutor;
+
+    public AbstractMappingHandler(TranslatorFactory translatorFactory) {
         this.translatorFactory = translatorFactory;
     }
 
@@ -30,7 +33,6 @@ public abstract class AbstractMappingHandler implements MappingHandler {
     @Override
     public FieldTranslationInvoker convert(Field declaringField, Mapping mapping) {
         Assert.isTrue(translatorFactory.containsTranslator(mapping.translator()), "translator not found: " + mapping.translator());
-        TranslateExecutor executor = translatorFactory.findExecutor(mapping.translator());
         String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());
         return (obj, cacheResSupplier, callback) -> {
             if (obj == null) {
@@ -42,6 +44,7 @@ public abstract class AbstractMappingHandler implements MappingHandler {
                     return obj;
                 }
             }
+            Translator executor = translatorFactory.findTranslator(mapping.translator());
             //加载缓存中的值，如果有的话，使用缓存中提供的值
             if (cacheResSupplier != null) {
                 Object cacheRes = cacheResSupplier.apply(uniqueName);

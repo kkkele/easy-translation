@@ -3,7 +3,7 @@ package com.superkele.translation.boot.config;
 
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.config.TranslationAutoConfigurationCustomizer;
-import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
+import com.superkele.translation.core.context.support.DefaultTranslatorContext;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
@@ -30,7 +30,7 @@ public class EasyTranslationInterceptorConfig {
     }
 
     @Autowired(required = false)
-    public void addTranslatorFactoryPostProcessor(DefaultTransExecutorContext defaultTransExecutorContext, List<TranslatorFactoryPostProcessor> postProcessors) {
+    public void addTranslatorFactoryPostProcessor(DefaultTranslatorContext defaultTransExecutorContext, List<TranslatorFactoryPostProcessor> postProcessors) {
         if (postProcessors != null)
             postProcessors.forEach(translatorFactoryPostProcessor -> {
                 defaultTransExecutorContext.addTranslatorFactoryPostProcessor(translatorFactoryPostProcessor);
@@ -39,7 +39,7 @@ public class EasyTranslationInterceptorConfig {
     }
 
     @Autowired(required = false)
-    public void addTranslatorPostProcessor(DefaultTransExecutorContext defaultTransExecutorContext, List<TranslatorPostProcessor> postProcessors) {
+    public void addTranslatorPostProcessor(DefaultTranslatorContext defaultTransExecutorContext, List<TranslatorPostProcessor> postProcessors) {
         if (postProcessors != null)
             postProcessors.forEach(postProcessor -> {
                 defaultTransExecutorContext.addTranslatorPostProcessor(postProcessor);

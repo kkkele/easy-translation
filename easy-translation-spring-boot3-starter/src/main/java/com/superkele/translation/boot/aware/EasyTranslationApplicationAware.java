@@ -2,8 +2,8 @@ package com.superkele.translation.boot.aware;
 
 import com.superkele.translation.boot.global.TranslationGlobalInformation;
 import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.context.ConfigurableTransExecutorContext;
-import com.superkele.translation.core.context.support.DefaultTransExecutorContext;
+import com.superkele.translation.core.context.ConfigurableTranslatorContext;
+import com.superkele.translation.core.context.support.DefaultTranslatorContext;
 import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
 import com.superkele.translation.core.util.LogUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +20,9 @@ import java.util.Set;
 public class EasyTranslationApplicationAware implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        ConfigurableTransExecutorContext executorContext = applicationContext.getBean("defaultTransExecutorContext", ConfigurableTransExecutorContext.class);
-        if (executorContext instanceof DefaultTransExecutorContext) {
-            DefaultTransExecutorContext defaultTransExecutorContext = (DefaultTransExecutorContext) executorContext;
+        ConfigurableTranslatorContext executorContext = applicationContext.getBean("defaultTransExecutorContext", ConfigurableTranslatorContext.class);
+        if (executorContext instanceof DefaultTranslatorContext) {
+            DefaultTranslatorContext defaultTransExecutorContext = (DefaultTranslatorContext) executorContext;
             Config defaultTranslationConfig = applicationContext.getBean("defaultTranslationConfig", Config.class);
             String[] packages = TranslationGlobalInformation.getPackages().stream().toArray(String[]::new);
             DefaultTranslatorDefinitionReader reader = new DefaultTranslatorDefinitionReader(packages);

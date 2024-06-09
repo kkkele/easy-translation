@@ -2,17 +2,17 @@ package com.superkele.translation.core.context.support;
 
 
 import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.translator.definition.ConfigurableTransDefinitionExecutorFactory;
+import com.superkele.translation.core.translator.definition.ConfigurableTranslatorFactory;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
-import com.superkele.translation.core.translator.support.DefaultTransExecutorFactory;
+import com.superkele.translation.core.translator.support.DefaultTranslatorFactory;
 import com.superkele.translation.core.translator.support.ExecutorParamInvokeFactoryPostProcessor;
 import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class AbstractAutoLoadTransExecutorContext extends AbstractRefreshableTransExecutorContext {
+public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefreshableTranslatorContext {
 
     protected List<TranslatorFactoryPostProcessor> translatorFactoryPostProcessors = new CopyOnWriteArrayList<>();
 
@@ -26,12 +26,12 @@ public abstract class AbstractAutoLoadTransExecutorContext extends AbstractRefre
     }
 
     @Override
-    protected void loadTranslatorPostProcessors(ConfigurableTransDefinitionExecutorFactory translatorFactory) {
+    protected void loadTranslatorPostProcessors(ConfigurableTranslatorFactory translatorFactory) {
         translatorPostProcessors.forEach(translatorFactory::addTranslatorPostProcessor);
     }
 
     @Override
-    protected void loadTranslatorDefinition(DefaultTransExecutorFactory translatorFactory) {
+    protected void loadTranslatorDefinition(DefaultTranslatorFactory translatorFactory) {
         DefaultTranslatorDefinitionReader definitionReader = getDefinitionReader();
         definitionReader.setConfig(getConfig());
         /**
@@ -51,7 +51,7 @@ public abstract class AbstractAutoLoadTransExecutorContext extends AbstractRefre
     }
 
     @Override
-    protected void invokeTranslatorFactoryPostProcessors(ConfigurableTransDefinitionExecutorFactory translatorFactory) {
+    protected void invokeTranslatorFactoryPostProcessors(ConfigurableTranslatorFactory translatorFactory) {
         addFirstTranslatorFactoryPostProcessor(new ExecutorParamInvokeFactoryPostProcessor());
         for (TranslatorFactoryPostProcessor translatorFactoryPostProcessor : translatorFactoryPostProcessors) {
             translatorFactoryPostProcessor.postProcess(translatorFactory);

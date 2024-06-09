@@ -1,8 +1,7 @@
 package com.superkele.translation.core.translator;
 
 
+@FunctionalInterface
 public interface Translator {
-    default Object doTranslate(Object... args) {
-        return null;
-    }
+    Object doTranslate(Object... args);
 }

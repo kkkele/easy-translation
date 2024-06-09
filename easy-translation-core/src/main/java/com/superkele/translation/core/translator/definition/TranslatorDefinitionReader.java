@@ -15,4 +15,5 @@ public interface TranslatorDefinitionReader {
     void loadStaticTranslatorDefinitions(TranslatorDefinitionRegistry registry);
 
     void loadEnumTranslatorDefinitions(TranslatorDefinitionRegistry registry);
+
 }

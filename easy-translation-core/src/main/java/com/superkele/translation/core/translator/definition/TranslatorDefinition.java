@@ -1,11 +1,19 @@
 package com.superkele.translation.core.translator.definition;
 
+import com.superkele.translation.core.decorator.TranslatorDecorator;
+import com.superkele.translation.core.invoker.enums.TransInvokeBeanType;
 import com.superkele.translation.core.translator.Translator;
-import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import lombok.Data;
+
+import java.lang.invoke.MethodHandle;
 
 @Data
 public class TranslatorDefinition {
+
+    /**
+     * 提供invokeObj的Bean类型
+     */
+    private TransInvokeBeanType beanType;
 
     /**
      * 翻译器方法返回值类型
@@ -23,19 +31,24 @@ public class TranslatorDefinition {
     private Class<? extends Translator> translatorClass;
 
     /**
-     * 该对象提供的翻译器
+     * 提供翻译器的Bean名称
      */
-    private Object invokeObj;
+    private String invokeBeanName;
 
     /**
-     * 翻译器
+     * 提供翻译器的Bean 类型
      */
-    private Translator translator;
+    private Class<?> invokeBeanClazz;
 
     /**
-     * 翻译器处理器
+     * 翻译器修饰器
      */
-    private TranslateExecutor translateExecutor;
+    private TranslatorDecorator translateDecorator;
+
+    /**
+     * 方法句柄
+     */
+    private MethodHandle methodHandle;
 
     /**
      * 需要映射的参数位置

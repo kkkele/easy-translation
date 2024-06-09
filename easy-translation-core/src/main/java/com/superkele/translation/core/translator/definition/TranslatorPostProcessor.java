@@ -1,12 +1,12 @@
 package com.superkele.translation.core.translator.definition;
 
 
-import com.superkele.translation.core.translator.handle.TranslateExecutor;
+import com.superkele.translation.core.translator.Translator;
 
 public interface TranslatorPostProcessor {
 
-    TranslateExecutor postProcessorBeforeInit(TranslateExecutor translator, String translatorName);
+    Translator postProcessorBeforeInit(Translator translator, String translatorName);
 
-    TranslateExecutor postProcessorAfterInit(TranslateExecutor translator, String translatorName);
+    Translator postProcessorAfterInit(Translator translator, String translatorName);
 
 }

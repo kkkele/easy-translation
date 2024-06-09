@@ -1,31 +1,32 @@
 package com.superkele.translation.core.translator.support;
 
+import com.superkele.translation.core.invoker.enums.TransInvokeBeanType;
+import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
-import com.superkele.translation.core.translator.factory.ConfigurableTransExecutorFactory;
-import com.superkele.translation.core.translator.handle.TranslateExecutor;
+import com.superkele.translation.core.translator.factory.ConfigurableTranslatorFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class AbstractTransExecutorFactory implements ConfigurableTransExecutorFactory {
-
-    private final Map<String, TranslateExecutor> translatorCache = new ConcurrentHashMap<>();
+public abstract class AbstractTranslatorFactory extends DefaultSingletonTranslatorRegistry implements ConfigurableTranslatorFactory {
 
     private final List<TranslatorPostProcessor> translatorPostProcessors = new ArrayList<>();
 
 
     @Override
-    public TranslateExecutor findExecutor(String translatorName) {
-        TranslateExecutor translator = translatorCache.get(translatorName);
+    public Translator findTranslator(String translatorName) {
+        //增加 原型Translator和单例Translator的区分
+        Translator translator = getSingleton(translatorName);
         if (translator != null) {
             return translator;
         }
         TranslatorDefinition definition = findTranslatorDefinition(translatorName);
         translator = createTranslator(translatorName, definition);
-        translatorCache.put(translatorName, translator);
+        //只要你不是原型InvokeBean对象，都可以进入单例桶
+        if (definition.getBeanType() != TransInvokeBeanType.PROTOTYPE) {
+            addSingleton(translatorName, translator);
+        }
         return translator;
     }
 
@@ -47,7 +48,7 @@ public abstract class AbstractTransExecutorFactory implements ConfigurableTransE
 
     protected abstract boolean containsTranslatorDefinition(String name);
 
-    protected abstract TranslateExecutor createTranslator(String translatorName, TranslatorDefinition definition);
+    protected abstract Translator createTranslator(String translatorName, TranslatorDefinition definition);
 
     protected abstract TranslatorDefinition findTranslatorDefinition(String translatorName);
 }

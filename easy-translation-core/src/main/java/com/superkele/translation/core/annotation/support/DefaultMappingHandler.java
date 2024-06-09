@@ -4,13 +4,13 @@ import com.superkele.translation.core.property.PropertyGetter;
 import com.superkele.translation.core.property.PropertySetter;
 import com.superkele.translation.core.property.support.DefaultMethodHandlePropertyHandler;
 import com.superkele.translation.core.property.support.PropertyHandler;
-import com.superkele.translation.core.translator.factory.TransExecutorFactory;
+import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
 public class DefaultMappingHandler extends AbstractMappingHandler {
 
     private PropertyHandler propertyHandler = new DefaultMethodHandlePropertyHandler();
 
-    public DefaultMappingHandler(TransExecutorFactory translatorFactory) {
+    public DefaultMappingHandler(TranslatorFactory translatorFactory) {
         super(translatorFactory);
     }
 
