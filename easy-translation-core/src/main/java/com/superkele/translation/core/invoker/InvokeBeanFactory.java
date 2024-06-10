@@ -8,9 +8,9 @@ import java.util.Map;
  */
 public interface InvokeBeanFactory {
 
-    Object getBean(String beanName);
+    <T> T getBean(String beanName);
 
-    Object getBean(Class<?> clazz);
+    <T> T getBean(Class<?> clazz);
 
-    Map<String, Object> getBeansOfType(Class<?> clazz);
+    <T> Map<String, T> getBeansOfType(Class<T> clazz);
 }

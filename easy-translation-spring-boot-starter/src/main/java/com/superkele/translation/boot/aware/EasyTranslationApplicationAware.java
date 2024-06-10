@@ -1,6 +1,7 @@
 package com.superkele.translation.boot.aware;
 
 import com.superkele.translation.boot.global.TranslationGlobalInformation;
+import com.superkele.translation.boot.invoker.SpringInvokeBeanFactory;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.context.ConfigurableTranslatorContext;
 import com.superkele.translation.core.context.support.DefaultTranslatorContext;
@@ -24,12 +25,13 @@ public class EasyTranslationApplicationAware implements ApplicationContextAware 
         if (executorContext instanceof DefaultTranslatorContext) {
             DefaultTranslatorContext defaultTransExecutorContext = (DefaultTranslatorContext) executorContext;
             Config defaultTranslationConfig = applicationContext.getBean("defaultTranslationConfig", Config.class);
+            SpringInvokeBeanFactory invokeBeanFactory = applicationContext.getBean(SpringInvokeBeanFactory.class);
             String[] packages = TranslationGlobalInformation.getPackages().stream().toArray(String[]::new);
             defaultTransExecutorContext.setBasePackages(packages);
             defaultTransExecutorContext.setConfig(defaultTranslationConfig);
-            // todo 待完成 defaultTransExecutorContext.setInvokeBeanFactory();
+            defaultTransExecutorContext.setInvokeBeanFactory(invokeBeanFactory);
         }
         executorContext.refresh();
-        LogUtils.debug(log::debug,"executorContext refresh success");
+        LogUtils.debug(log::debug, "executorContext refresh success");
     }
 }
