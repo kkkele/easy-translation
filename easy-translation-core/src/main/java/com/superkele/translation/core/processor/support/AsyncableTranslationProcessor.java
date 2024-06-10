@@ -78,8 +78,11 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
 
     protected FieldTranslation computeFieldTranslationToCache(List<Pair<Field, Mapping>> mappingFields) {
         //fieldName event map
-        Map<String, FieldTranslationEvent> fieldTranslationMap = new HashMap<>();
-        Map<Short, List<FieldTranslationEvent>> afterEventMapDTO = new HashMap<>();
+        Map<String, FieldTranslationEvent> fieldNameEventMap = new HashMap<>();
+        //记录了不同的 eventMask 可以触发的事件
+        Map<Short, List<FieldTranslationEvent>> eventMaskAfterMap = new HashMap<>();
+        //记录不同event值对应的不同的event
+        Map<Short, FieldTranslationEvent> eventMaskMap = new HashMap<>();
         List<FieldTranslationEvent> sortEvents = new ArrayList<>();
         //先将所有的mapping和field改造成FieldTranslationEvent对象
         //1.简单排序
@@ -93,12 +96,12 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
         Set<String> uniqueNameSet = new HashSet<>();
         for (Pair<Field, Mapping> pair : mappingFields) {
             Mapping mapping = pair.getValue();
-            FieldTranslationEvent fieldTranslationEvent = new FieldTranslationEvent();
-            short event = (short) (initEvent << leftShift);
-            fieldTranslationEvent.setEventValue(event);
-            fieldTranslationEvent.setAsync(mapping.async());
-            fieldTranslationEvent.setFieldTranslationInvoker(getMappingHandler().convert(pair.getKey(), mapping));
-            fieldTranslationMap.put(pair.getKey().getName(), fieldTranslationEvent);
+            FieldTranslationEvent event = new FieldTranslationEvent();
+            short eventValue = (short) (initEvent << leftShift);
+            event.setEventValue(eventValue);
+            event.setAsync(mapping.async());
+            event.setFieldTranslationInvoker(getMappingHandler().convert(pair.getKey(), mapping));
+            fieldNameEventMap.put(pair.getKey().getName(), event);
             leftShift++;
             String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());
             if (cacheEnabled || uniqueNameSet.contains(uniqueName)) {
@@ -111,9 +114,10 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
         for (Pair<Field, Mapping> pair : mappingFields) {
             String fieldName = pair.getKey().getName();
             Mapping mapping = pair.getValue();
-            FieldTranslationEvent fieldTranslationEvent = fieldTranslationMap.get(fieldName);
+            FieldTranslationEvent event = fieldNameEventMap.get(fieldName);
             if (mapping.after().length == 0) {
-                sortEvents.add(fieldTranslationEvent);
+                event.setTriggerMask((short) 0);
+                sortEvents.add(event);
             } else {
                 short eventMask = 0;
                 short[] preEvents = new short[mapping.after().length];
@@ -121,22 +125,32 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                 for (int i = 0; i < mapping.after().length; i++) {
                     String afterFieldName = mapping.after()[i];
                     //获取前置事件
-                    FieldTranslationEvent preEvent = fieldTranslationMap.get(afterFieldName);
+                    FieldTranslationEvent preEvent = fieldNameEventMap.get(afterFieldName);
                     if (preEvent.isAsync()) {
                         preEvents[count++] = preEvent.getEventValue();
                     }
                     Assert.isTrue(ObjectUtil.isNotNull(preEvent), "after字段必须为加了@Mapping注解(或其对应的组合注解)的字段");
                     eventMask |= preEvent.getEventValue();
                 }
-                List<FieldTranslationEvent> afterEvents = afterEventMapDTO.computeIfAbsent(eventMask, key -> new ArrayList<>());
-                afterEvents.add(fieldTranslationEvent);
+                List<FieldTranslationEvent> afterEvents = eventMaskAfterMap.computeIfAbsent(eventMask, key -> new ArrayList<>());
+                //设置前置事件掩码
+                event.setTriggerMask(eventMask);
+                afterEvents.add(event);
             }
         }
-        Map<Short, FieldTranslationEvent[]> afterEventsMap = new HashMap<>();
-        afterEventMapDTO.forEach((eventMask, fieldTranslationEvents) -> afterEventsMap.put(eventMask, ArrayUtil.toArray(fieldTranslationEvents, FieldTranslationEvent.class)));
+        //第三次遍历，给每个事件增加 after 事件
+        for (Pair<Field, Mapping> pair : mappingFields) {
+            FieldTranslationEvent event = fieldNameEventMap.get(pair.getKey().getName());
+            List<FieldTranslationEvent> after = new ArrayList<>();
+            eventMaskAfterMap.forEach((eventMask, events) -> {
+                if ((eventMask.shortValue() & event.getEventValue()) == event.getEventValue()) {
+                    after.addAll(events);
+                }
+            });
+            event.setAfterEvents(after.stream().toArray(FieldTranslationEvent[]::new));
+        }
         FieldTranslation res = new FieldTranslation();
         res.setSortEvents(ArrayUtil.toArray(sortEvents, FieldTranslationEvent.class));
-        res.setAfterEventMaskMap(afterEventsMap);
         res.setConsumeSize(mappingFields.size());
         res.setHasSameInvoker(cacheEnabled);
         return res;
@@ -222,27 +236,26 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
             //更新事件
             int activeEvent = this.activeEvent.updateAndGet(current -> current | eventValue);
             //获取事件掩码集合，对比触发after事件
-            fieldTranslation.getAfterEventMaskMap().forEach((eventMask, fieldTranslationEvents) -> {
-                if (consumed.contains(eventMask)) {
-                    return;
+            for (FieldTranslationEvent afterEvent : event.getAfterEvents()) {
+                if (consumed.contains(afterEvent.getEventValue())) {
+                    continue;
                 }
-                if ((activeEvent & eventMask) == eventMask) {
-                    lock.lock();
-                    try {
-                        if (consumed.contains(eventMask)) {
-                            return;
+                short triggerMask = afterEvent.getTriggerMask();
+                if ((activeEvent & triggerMask) == triggerMask) {
+                    if (getAsyncEnable()) {
+                        lock.lock();
+                        try {
+                            if (consumed.contains(afterEvent.getEventValue())) {
+                                continue;
+                            }
+                            consumed.add(afterEvent.getEventValue());
+                        } finally {
+                            lock.unlock();
                         }
-                        consumed.add(eventMask);
-                    } finally {
-                        lock.unlock();
                     }
-                    //手动依次触发after事件
-                    for (FieldTranslationEvent fieldTranslationEvent : fieldTranslationEvents) {
-                        translate(obj, fieldTranslationEvent);
-                    }
+                    translate(obj, afterEvent);
                 }
-            });
-
+            }
         }
     }
 }

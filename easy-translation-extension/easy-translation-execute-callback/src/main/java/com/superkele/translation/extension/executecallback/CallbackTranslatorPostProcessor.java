@@ -2,8 +2,8 @@ package com.superkele.translation.extension.executecallback;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReUtil;
+import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
-import com.superkele.translation.core.translator.handle.TranslateExecutor;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -14,17 +14,17 @@ public class CallbackTranslatorPostProcessor implements TranslatorPostProcessor 
     private final List<CallBackRegister> callBackRegisters;
 
     @Override
-    public TranslateExecutor postProcessorBeforeInit(TranslateExecutor translator, String translatorName) {
+    public Translator postProcessorBeforeInit(Translator translator, String translatorName) {
         if (CollectionUtil.isEmpty(callBackRegisters)) {
             return translator;
         }
-        TranslateExecutor translatorPlus = translator;
+        Translator translatorPlus = translator;
         for (CallBackRegister callBackRegister : callBackRegisters) {
             TranslateExecuteCallBack translateExecuteCallBack = callBackRegister.callBack();
             if (ReUtil.isMatch(callBackRegister.match(), translatorName)) {
-                TranslateExecutor copyTranslator = translatorPlus;
+                Translator copyTranslator = translatorPlus;
                 translatorPlus = args -> {
-                    Object result = copyTranslator.execute(args);
+                    Object result = copyTranslator.doTranslate(args);
                     translateExecuteCallBack.onSuccess(result);
                     return result;
                 };
@@ -34,7 +34,7 @@ public class CallbackTranslatorPostProcessor implements TranslatorPostProcessor 
     }
 
     @Override
-    public TranslateExecutor postProcessorAfterInit(TranslateExecutor translator, String translatorName) {
+    public Translator postProcessorAfterInit(Translator translator, String translatorName) {
         return translator;
     }
 }
