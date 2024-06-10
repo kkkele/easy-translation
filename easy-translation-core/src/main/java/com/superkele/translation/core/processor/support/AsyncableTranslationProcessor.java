@@ -126,10 +126,10 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                     String afterFieldName = mapping.after()[i];
                     //获取前置事件
                     FieldTranslationEvent preEvent = fieldNameEventMap.get(afterFieldName);
+                    Assert.notNull(preEvent, "找不到名为 [" + afterFieldName + "]的前置事件，after字段必须为加了@Mapping注解(或其对应的组合注解)的字段,如果有多个参数，请使用数组传参");
                     if (preEvent.isAsync()) {
                         preEvents[count++] = preEvent.getEventValue();
                     }
-                    Assert.isTrue(ObjectUtil.isNotNull(preEvent), "after字段必须为加了@Mapping注解(或其对应的组合注解)的字段");
                     eventMask |= preEvent.getEventValue();
                 }
                 List<FieldTranslationEvent> afterEvents = eventMaskAfterMap.computeIfAbsent(eventMask, key -> new ArrayList<>());
