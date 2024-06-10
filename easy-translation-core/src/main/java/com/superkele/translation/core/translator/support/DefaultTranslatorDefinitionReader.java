@@ -4,6 +4,7 @@ import com.superkele.translation.annotation.BeanNameResolver;
 import com.superkele.translation.annotation.TransMapper;
 import com.superkele.translation.annotation.TransValue;
 import com.superkele.translation.annotation.Translation;
+import com.superkele.translation.annotation.constant.InvokeBeanScope;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.convert.MethodConvert;
 import com.superkele.translation.core.exception.TranslationException;
@@ -142,6 +143,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         definition.setMapperIndex(getIndexPair(method));
         definition.setMethodHandle(methodHandle);
         definition.setTranslatorType(TranslatorType.DYNAMIC_METHOD);
+        definition.setScope(translation.scope());
         definition.setTranslateDecorator(x -> x);
         definition.setInvokeBeanClazz(clazz);
         definition.setInvokeBeanName(beanNameResolver.resolve(translation.invokeBeanName()));
