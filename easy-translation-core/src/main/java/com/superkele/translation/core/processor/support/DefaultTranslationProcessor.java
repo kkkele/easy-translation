@@ -17,7 +17,7 @@ public class DefaultTranslationProcessor extends ListableTranslationProcessor {
     private Config config;
 
     public DefaultTranslationProcessor(TranslatorContext context) {
-        this.mappingHandler = new DefaultMappingHandler(context);
+        this.mappingHandler = new DefaultMappingHandler(context, propertyHandler);
         if (context instanceof DefaultTranslatorContext) {
             Config config = ((DefaultTranslatorContext) context).getConfig();
             this.config = config;
@@ -25,7 +25,7 @@ public class DefaultTranslationProcessor extends ListableTranslationProcessor {
     }
 
     public DefaultTranslationProcessor(TranslatorContext context, Config config) {
-        this.mappingHandler = new DefaultMappingHandler(context);
+        this.mappingHandler = new DefaultMappingHandler(context, propertyHandler);
         this.config = config;
     }
 

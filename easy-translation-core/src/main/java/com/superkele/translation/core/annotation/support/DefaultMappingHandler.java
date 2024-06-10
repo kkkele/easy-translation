@@ -8,10 +8,11 @@ import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
 public class DefaultMappingHandler extends AbstractMappingHandler {
 
-    private PropertyHandler propertyHandler = new DefaultMethodHandlePropertyHandler();
+    private  PropertyHandler propertyHandler;
 
-    public DefaultMappingHandler(TranslatorFactory translatorFactory) {
+    public DefaultMappingHandler(TranslatorFactory translatorFactory,PropertyHandler propertyHandler) {
         super(translatorFactory);
+        this.propertyHandler = propertyHandler;
     }
 
     public PropertyHandler getPropertyHandler() {

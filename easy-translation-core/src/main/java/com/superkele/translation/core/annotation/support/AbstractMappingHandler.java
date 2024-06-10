@@ -19,7 +19,6 @@ public abstract class AbstractMappingHandler implements MappingHandler {
 
     private final TranslatorFactory translatorFactory;
 
-
     public AbstractMappingHandler(TranslatorFactory translatorFactory) {
         this.translatorFactory = translatorFactory;
     }

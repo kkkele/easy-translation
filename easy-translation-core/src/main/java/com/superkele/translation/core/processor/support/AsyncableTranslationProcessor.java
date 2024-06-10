@@ -6,11 +6,13 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.Mapping;
+import com.superkele.translation.annotation.RefTranslation;
 import com.superkele.translation.annotation.constant.TranslateTiming;
 import com.superkele.translation.core.annotation.FieldTranslationInvoker;
 import com.superkele.translation.core.annotation.MappingHandler;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
+import com.superkele.translation.core.property.support.DefaultMethodHandlePropertyHandler;
 import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.thread.ContextPasser;
 import com.superkele.translation.core.util.Assert;
@@ -31,9 +33,13 @@ import java.util.stream.Collectors;
 public abstract class AsyncableTranslationProcessor extends AbstractTranslationProcessor {
 
 
+    /**
+     * key：主类
+     * value：处理后的，需要翻译的字段
+     */
     private final Map<Class<?>, FieldTranslation> fieldTranslationMap = new ConcurrentHashMap<>();
-
     protected List<ContextHolder> contextHolders = new ArrayList<>();
+    protected DefaultMethodHandlePropertyHandler propertyHandler = new DefaultMethodHandlePropertyHandler();
 
     protected abstract ExecutorService getThreadPoolExecutor();
 
@@ -81,8 +87,6 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
         Map<String, FieldTranslationEvent> fieldNameEventMap = new HashMap<>();
         //记录了不同的 eventMask 可以触发的事件
         Map<Short, List<FieldTranslationEvent>> eventMaskAfterMap = new HashMap<>();
-        //记录不同event值对应的不同的event
-        Map<Short, FieldTranslationEvent> eventMaskMap = new HashMap<>();
         List<FieldTranslationEvent> sortEvents = new ArrayList<>();
         //先将所有的mapping和field改造成FieldTranslationEvent对象
         //1.简单排序
@@ -95,13 +99,17 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
         boolean cacheEnabled = false;
         Set<String> uniqueNameSet = new HashSet<>();
         for (Pair<Field, Mapping> pair : mappingFields) {
+            Field field = pair.getKey();
             Mapping mapping = pair.getValue();
             FieldTranslationEvent event = new FieldTranslationEvent();
             short eventValue = (short) (initEvent << leftShift);
+            RefTranslation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, RefTranslation.class);
+            event.setRefTranslation(mergedAnnotation);
+            event.setPropertyName(field.getName());
             event.setEventValue(eventValue);
             event.setAsync(mapping.async());
-            event.setFieldTranslationInvoker(getMappingHandler().convert(pair.getKey(), mapping));
-            fieldNameEventMap.put(pair.getKey().getName(), event);
+            event.setFieldTranslationInvoker(getMappingHandler().convert(field, mapping));
+            fieldNameEventMap.put(field.getName(), event);
             leftShift++;
             String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());
             if (cacheEnabled || uniqueNameSet.contains(uniqueName)) {
@@ -232,6 +240,11 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                 fieldTranslationInvoker.invoke(obj, translationResCache::get, translationResCache::put);
             } else {
                 fieldTranslationInvoker.invoke(obj);
+            }
+            //如果开启了关联翻译的话
+            if (event.getRefTranslation() != null) {
+                //处理相关内容
+                process(propertyHandler.invokeGetter(obj, event.getPropertyName()));
             }
             latch.countDown();
             //更新事件
