@@ -126,7 +126,8 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                     String afterFieldName = mapping.after()[i];
                     //获取前置事件
                     FieldTranslationEvent preEvent = fieldNameEventMap.get(afterFieldName);
-                    Assert.notNull(preEvent, "找不到名为 [" + afterFieldName + "]的前置事件，after字段必须为加了@Mapping注解(或其对应的组合注解)的字段,如果有多个参数，请使用数组传参");
+                    Assert.notNull(preEvent, "找不到名为 [" + afterFieldName + "]的前置事件，after字段必须为加了@Mapping注解(或其对应的组合注解)的字段,如果有多个参数，请使用数组传参\n" +
+                            "If a precedent named [" + afterFieldName + "] could not be found, the after field must be a field with a @Mapping annotation (or its corresponding combination annotation), if there are multiple parameters, use an array of parameters");
                     if (preEvent.isAsync()) {
                         preEvents[count++] = preEvent.getEventValue();
                     }
