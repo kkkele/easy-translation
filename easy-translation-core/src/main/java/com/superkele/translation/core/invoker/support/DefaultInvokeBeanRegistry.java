@@ -1,7 +1,7 @@
 package com.superkele.translation.core.invoker.support;
 
 import com.superkele.translation.core.invoker.InvokeBeanRegistry;
-import com.superkele.translation.core.translator.definition.InvokeBeanScope;
+import com.superkele.translation.annotation.constant.InvokeBeanScope;
 import com.superkele.translation.core.util.Pair;
 
 import java.util.HashMap;

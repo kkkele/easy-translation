@@ -4,7 +4,7 @@ import com.superkele.translation.extension.perfrecord.PerfRecordTranslatorFactor
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
-@ConditionalOnProperty(prefix = "easy-translation.debug", havingValue = "true")
+@ConditionalOnProperty(prefix = "easy-translation",name="debug", havingValue = "true")
 public class ProcessorPerfRecordAutoConfig {
 
     @Bean

@@ -1,5 +1,6 @@
 package com.superkele.translation.core.translator.definition;
 
+import com.superkele.translation.annotation.constant.InvokeBeanScope;
 import com.superkele.translation.core.decorator.TranslatorDecorator;
 import com.superkele.translation.core.invoker.enums.TranslatorType;
 import com.superkele.translation.core.translator.Translator;

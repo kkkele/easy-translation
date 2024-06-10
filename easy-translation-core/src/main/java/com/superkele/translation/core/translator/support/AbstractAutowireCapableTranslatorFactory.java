@@ -76,7 +76,7 @@ public abstract class AbstractAutowireCapableTranslatorFactory extends AbstractT
 
     protected abstract Object getBeanInvoker(String beanName);
 
-    protected abstract Object getBeanInvoker(Class<?> clazz);
+    protected abstract <T> T getBeanInvoker(Class<T> clazz);
 
     /**
      * 将动态方法转为Translator

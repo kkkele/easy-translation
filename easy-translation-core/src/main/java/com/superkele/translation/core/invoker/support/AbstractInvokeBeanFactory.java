@@ -27,24 +27,24 @@ public abstract class AbstractInvokeBeanFactory extends DefaultInvokeBeanRegistr
     }
 
     @Override
-    public Object getBean(Class<?> clazz) {
+    public <T> T getBean(Class<?> clazz) {
         String[] beanNames = getBeanNames(clazz);
         if (beanNames == null || beanNames.length == 0) {
             throw new NotDefineException("invoke bean type" + clazz.getName() + "not found");
         }
         if (beanNames.length == 1) {
-            return getBean(beanNames[0]);
+            return (T) getBean(beanNames[0]);
         }
         throw new TranslationException("find more than one invoke bean which type is" + clazz.getName());
     }
 
     @Override
-    public Map<String, Object> getBeansOfType(Class<?> clazz) {
+    public <T> Map<String, T> getBeansOfType(Class<T> clazz) {
         String[] beanNames = getBeanNames(clazz);
         return Optional.ofNullable(beanNames)
                 .map(v -> Arrays.stream(v)
                         .map(name -> Pair.of(name, getBean(name)))
-                        .collect(Collectors.toMap(pair -> pair.getKey(), pair -> pair.getValue())))
+                        .collect(Collectors.toMap(pair -> pair.getKey(), pair -> (T) pair.getValue())))
                 .orElse(new HashMap<>());
     }
 

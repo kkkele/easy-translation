@@ -47,25 +47,29 @@ public class DefaultTranslatorFactory extends AbstractAutowireCapableTranslatorF
 
     @Override
     protected Object getBeanInvoker(String beanName) {
-        return invokeBeanRegistry.getBean(beanName);
+        try {
+            return invokeBeanRegistry.getBean(beanName);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
-    protected Object getBeanInvoker(Class<?> clazz) {
+    protected <T> T getBeanInvoker(Class<T> clazz) {
         try {
             Object bean = invokeBeanRegistry.getBean(clazz);
-            return bean;
+            return (T) bean;
         } catch (Exception e) {
         }
-        Map<String, Object> beansOfType = invokeBeanRegistry.getBeansOfType(clazz);
+        Map<String, T> beansOfType = invokeBeanRegistry.getBeansOfType(clazz);
         Object defaultBean = null;
         for (Object bean : beansOfType.values()) {
             if (bean.getClass() == clazz) {
-                return bean;
+                return (T) bean;
             }
             defaultBean = bean;
         }
-        return defaultBean;
+        return (T) defaultBean;
     }
 
 }

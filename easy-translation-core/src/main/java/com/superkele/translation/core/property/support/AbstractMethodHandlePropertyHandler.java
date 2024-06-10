@@ -69,7 +69,7 @@ public abstract class AbstractMethodHandlePropertyHandler implements PropertyHan
         return getterMethodHandleCache.computeIfAbsent(Pair.of(temp.getClass(), property), methodName -> {
             try {
                 String getterMethodName = convertToGetterMethodName(property);
-                return MethodConvert.getMethodHandle(Getter.class, temp.getClass().getMethod(getterMethodName));
+                return MethodConvert.getDynamicMethodHandle(Getter.class, temp.getClass().getMethod(getterMethodName));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (LambdaConversionException e) {

@@ -2,6 +2,7 @@ package com.superkele.translation.annotation;
 
 
 import com.superkele.translation.annotation.constant.DefaultBeanNameResolver;
+import com.superkele.translation.annotation.constant.InvokeBeanScope;
 
 import java.lang.annotation.*;
 
@@ -20,8 +21,18 @@ public @interface Translation {
      */
     String name() default "";
 
+    /**
+     * 实现的bean名称
+     */
     String invokeBeanName() default "";
 
+    /**
+     * invokeBeanName解析器
+     */
     Class<? extends BeanNameResolver> beanNameResolver() default DefaultBeanNameResolver.class;
 
+    /**
+     * 原型Bean还是单例Bean
+     */
+    InvokeBeanScope scope() default InvokeBeanScope.SINGLETON;
 }

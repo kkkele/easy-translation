@@ -88,7 +88,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         }
         MethodHandle methodHandle;
         try {
-            methodHandle = MethodConvert.getMethodHandle(translatorClazz, method);
+            methodHandle = MethodConvert.getStaticMethodHandle(translatorClazz, method);
         } catch (IllegalAccessException e) {
             throw new TranslationException("EasyTranslator:" + e);
         } catch (LambdaConversionException e) {
@@ -115,7 +115,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         }
         MethodHandle methodHandle;
         try {
-            methodHandle = MethodConvert.getMethodHandle(translatorClazz, method);
+            methodHandle = MethodConvert.getDynamicMethodHandle(translatorClazz, method);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (LambdaConversionException e) {

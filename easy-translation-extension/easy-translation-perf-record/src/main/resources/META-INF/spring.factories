@@ -1,3 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.superkele.translation.extension.perfrecord.PerfRecordTranslatorFactoryPostProcessor,\
-  com.superkele.translation.extension.perfrecord.PerfRecordTranslatorPostProcessor
+  com.superkele.translation.extension.perfrecord.autowired.ProcessorPerfRecordAutoConfig

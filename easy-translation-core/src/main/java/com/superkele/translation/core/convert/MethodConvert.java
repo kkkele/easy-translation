@@ -64,9 +64,9 @@ public class MethodConvert {
     }
 
     /**
-     * 将方法转为任意FunctionInterface句柄
+     * 将动态方法转为任意FunctionInterface句柄
      */
-    public static MethodHandle getMethodHandle(Class<?> targetInterface,
+    public static MethodHandle getDynamicMethodHandle(Class<?> targetInterface,
                                         Method convertedMethod)
             throws IllegalAccessException, LambdaConversionException {
 /*        Pair<Method, MethodType> pairs = findFunctionInterfaceMethodType(targetInterface);
@@ -77,6 +77,24 @@ public class MethodConvert {
                 LOOKUP,
                 pairs.getKey().getName(),
                 MethodType.methodType(targetInterface, convertedMethod.getDeclaringClass()),
+                pairs.getValue(),
+                convertedMethodHandle,
+                MethodType.methodType(convertedMethod.getReturnType(), convertedMethod.getParameterTypes()));
+        return callSite.getTarget();
+    }
+
+    /**
+     * 将静态方法转为任意FunctionInterface句柄
+     */
+    public static MethodHandle getStaticMethodHandle(Class<?> targetInterface,
+                                               Method convertedMethod)
+            throws IllegalAccessException, LambdaConversionException {
+        MethodHandle convertedMethodHandle = LOOKUP.unreflect(convertedMethod);
+        Pair<Method, MethodType> pairs = findFunctionInterfaceMethodType(targetInterface);
+        CallSite callSite = LambdaMetafactory.metafactory(
+                LOOKUP,
+                pairs.getKey().getName(),
+                MethodType.methodType(targetInterface),
                 pairs.getValue(),
                 convertedMethodHandle,
                 MethodType.methodType(convertedMethod.getReturnType(), convertedMethod.getParameterTypes()));

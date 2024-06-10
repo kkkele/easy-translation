@@ -1,4 +1,4 @@
-package com.superkele.translation.core.translator.definition;
+package com.superkele.translation.annotation.constant;
 
 public enum InvokeBeanScope {
 
