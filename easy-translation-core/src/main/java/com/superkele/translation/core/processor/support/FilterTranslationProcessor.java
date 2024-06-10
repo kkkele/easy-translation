@@ -10,6 +10,17 @@ public abstract class FilterTranslationProcessor implements TranslationProcessor
 
     private Map<Class<?>, Boolean> filterCache = new ConcurrentHashMap<>();
 
+    @Override
+    public void process(Object obj) {
+        if (obj == null) {
+            return;
+        }
+        Class<?> clazz = obj.getClass();
+        if (!filter(clazz)) {
+            return;
+        }
+        processInternal(obj, clazz);
+    }
 
     @Override
     public void process(Object obj, Class<?> clazz) {

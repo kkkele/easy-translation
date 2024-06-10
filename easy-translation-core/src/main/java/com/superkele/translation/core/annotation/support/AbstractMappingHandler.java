@@ -29,8 +29,12 @@ public abstract class AbstractMappingHandler implements MappingHandler {
 
     @Override
     public FieldTranslationInvoker convert(Field declaringField, Mapping mapping) {
-        Assert.isTrue(translatorFactory.containsTranslator(mapping.translator()), "translator not found: " + mapping.translator());
         String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());
+        if (StringUtils.isBlank(mapping.translator())) {
+            return (obj, cacheResSupplier, callback) -> {
+                return obj;
+            };
+        }
         return (obj, cacheResSupplier, callback) -> {
             if (obj == null) {
                 return null;
@@ -42,6 +46,7 @@ public abstract class AbstractMappingHandler implements MappingHandler {
                 }
             }
             Translator translator = translatorFactory.findTranslator(mapping.translator());
+            Assert.notNull(translator, "translator not found: " + mapping.translator());
             //加载缓存中的值，如果有的话，使用缓存中提供的值
             if (cacheResSupplier != null) {
                 Object cacheRes = cacheResSupplier.apply(uniqueName);

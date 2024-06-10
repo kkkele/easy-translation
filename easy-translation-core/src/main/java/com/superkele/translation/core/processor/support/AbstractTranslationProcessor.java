@@ -12,10 +12,7 @@ import java.util.Map;
 
 public abstract class AbstractTranslationProcessor extends FilterTranslationProcessor {
 
-    @Override
-    public void process(Object obj) {
-        process(obj, obj.getClass());
-    }
+
 
     @Override
     public void process(Object obj, Class<?> type, String field, boolean async, Class<? extends TranslationUnpackingHandler> listTypeHandlerClazz) {
