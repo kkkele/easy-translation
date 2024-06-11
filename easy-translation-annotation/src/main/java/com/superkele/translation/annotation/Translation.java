@@ -16,8 +16,7 @@ import java.lang.annotation.*;
 public @interface Translation {
 
     /**
-     * <p>转换器名称</p>
-     * <p>translator name</p>
+     * 翻译器名称
      */
     String name() default "";
 

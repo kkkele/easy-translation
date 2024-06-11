@@ -6,11 +6,8 @@ import com.superkele.translation.annotation.constant.TranslateTiming;
 
 import java.lang.annotation.*;
 
-
 /**
- * use the annotation to map the field value
- * support SPEL expression
- * It enables field self-translation,and the value of some fields can be implemented to translate another field
+ *  用以model类中翻译字段，标记了该注解的字段在被processor解析后会被翻译。
  */
 @Inherited
 @Target(ElementType.FIELD)
