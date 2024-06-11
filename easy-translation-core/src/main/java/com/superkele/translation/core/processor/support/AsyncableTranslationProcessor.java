@@ -242,9 +242,11 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                 fieldTranslationInvoker.invoke(obj);
             }
             //如果开启了关联翻译的话
-            if (event.getRefTranslation() != null) {
+            RefTranslation refTranslation = event.getRefTranslation();
+            if (refTranslation != null) {
                 //处理相关内容
-                process(propertyHandler.invokeGetter(obj, event.getPropertyName()));
+                process(propertyHandler.invokeGetter(obj, event.getPropertyName()), refTranslation.type(),
+                        refTranslation.field(), refTranslation.async(), refTranslation.listTypeHandler());
             }
             latch.countDown();
             //更新事件
