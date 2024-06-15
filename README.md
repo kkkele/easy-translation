@@ -2,13 +2,11 @@
 
 [English](./README-EN.md) | [中文](./README.md)
 
-文档地址：https://kkkele.github.io/easy-translation/#
+## 文档地址：https://kkkele.github.io/easy-translation-docs/#/
 
-![easy-translation-logo](./assets/easy-translation-logo.jpg)
+![easy-translation-logo](assets/easy-translation-logo.jpg)
 
 # Easy-Translation
-
-
 
 一个配置上非常轻量，使用简单且强大而灵活的**字段翻译**插件。可以理解为**字段自动填充框架**，主要作用就是由其他的字段**自动映射**成所需要的字段。
 
