@@ -7,8 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TranslationListTypeHandlerFactory {
 
-    private Map<Class<? extends TranslationUnpackingHandler>, TranslationUnpackingHandler> translationListTypeHandlerMap
-            = new ConcurrentHashMap<>();
+    private Map<Class<? extends TranslationUnpackingHandler>, TranslationUnpackingHandler> translationListTypeHandlerMap = new ConcurrentHashMap<>();
 
 
     public TranslationUnpackingHandler getTranslationListTypeHandler(Class<? extends TranslationUnpackingHandler> clazz) {

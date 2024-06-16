@@ -49,10 +49,6 @@
             <artifactId>easy-translation-perf-record</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>io.github.kkkele</groupId>
-            <artifactId>easy-translation-json-serialize</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>ch.qos.logback</groupId>

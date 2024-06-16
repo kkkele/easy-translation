@@ -32,7 +32,6 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
     @Override
     protected void loadTranslatorDefinition(DefaultTranslatorFactory translatorFactory) {
         DefaultTranslatorDefinitionReader definitionReader = new DefaultTranslatorDefinitionReader(translatorFactory);
-        definitionReader.setConfig(getConfig());
         definitionReader.loadTranslatorDefinitions(getBasePackages());
     }
 

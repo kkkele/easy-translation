@@ -13,6 +13,7 @@ import com.superkele.translation.core.annotation.MappingHandler;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.property.support.DefaultMethodHandlePropertyHandler;
+import com.superkele.translation.core.property.support.PropertyHandler;
 import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.thread.ContextPasser;
 import com.superkele.translation.core.util.Assert;
@@ -38,8 +39,8 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
      * value：处理后的，需要翻译的字段
      */
     private final Map<Class<?>, FieldTranslation> fieldTranslationMap = new ConcurrentHashMap<>();
+
     protected List<ContextHolder> contextHolders = new ArrayList<>();
-    protected DefaultMethodHandlePropertyHandler propertyHandler = new DefaultMethodHandlePropertyHandler();
 
     protected abstract ExecutorService getThreadPoolExecutor();
 
@@ -48,6 +49,8 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
     protected abstract MappingHandler getMappingHandler();
 
     protected abstract long getTimeout();
+
+    protected abstract PropertyHandler getPropertyHandler();
 
 
     public void addContextHolders(ContextHolder contextHolder) {
@@ -74,7 +77,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                     .ifPresent(mappingFields::add);
         }
         if (CollectionUtil.isNotEmpty(mappingFields)) {
-            FieldTranslation fieldTranslation = computeFieldTranslationToCache(mappingFields);
+            FieldTranslation fieldTranslation = computeFieldTranslation(mappingFields);
             if (ObjectUtil.isNotNull(fieldTranslation)) {
                 fieldTranslationMap.put(clazz, fieldTranslation);
             }
@@ -82,7 +85,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
         return fieldTranslationMap.containsKey(clazz);
     }
 
-    protected FieldTranslation computeFieldTranslationToCache(List<Pair<Field, Mapping>> mappingFields) {
+    protected FieldTranslation computeFieldTranslation(List<Pair<Field, Mapping>> mappingFields) {
         //fieldName event map
         Map<String, FieldTranslationEvent> fieldNameEventMap = new HashMap<>();
         //记录了不同的 eventMask 可以触发的事件
@@ -245,7 +248,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
             RefTranslation refTranslation = event.getRefTranslation();
             if (refTranslation != null) {
                 //处理相关内容
-                process(propertyHandler.invokeGetter(obj, event.getPropertyName()), refTranslation.type(),
+                process(getPropertyHandler().invokeGetter(obj, event.getPropertyName()), refTranslation.type(),
                         refTranslation.field(), refTranslation.async(), refTranslation.listTypeHandler());
             }
             latch.countDown();

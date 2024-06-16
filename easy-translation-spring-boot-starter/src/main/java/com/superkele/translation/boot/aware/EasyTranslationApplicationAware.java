@@ -24,11 +24,9 @@ public class EasyTranslationApplicationAware implements ApplicationContextAware 
         ConfigurableTranslatorContext executorContext = applicationContext.getBean("defaultTransExecutorContext", ConfigurableTranslatorContext.class);
         if (executorContext instanceof DefaultTranslatorContext) {
             DefaultTranslatorContext defaultTransExecutorContext = (DefaultTranslatorContext) executorContext;
-            Config defaultTranslationConfig = applicationContext.getBean("defaultTranslationConfig", Config.class);
             SpringInvokeBeanFactory invokeBeanFactory = applicationContext.getBean(SpringInvokeBeanFactory.class);
             String[] packages = TranslationGlobalInformation.getPackages().stream().toArray(String[]::new);
             defaultTransExecutorContext.setBasePackages(packages);
-            defaultTransExecutorContext.setConfig(defaultTranslationConfig);
             defaultTransExecutorContext.setInvokeBeanFactory(invokeBeanFactory);
         }
         executorContext.refresh();

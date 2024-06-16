@@ -1,6 +1,7 @@
 package com.superkele.demo.domain.vo;
 
 import com.superkele.translation.annotation.Mapping;
+import com.superkele.translation.annotation.constant.TranslateTiming;
 import lombok.Data;
 
 @Data
@@ -10,7 +11,7 @@ public class AppUserVo {
 
     private Integer sexCode;
 
-    @Mapping(translator = "dict", mapper = "sexCode",other = "sex")
+    @Mapping(translator = "dict", mapper = "sexCode",other = "sex",timing = TranslateTiming.JSON_SERIALIZE)
     private String sexValue;
 
     private Integer statusCode;

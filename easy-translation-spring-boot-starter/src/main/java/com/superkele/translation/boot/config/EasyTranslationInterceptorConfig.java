@@ -1,6 +1,8 @@
 package com.superkele.translation.boot.config;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.superkele.translation.boot.config.properties.TranslationProperties;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.config.TranslationAutoConfigurationCustomizer;
 import com.superkele.translation.core.context.support.DefaultTranslatorContext;
@@ -9,22 +11,32 @@ import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 import com.superkele.translation.core.util.LogUtils;
+import com.superkele.translation.extension.serialize.jackson.TranslationJsonNodeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @Slf4j
 public class EasyTranslationInterceptorConfig {
 
+    @Autowired(required = false)
+    public void setLog(TranslationProperties properties) {
+        Optional.ofNullable(properties)
+                .ifPresent(p -> {
+                    LogUtils.printLog = p.isDebug();
+                    LogUtils.debug(log::debug,"debug mode enabled");
+                });
+    }
 
     @Autowired(required = false)
-    public void customize(Config config, List<TranslationAutoConfigurationCustomizer> configCustomizers) {
+    public void customize(List<TranslationAutoConfigurationCustomizer> configCustomizers) {
         if (configCustomizers != null)
             configCustomizers.forEach(customizer -> {
-                customizer.customize(config);
+                customizer.customize(Config.INSTANCE);
                 LogUtils.debug(log::debug,"add config-customizer: {}", () -> customizer);
             });
     }
@@ -54,6 +66,12 @@ public class EasyTranslationInterceptorConfig {
                 defaultTranslationProcessor.addContextHolders(contextPasser);
                 LogUtils.debug(log::debug,"add contextHolder: {}", () -> contextPasser);
             });
+    }
+
+
+    @Autowired(required = false)
+    public void customizer(ObjectMapper objectMapper, TranslationJsonNodeModule translationFieldSerializeModifier) {
+        objectMapper.registerModules(translationFieldSerializeModifier);
     }
 
 }

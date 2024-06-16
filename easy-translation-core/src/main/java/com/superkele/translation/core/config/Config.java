@@ -22,6 +22,8 @@ import java.util.concurrent.ExecutorService;
 @Getter
 public class Config {
 
+    public static final Config INSTANCE = new Config();
+
     /**
      * key: 参数长度
      * value: 被映射成的翻译器类
@@ -36,7 +38,7 @@ public class Config {
 
     private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
 
-    public Config() {
+    private Config() {
         init();
     }
 

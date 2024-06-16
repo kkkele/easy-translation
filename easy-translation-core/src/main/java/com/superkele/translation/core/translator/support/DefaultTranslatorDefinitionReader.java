@@ -23,27 +23,24 @@ import java.util.*;
 public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinitionReader {
 
     private final Map<Class<? extends BeanNameResolver>, BeanNameResolver> singleton = new HashMap<>();
-    private Config config = new Config();
+
+    private static final Config CONFIG = Config.INSTANCE;
 
     public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry) {
         super(registry);
     }
 
-    public DefaultTranslatorDefinitionReader setConfig(Config config) {
-        this.config = config;
-        return this;
-    }
 
 
     @Override
     protected String getDefaultTranslatorName(Method method) {
-        String beanName = config.getBeanNameGetter().getDeclaringBeanName(method.getDeclaringClass());
-        return config.getDefaultTranslatorNameGenerator().genName(beanName, method.getName());
+        String beanName = CONFIG.getBeanNameGetter().getDeclaringBeanName(method.getDeclaringClass());
+        return CONFIG.getDefaultTranslatorNameGenerator().genName(beanName, method.getName());
     }
 
     @Override
     protected String getDefaultTranslatorName(Class<?> clazz) {
-        return config.getBeanNameGetter().getDeclaringBeanName(clazz);
+        return CONFIG.getBeanNameGetter().getDeclaringBeanName(clazz);
     }
 
     /**
@@ -83,7 +80,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
 
     @Override
     protected TranslatorDefinition convertStaticMethodToTranslatorDefinition(Class<?> clazz, Method method) {
-        Class<? extends Translator> translatorClazz = config.getTranslatorClazzMap().get(method.getParameterCount());
+        Class<? extends Translator> translatorClazz = CONFIG.getTranslatorClazzMap().get(method.getParameterCount());
         if (translatorClazz == null) {
             throw new TranslationException("Do not find the translator type with " + method.getParameterCount() + "params ,see https://kkkele.github.io/easy-translation/#/zh-cn/config/ for more information");
         }
@@ -110,7 +107,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
 
     @Override
     protected TranslatorDefinition convertDynamicMethodToTranslatorDefinition(Class<?> clazz, Method method, Translation translation) {
-        Class<? extends Translator> translatorClazz = config.getTranslatorClazzMap().get(method.getParameterCount());
+        Class<? extends Translator> translatorClazz = CONFIG.getTranslatorClazzMap().get(method.getParameterCount());
         if (translatorClazz == null) {
             throw new TranslationException("Do not find the translator type with " + method.getParameterCount() + " params ,see https://kkkele.github.io/easy-translation/#/zh-cn/config/ for more information");
         }
