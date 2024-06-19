@@ -1,34 +1,37 @@
-package com.superkele.translation.extension.serialize.jackson;
+package com.superkele.translation.core.metadata.support;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.Mapping;
+import com.superkele.translation.annotation.NullPointerExceptionHandler;
 import com.superkele.translation.annotation.RefTranslation;
+import com.superkele.translation.annotation.bean.FieldTransInfo;
 import com.superkele.translation.annotation.constant.TranslateTiming;
-import com.superkele.translation.core.annotation.MappingHandler;
 import com.superkele.translation.core.metadata.FieldTranslation;
+import com.superkele.translation.core.metadata.FieldTranslationBuilder;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.ReflectUtils;
+import com.superkele.translation.core.util.Singleton;
+import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public abstract class FilterSerializerModifier extends AbstractSerializeModifier {
+public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
 
     @Override
-    public FieldTranslation getFieldTranslation(Class<?> targetType) {
-        Field[] fields = ReflectUtils.getFields(targetType);
+    public FieldTranslation build(Class<?> clazz, boolean isJsonSerialize) {
+        Field[] fields = ReflectUtils.getFields(clazz);
         List<Pair<Field, Mapping>> mappingFields = Arrays.stream(fields)
                 .map(field -> Pair.of(field, AnnotatedElementUtils.getMergedAnnotation(field, Mapping.class)))
                 .filter(pair -> ObjectUtil.isNotNull(pair.getValue()))
-                .filter(pair -> pair.getValue().timing() == TranslateTiming.JSON_SERIALIZE)
+                .filter(pair -> pair.getValue().timing() == (isJsonSerialize ? TranslateTiming.JSON_SERIALIZE : TranslateTiming.AFTER_RETURN))
                 .collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(mappingFields)) {
             return computeFieldTranslation(mappingFields);
@@ -36,7 +39,8 @@ public abstract class FilterSerializerModifier extends AbstractSerializeModifier
         return null;
     }
 
-    public FieldTranslation computeFieldTranslation(List<Pair<Field, Mapping>> mappingFields) {
+
+    protected FieldTranslation computeFieldTranslation(List<Pair<Field, Mapping>> mappingFields) {
         //fieldName event map
         Map<String, FieldTranslationEvent> fieldNameEventMap = new HashMap<>();
         //记录了不同的 eventMask 可以触发的事件
@@ -62,7 +66,9 @@ public abstract class FilterSerializerModifier extends AbstractSerializeModifier
             event.setPropertyName(field.getName());
             event.setEventValue(eventValue);
             event.setAsync(mapping.async());
-            event.setFieldTranslationInvoker(getMappingHandler().convert(field, mapping));
+            event.setTranslator(mapping.translator());
+            event.setFieldTransInfo(new FieldTransInfoDTO(field.getDeclaringClass(), field.getName(), mapping.receive(), mapping.mapper(), mapping.other(), Singleton.get(mapping.nullPointerHandler())));
+            event.setMappingHandler(Singleton.get(mapping.mappingHandler()));
             fieldNameEventMap.put(field.getName(), event);
             leftShift++;
             String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());
@@ -119,6 +125,60 @@ public abstract class FilterSerializerModifier extends AbstractSerializeModifier
         return res;
     }
 
-    protected abstract MappingHandler getMappingHandler();
+
+    @Data
+    public static class FieldTransInfoDTO implements FieldTransInfo {
+
+        private Class<?> declaringClass;
+
+        private String propertyName;
+
+        private String receive;
+
+        private String[] mapper;
+
+        private String[] others;
+
+        private NullPointerExceptionHandler nullPointerExceptionHandler;
+
+        public FieldTransInfoDTO(Class<?> declaringClass, String propertyName, String receive, String[] mapper, String[] others, NullPointerExceptionHandler nullPointerExceptionHandler) {
+            this.declaringClass = declaringClass;
+            this.propertyName = propertyName;
+            this.receive = receive;
+            this.mapper = mapper;
+            this.others = others;
+            this.nullPointerExceptionHandler = nullPointerExceptionHandler;
+        }
+
+        @Override
+        public Class<?> getSourceClass() {
+            return declaringClass;
+        }
+
+        @Override
+        public String getPropertyName() {
+            return propertyName;
+        }
+
+        @Override
+        public String receive() {
+            return receive;
+        }
+
+        @Override
+        public String[] mapperPropertyNames() {
+            return mapper;
+        }
+
+        @Override
+        public String[] others() {
+            return others;
+        }
+
+        @Override
+        public NullPointerExceptionHandler getNullPointerExceptionHandler() {
+            return nullPointerExceptionHandler;
+        }
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.superkele.translation.core.config;
 
 import cn.hutool.core.util.StrUtil;
+import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.translator.ConditionTranslator;
 import com.superkele.translation.core.translator.ContextTranslator;
 import com.superkele.translation.core.translator.MapperTranslator;
@@ -12,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -30,13 +33,30 @@ public class Config {
      */
     private Map<Integer, Class<? extends Translator>> translatorClazzMap = new ConcurrentHashMap<>(16);
 
+    /**
+     * beanName生成器
+     */
     private BeanNameGetter beanNameGetter = clazz -> StrUtil.lowerFirst(clazz.getSimpleName());
 
+    /**
+     * 全局线程池
+     */
     private ExecutorService threadPoolExecutor;
 
+    /**
+     * 翻译过期时间
+     */
     private volatile long timeout = 3000; //ms
 
+    /**
+     * 默认翻译器名称生成器
+     */
     private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
+
+    /**
+     * 多线程上下文Holder
+     */
+    private List<ContextHolder> contextHolders = new ArrayList<>();
 
     private Config() {
         init();
@@ -67,6 +87,11 @@ public class Config {
         Pair<Method, MethodType> pair = ReflectUtils.findFunctionInterfaceMethodType(translatorClazz);
         translatorClazzMap.put(pair.getKey().getParameterCount(), translatorClazz);
         return this;
+    }
+
+    public void addContextHolders(ContextHolder contextHolder) {
+        contextHolders.remove(contextHolder);
+        contextHolders.add(contextHolder);
     }
 
     public Config registerTranslatorClazz(Class<? extends Translator>... translatorClazzArr) {

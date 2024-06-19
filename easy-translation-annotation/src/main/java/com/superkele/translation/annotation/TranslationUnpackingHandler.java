@@ -42,4 +42,10 @@ public interface TranslationUnpackingHandler {
      * 4: 需要调用unpackingOther方法解包
      */
     int unpackingType(Object obj);
+
+    int OBJECT_TYPE = 0;
+    int COLLECTION_TYPE = 1;
+    int MAP_TYPE = 2;
+    int ARRAY_TYPE = 3;
+    int OTHER_TYPE = 4;
 }

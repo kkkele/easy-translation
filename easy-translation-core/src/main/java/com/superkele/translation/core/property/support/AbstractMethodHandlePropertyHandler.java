@@ -1,6 +1,7 @@
 package com.superkele.translation.core.property.support;
 
 import cn.hutool.core.map.WeakConcurrentMap;
+import com.superkele.translation.core.property.PropertyHandler;
 import com.superkele.translation.core.convert.MethodConvert;
 import com.superkele.translation.core.property.Getter;
 import com.superkele.translation.core.util.Assert;
@@ -14,12 +15,9 @@ import java.util.Map;
 
 public abstract class AbstractMethodHandlePropertyHandler implements PropertyHandler {
 
-    private final Map<Pair<Class<?>, String>, MethodHandle> getterMethodHandleCache = new WeakConcurrentMap<>();
+    private static final Map<Pair<Class<?>, String>, MethodHandle> GETTER_METHOD_HANDLE_CACHE = new WeakConcurrentMap<>();
 
-    private final Map<Pair<Class<?>, String>, MethodHandle[]> propertyGetterCache = new WeakConcurrentMap<>();
-
-    // private final Map<Pair<Class<?>, String>, MethodHandle> setterMethodHandleCache = new WeakConcurrentMap<>();
-
+    private static final Map<Pair<Class<?>, String>, MethodHandle[]> PROPERTY_GETTER_CACHE = new WeakConcurrentMap<>();
 
     protected abstract String convertToGetterMethodName(String propertyName);
 
@@ -29,7 +27,7 @@ public abstract class AbstractMethodHandlePropertyHandler implements PropertyHan
 
     @Override
     public Object invokeGetter(Object invokeObj, String propertyName) {
-        MethodHandle[] methodHandlesArr = propertyGetterCache.get(Pair.of(invokeObj.getClass(), propertyName));
+        MethodHandle[] methodHandlesArr = PROPERTY_GETTER_CACHE.get(Pair.of(invokeObj.getClass(), propertyName));
         if (methodHandlesArr != null) {
             Object res = invokeObj;
             for (MethodHandle methodHandle : methodHandlesArr) {
@@ -55,7 +53,7 @@ public abstract class AbstractMethodHandlePropertyHandler implements PropertyHan
                 throw new RuntimeException(e);
             }
         }
-        propertyGetterCache.put(Pair.of(invokeObj.getClass(), propertyName), methodHandles);
+        PROPERTY_GETTER_CACHE.put(Pair.of(invokeObj.getClass(), propertyName), methodHandles);
         return res;
     }
 
@@ -66,7 +64,7 @@ public abstract class AbstractMethodHandlePropertyHandler implements PropertyHan
     }
 
     protected MethodHandle generateGetterMethodHandle(Object temp, String property) {
-        return getterMethodHandleCache.computeIfAbsent(Pair.of(temp.getClass(), property), methodName -> {
+        return GETTER_METHOD_HANDLE_CACHE.computeIfAbsent(Pair.of(temp.getClass(), property), methodName -> {
             try {
                 String getterMethodName = convertToGetterMethodName(property);
                 return MethodConvert.getDynamicMethodHandle(Getter.class, temp.getClass().getMethod(getterMethodName));

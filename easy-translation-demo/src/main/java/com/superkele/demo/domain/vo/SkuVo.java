@@ -3,7 +3,6 @@ package com.superkele.demo.domain.vo;
 
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.constant.IgnoreNullPointerExceptionHandler;
-import com.superkele.translation.boot.annotation.Translator;
 import lombok.Data;
 
 @Data

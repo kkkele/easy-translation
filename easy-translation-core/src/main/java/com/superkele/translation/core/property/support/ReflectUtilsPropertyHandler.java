@@ -1,5 +1,6 @@
 package com.superkele.translation.core.property.support;
 
+import com.superkele.translation.core.property.PropertyHandler;
 import com.superkele.translation.core.util.ReflectUtils;
 
 public class ReflectUtilsPropertyHandler implements PropertyHandler {

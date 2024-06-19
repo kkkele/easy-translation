@@ -10,7 +10,7 @@ import com.superkele.translation.core.property.PropertySetter;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
 import com.superkele.translation.core.util.Assert;
-import com.superkele.translation.core.util.HandlerUtil;
+import com.superkele.translation.core.util.Singleton;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -31,9 +31,7 @@ public abstract class AbstractMappingHandler implements MappingHandler {
     public FieldTranslationInvoker convert(Field declaringField, Mapping mapping) {
         String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());
         if (StringUtils.isBlank(mapping.translator())) {
-            return (obj, cacheResSupplier, callback) -> {
-                return obj;
-            };
+            return (obj, cacheResSupplier, callback) -> obj;
         }
         return (obj, cacheResSupplier, callback) -> {
             if (obj == null) {
@@ -67,7 +65,7 @@ public abstract class AbstractMappingHandler implements MappingHandler {
                     try {
                         args[i] = getPropertyGetter().invokeGetter(obj, mapper[i]);
                     } catch (NullPointerException e) {
-                        NullPointerExceptionHandler nullPointerExceptionHandler = HandlerUtil.getNullPointerExceptionHandler(mapping.nullPointerHandler());
+                        NullPointerExceptionHandler nullPointerExceptionHandler = Singleton.get(mapping.nullPointerHandler());
                         nullPointerExceptionHandler.handle(e);
                         return obj;
                     }

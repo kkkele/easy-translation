@@ -7,7 +7,7 @@ import com.superkele.translation.annotation.constant.TranslateTiming;
 import java.lang.annotation.*;
 
 /**
- *  用以model类中翻译字段，标记了该注解的字段在被processor解析后会被翻译。
+ * 用以model类中翻译字段，标记了该注解的字段在被processor解析后会被翻译。
  */
 @Inherited
 @Target(ElementType.FIELD)
@@ -25,6 +25,8 @@ public @interface Mapping {
      */
     String[] mapper() default {};
 
+    String[] mapperOrigin() default {};
+
     /**
      * 接收的属性内容
      */
@@ -39,6 +41,17 @@ public @interface Mapping {
      * 执行时机
      */
     TranslateTiming timing() default TranslateTiming.AFTER_RETURN;
+
+    /**
+     * 用户使用该mappingHandler字段控制映射器
+     * 必须指定为mappingHandler的实现类
+     * @see com.superkele.translation.core.mapping.MappingHandler
+     * <ul>
+     *     <li>可以使用全类名指定映射器</li>
+     *     <li>可以 '@'+beanName 指定映射器，例如 @OneToOneMappingHandler </li>
+     * </ul>
+     */
+    String mappingHandler() default "";
 
     /**
      * 当不为null时，是否也映射
@@ -56,7 +69,6 @@ public @interface Mapping {
      */
     boolean async() default false;
 
-
     /**
      * 在该字段翻译执行后再开始翻译，主要用于精细化控制异步翻译时的执行顺序
      * 当该字段生效时，无视sort的执行顺序
@@ -68,6 +80,7 @@ public @interface Mapping {
 
     /**
      * 当翻译时，属性为空导致了空指针异常的解决方案
+     *
      * @return
      */
     Class<? extends NullPointerExceptionHandler> nullPointerHandler() default DefaultNullPointerExceptionHandler.class;

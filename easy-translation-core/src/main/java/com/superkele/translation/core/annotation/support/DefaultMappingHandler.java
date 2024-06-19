@@ -2,8 +2,7 @@ package com.superkele.translation.core.annotation.support;
 
 import com.superkele.translation.core.property.PropertyGetter;
 import com.superkele.translation.core.property.PropertySetter;
-import com.superkele.translation.core.property.support.DefaultMethodHandlePropertyHandler;
-import com.superkele.translation.core.property.support.PropertyHandler;
+import com.superkele.translation.core.property.PropertyHandler;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
 public class DefaultMappingHandler extends AbstractMappingHandler {

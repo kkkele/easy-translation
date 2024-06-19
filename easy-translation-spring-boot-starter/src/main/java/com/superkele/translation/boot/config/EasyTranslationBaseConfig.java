@@ -1,22 +1,17 @@
 package com.superkele.translation.boot.config;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.superkele.translation.boot.config.properties.TranslationProperties;
 import com.superkele.translation.boot.scanner.TranslationScanPostProcessor;
 import com.superkele.translation.core.aop.TranslationAspect;
-import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.context.support.DefaultTranslatorContext;
 import com.superkele.translation.core.processor.TranslationProcessor;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.core.property.support.DefaultMethodHandlePropertyHandler;
-import com.superkele.translation.core.property.support.PropertyHandler;
+import com.superkele.translation.core.property.PropertyHandler;
 import com.superkele.translation.extension.serialize.jackson.TranslationJsonNodeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
