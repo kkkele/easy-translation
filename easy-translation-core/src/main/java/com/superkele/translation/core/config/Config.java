@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
 
 /**
  * Easy-Translation 全局配置类
@@ -37,22 +38,25 @@ public class Config {
      * beanName生成器
      */
     private BeanNameGetter beanNameGetter = clazz -> StrUtil.lowerFirst(clazz.getSimpleName());
-
     /**
      * 全局线程池
      */
     private ExecutorService threadPoolExecutor;
-
     /**
      * 翻译过期时间
      */
     private volatile long timeout = 3000; //ms
-
     /**
      * 默认翻译器名称生成器
      */
     private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
-
+    private Function<String, String[]> mapperSplitExecutor = s -> {
+        String[] split = s.split(":");
+        for (int i = 0; i < split.length && i < 2; i++) {
+            split[i] = split[i].trim();
+        }
+        return split;
+    };
     /**
      * 多线程上下文Holder
      */
@@ -60,6 +64,11 @@ public class Config {
 
     private Config() {
         init();
+    }
+
+    public Config setMapperSplitExecutor(Function<String, String[]> mapperSplitExecutor) {
+        this.mapperSplitExecutor = mapperSplitExecutor;
+        return this;
     }
 
     public Config setTimeout(long timeout) {

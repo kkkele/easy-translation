@@ -1,6 +1,5 @@
 package com.superkele.translation.core.metadata;
 
-import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.NullPointerExceptionHandler;
 import com.superkele.translation.annotation.RefTranslation;
 import com.superkele.translation.core.mapping.MappingHandler;
@@ -43,18 +42,38 @@ public class FieldTranslationEvent {
      */
     private String cacheKey;
 
+    /**
+     * 映射字段对应的类的属性
+     * 例如：@Mapping中将 mapper="stuId:id" 则mapper=“stuId",mapperOriginField="id",如果是从一个结果集中以属性分组时，将会使用该字段
+     * 具体的分割方法，可以通过设置config来配置
+     * @see com.superkele.translation.core.config.Config#mapperSplitExecutor
+     */
     private String[] mapperOriginField;
 
+    /**
+     * 映射的字段
+     */
     private String[] mapper;
 
+    /**
+     * 其他字段
+     */
     private String[] other;
 
+    /**
+     * 接收参数
+     */
     private String receive;
 
     /**
      * 是否为关联翻译字段
      */
     private RefTranslation refTranslation;
+
+    /**
+     * 参数不为空时是否映射
+     */
+    private boolean notNullMapping;
 
     /**
      * 空指针异常处理器
@@ -76,5 +95,5 @@ public class FieldTranslationEvent {
     /**
      * 在此事件更新后发生的回调事件
      */
-    private FieldTranslationEvent[] afterEvents;
+    private FieldTranslationEvent[] activeEvents;
 }

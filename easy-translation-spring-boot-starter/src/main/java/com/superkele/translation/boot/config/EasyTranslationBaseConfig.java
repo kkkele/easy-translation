@@ -5,6 +5,8 @@ import com.superkele.translation.boot.config.properties.TranslationProperties;
 import com.superkele.translation.boot.scanner.TranslationScanPostProcessor;
 import com.superkele.translation.core.aop.TranslationAspect;
 import com.superkele.translation.core.context.support.DefaultTranslatorContext;
+import com.superkele.translation.core.metadata.FieldTranslationBuilder;
+import com.superkele.translation.core.metadata.support.MappingFiledTranslationBuilder;
 import com.superkele.translation.core.processor.TranslationProcessor;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.core.property.support.DefaultMethodHandlePropertyHandler;
@@ -39,13 +41,18 @@ public class EasyTranslationBaseConfig {
     }
 
     @Bean
-    public DefaultTranslationProcessor defaultTranslationProcessor(DefaultTranslatorContext defaultTransExecutorContext, PropertyHandler propertyHandler) {
-        return new DefaultTranslationProcessor(defaultTransExecutorContext, propertyHandler);
+    public FieldTranslationBuilder mappingFiledTranslationBuilder(PropertyHandler propertyHandler) {
+        return new MappingFiledTranslationBuilder(propertyHandler);
     }
 
     @Bean
-    public TranslationJsonNodeModule translationFieldSerializeModifier(DefaultTranslatorContext defaultTransExecutorContext, PropertyHandler propertyHandler) {
-        return new TranslationJsonNodeModule(defaultTransExecutorContext, propertyHandler);
+    public DefaultTranslationProcessor defaultTranslationProcessor(DefaultTranslatorContext defaultTransExecutorContext, FieldTranslationBuilder mappingFiledTranslationBuilder) {
+        return new DefaultTranslationProcessor(defaultTransExecutorContext, mappingFiledTranslationBuilder);
+    }
+
+    @Bean
+    public TranslationJsonNodeModule translationFieldSerializeModifier(DefaultTranslatorContext defaultTransExecutorContext, FieldTranslationBuilder fieldTranslationBuilder) {
+        return new TranslationJsonNodeModule(defaultTransExecutorContext, fieldTranslationBuilder);
     }
 
 

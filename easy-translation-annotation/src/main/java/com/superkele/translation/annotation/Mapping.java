@@ -25,7 +25,6 @@ public @interface Mapping {
      */
     String[] mapper() default {};
 
-    String[] mapperOrigin() default {};
 
     /**
      * 接收的属性内容

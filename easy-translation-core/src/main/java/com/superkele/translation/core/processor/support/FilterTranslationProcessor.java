@@ -40,7 +40,7 @@ public abstract class FilterTranslationProcessor implements TranslationProcessor
         if (CollectionUtil.isEmpty(collection)) {
             return;
         }
-        Map<Class<?>, List<?>> classMap = new HashMap<>();
+        Map<Class, List> classMap = new HashMap<>();
         collection.forEach(beanDescription -> {
             if (!filter(beanDescription.getClazz())) {
                 return;
@@ -51,7 +51,7 @@ public abstract class FilterTranslationProcessor implements TranslationProcessor
         processInternal(classMap, async);
     }
 
-    protected abstract <T> void processInternal(Map<Class<?>, List<?>> classMap, boolean async);
+    protected abstract void processInternal(Map<Class, List> classMap, boolean async);
 
     protected boolean filter(Class<?> clazz) {
         return filterCache.computeIfAbsent(clazz, this::predictFilter);

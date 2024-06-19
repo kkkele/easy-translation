@@ -1,9 +1,12 @@
 package com.superkele.translation.core.processor.support;
 
+import cn.hutool.core.collection.ListUtil;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.metadata.FieldTranslation;
+import com.superkele.translation.core.metadata.FieldTranslationBuilder;
 import com.superkele.translation.core.metadata.support.MappingFiledTranslationBuilder;
 import com.superkele.translation.core.thread.ContextPasser;
+import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -19,10 +22,16 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
      * value：处理后的，需要翻译的字段
      */
     private final Map<Class<?>, FieldTranslation> fieldTranslationMap = new ConcurrentHashMap<>();
-    private final MappingFiledTranslationBuilder mappingFiledTranslationBuilder = new MappingFiledTranslationBuilder();
+    private final TranslatorFactory translatorFactory;
+
+    protected AsyncableTranslationProcessor(TranslatorFactory translatorFactory) {
+        this.translatorFactory = translatorFactory;
+    }
+
+    protected abstract FieldTranslationBuilder getMappingFieldTranslationBuilder();
 
     @Override
-    protected <T> void processInternal(Map<Class<?>, List<?>> classMap, boolean async) {
+    protected void processInternal(Map<Class, List> classMap, boolean async) {
         if (async) {
             List<ContextPasser> contextPassers = buildContextPasser();
             contextPassers.forEach(contextPasser -> contextPasser.setPassValue());
@@ -30,11 +39,11 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                     .stream()
                     .map(clazz -> {
                         FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
-                        List<?> list = classMap.get(clazz);
+                        List list = classMap.get(clazz);
                         return CompletableFuture.runAsync(() -> {
                             contextPassers.forEach(contextPasser -> contextPasser.passContext());
-                            OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(this, fieldTranslation);
-                            onceFieldTranslationHandler.handle(list, getAsyncEnable());
+                            OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list, translatorFactory);
+                            onceFieldTranslationHandler.handle(true);
                             contextPassers.forEach(contextPasser -> contextPasser.clearContext());
                         });
                     })
@@ -43,8 +52,8 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
         } else {
             classMap.forEach((clazz, list) -> {
                 FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
-                OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(this, fieldTranslation);
-                onceFieldTranslationHandler.handle(list, getAsyncEnable());
+                OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list, translatorFactory);
+                onceFieldTranslationHandler.handle(false);
             });
         }
     }
@@ -54,13 +63,13 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
     @Override
     protected void processInternal(Object obj, Class<?> clazz) {
         FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
-        OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(this, fieldTranslation);
-        onceFieldTranslationHandler.handle(obj);
+        OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, ListUtil.of(obj), translatorFactory);
+        onceFieldTranslationHandler.handle(false);
     }
 
     @Override
     protected Boolean predictFilter(Class<?> clazz) {
-        FieldTranslation fieldTranslation = mappingFiledTranslationBuilder.build(clazz, false);
+        FieldTranslation fieldTranslation = getMappingFieldTranslationBuilder().build(clazz, false);
         Optional.ofNullable(fieldTranslation)
                 .ifPresent(res -> fieldTranslationMap.put(clazz, res));
         return fieldTranslationMap.containsKey(clazz);

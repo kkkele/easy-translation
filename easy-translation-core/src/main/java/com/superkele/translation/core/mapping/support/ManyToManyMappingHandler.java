@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ManyToManyMappingHandler extends AbstractMappingHandler {
+public class ManyToManyMappingHandler extends ReduceParamMappingHandler {
 
 
     protected ManyToManyMappingHandler(PropertyHandler propertyHandler) {
@@ -32,13 +32,6 @@ public class ManyToManyMappingHandler extends AbstractMappingHandler {
     }
 
     @Override
-    protected Object[] processMapperKey(Object[] params) {
-        return Arrays.stream(params)
-                .map(obj -> ListUtil.of(obj))
-                .toArray(Object[][]::new);
-    }
-
-    @Override
     protected Object processMappingValue(Object originValue, String[] originMapperField) {
         if (!(originValue instanceof Collection)) {
             return originValue;
@@ -48,6 +41,16 @@ public class ManyToManyMappingHandler extends AbstractMappingHandler {
         }
         Collection collectionRes = (Collection) originValue;
         return groupByAttributesRecursive(collectionRes, originMapperField, 0);
+    }
+
+    @Override
+    protected Object map(Object processedResult, Object[] mapperKey) {
+        Object res = processedResult;
+        for (Object key : mapperKey) {
+            Map map = (Map) res;
+            res = map.get(key);
+        }
+        return res;
     }
 
     private <T> Object groupByAttributesRecursive(Collection<T> collection, String[] attributes, int depth) {
@@ -64,18 +67,5 @@ public class ManyToManyMappingHandler extends AbstractMappingHandler {
         return obj -> propertyHandler.invokeGetter(obj, attribute);
     }
 
-    @Override
-    protected Object map(Object processedResult, Object[] mapperKey) {
-        Object res = processedResult;
-        for (Object key : mapperKey) {
-            Map map = (Map) res;
-            res = map.get(key);
-        }
-        return res;
-    }
 
-    @Override
-    public boolean waitPreEventWhenBatch() {
-        return true;
-    }
 }

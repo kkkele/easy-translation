@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class OneToManyMappingHandler extends AbstractMappingHandler {
+public class OneToManyMappingHandler extends SingleMappingHandler {
 
     protected OneToManyMappingHandler(PropertyHandler propertyHandler) {
         super(propertyHandler);
@@ -32,11 +32,6 @@ public class OneToManyMappingHandler extends AbstractMappingHandler {
     @Override
     protected PropertyHandler getPropertyHandler() {
         return propertyHandler;
-    }
-
-    @Override
-    protected Object[] processMapperKeyBatch(List<Object[]> params) {
-        return params.get(0);
     }
 
     @Override

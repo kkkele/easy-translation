@@ -5,18 +5,19 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.Mapping;
-import com.superkele.translation.annotation.NullPointerExceptionHandler;
 import com.superkele.translation.annotation.RefTranslation;
-import com.superkele.translation.annotation.bean.FieldTransInfo;
 import com.superkele.translation.annotation.constant.TranslateTiming;
+import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.constant.TranslationConstant;
+import com.superkele.translation.core.mapping.MappingHandler;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
+import com.superkele.translation.core.property.PropertyHandler;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.ReflectUtils;
 import com.superkele.translation.core.util.Singleton;
-import lombok.Data;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
@@ -24,6 +25,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
+
+    private final PropertyHandler propertyHandler;
+
+    public MappingFiledTranslationBuilder(PropertyHandler propertyHandler) {
+        this.propertyHandler = propertyHandler;
+    }
 
     @Override
     public FieldTranslation build(Class<?> clazz, boolean isJsonSerialize) {
@@ -67,16 +74,38 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
             event.setEventValue(eventValue);
             event.setAsync(mapping.async());
             event.setTranslator(mapping.translator());
-            event.setFieldTransInfo(new FieldTransInfoDTO(field.getDeclaringClass(), field.getName(), mapping.receive(), mapping.mapper(), mapping.other(), Singleton.get(mapping.nullPointerHandler())));
-            event.setMappingHandler(Singleton.get(mapping.mappingHandler()));
+            event.setOther(mapping.other());
+            String[] mapper = new String[mapping.mapper().length];
+            String[] mapperOriginField = new String[mapping.mapper().length];
+            for (int i = 0; i < mapper.length; i++) {
+                String mapperStr = mapping.mapper()[i];
+                String[] split = Config.INSTANCE.getMapperSplitExecutor().apply(mapperStr);
+                if (split.length == 1) {
+                    mapper[i] = split[0];
+                    mapperOriginField[i] = split[0];
+                }
+                if (split.length == 2) {
+                    mapperOriginField[i] = split[1];
+                }
+            }
+            event.setMapper(mapper);
+            event.setReceive(mapping.receive());
+            event.setMapperOriginField(mapperOriginField);
+            String mappingHandler = Optional.ofNullable(mapping.mappingHandler())
+                    .filter(StrUtil::isNotBlank)
+                    .orElse(TranslationConstant.DEFAULT_MAPPING_HANDLER);
+            event.setMappingHandler(getMappingHandler(mappingHandler));
+            event.setNullPointerExceptionHandler(Singleton.get(mapping.nullPointerHandler()));
             fieldNameEventMap.put(field.getName(), event);
-            leftShift++;
             String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());
-            if (cacheEnabled || uniqueNameSet.contains(uniqueName)) {
+            event.setCacheKey(uniqueName);
+            if (uniqueNameSet.contains(uniqueName)) {
                 cacheEnabled = true;
+                event.setCacheEnable(true);
             } else {
                 uniqueNameSet.add(uniqueName);
             }
+            leftShift++;
         }
         //第二次遍历，划分sort事件和after事件(触发的时机不同，sort事件是按顺序直接触发（一定会），after事件是回调触发（存在不执行的可能）)
         for (Pair<Field, Mapping> pair : mappingFields) {
@@ -116,7 +145,7 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
                     after.addAll(events);
                 }
             });
-            event.setAfterEvents(after.stream().toArray(FieldTranslationEvent[]::new));
+            event.setActiveEvents(after.stream().toArray(FieldTranslationEvent[]::new));
         }
         FieldTranslation res = new FieldTranslation();
         res.setSortEvents(ArrayUtil.toArray(sortEvents, FieldTranslationEvent.class));
@@ -125,60 +154,9 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
         return res;
     }
 
-
-    @Data
-    public static class FieldTransInfoDTO implements FieldTransInfo {
-
-        private Class<?> declaringClass;
-
-        private String propertyName;
-
-        private String receive;
-
-        private String[] mapper;
-
-        private String[] others;
-
-        private NullPointerExceptionHandler nullPointerExceptionHandler;
-
-        public FieldTransInfoDTO(Class<?> declaringClass, String propertyName, String receive, String[] mapper, String[] others, NullPointerExceptionHandler nullPointerExceptionHandler) {
-            this.declaringClass = declaringClass;
-            this.propertyName = propertyName;
-            this.receive = receive;
-            this.mapper = mapper;
-            this.others = others;
-            this.nullPointerExceptionHandler = nullPointerExceptionHandler;
-        }
-
-        @Override
-        public Class<?> getSourceClass() {
-            return declaringClass;
-        }
-
-        @Override
-        public String getPropertyName() {
-            return propertyName;
-        }
-
-        @Override
-        public String receive() {
-            return receive;
-        }
-
-        @Override
-        public String[] mapperPropertyNames() {
-            return mapper;
-        }
-
-        @Override
-        public String[] others() {
-            return others;
-        }
-
-        @Override
-        public NullPointerExceptionHandler getNullPointerExceptionHandler() {
-            return nullPointerExceptionHandler;
-        }
+    protected MappingHandler getMappingHandler(String mappingHandler) {
+        return Singleton.get(mappingHandler, propertyHandler);
     }
+
 
 }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.superkele.translation.core.metadata.FieldTranslation;
-import com.superkele.translation.core.metadata.support.MappingFiledTranslationBuilder;
+import com.superkele.translation.core.metadata.FieldTranslationBuilder;
 import com.superkele.translation.core.util.LogUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +16,11 @@ import java.util.Optional;
 @Slf4j
 public class TranslationSerializerModifier extends BeanSerializerModifier {
 
-    private final MappingFiledTranslationBuilder mappingFiledTranslationBuilder = new MappingFiledTranslationBuilder();
+    private final FieldTranslationBuilder filedTranslationBuilder;
+
+    public TranslationSerializerModifier(FieldTranslationBuilder filedTranslationBuilder) {
+        this.filedTranslationBuilder = filedTranslationBuilder;
+    }
 
     @Override
     public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
@@ -40,7 +44,7 @@ public class TranslationSerializerModifier extends BeanSerializerModifier {
 
 
     protected FieldTranslation getFieldTranslation(Class<?> targetType) {
-        return mappingFiledTranslationBuilder.build(targetType, true);
+        return filedTranslationBuilder.build(targetType, true);
     }
 
 }

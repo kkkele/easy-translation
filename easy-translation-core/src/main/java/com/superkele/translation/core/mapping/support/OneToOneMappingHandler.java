@@ -4,15 +4,10 @@ import com.superkele.translation.core.property.PropertyHandler;
 
 import java.util.List;
 
-public class OneToOneMappingHandler extends AbstractMappingHandler {
+public class OneToOneMappingHandler extends SingleMappingHandler {
 
     protected OneToOneMappingHandler(PropertyHandler propertyHandler) {
         super(propertyHandler);
-    }
-
-    @Override
-    protected Object[] processMapperKeyBatch(List<Object[]> params) {
-        return params.get(0);
     }
 
     @Override

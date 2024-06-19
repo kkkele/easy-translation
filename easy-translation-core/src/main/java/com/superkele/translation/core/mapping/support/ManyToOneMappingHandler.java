@@ -5,7 +5,7 @@ import com.superkele.translation.core.property.PropertyHandler;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ManyToOneMappingHandler extends AbstractMappingHandler {
+public class ManyToOneMappingHandler extends ReduceParamMappingHandler {
 
     protected ManyToOneMappingHandler(PropertyHandler propertyHandler) {
         super(propertyHandler);
@@ -25,11 +25,6 @@ public class ManyToOneMappingHandler extends AbstractMappingHandler {
     }
 
     @Override
-    protected Object[] processMapperKey(Object[] params) {
-        return new Object[0];
-    }
-
-    @Override
     protected Object processMappingValue(Object originValue, String[] originMapperField) {
         return originValue;
     }
@@ -39,8 +34,4 @@ public class ManyToOneMappingHandler extends AbstractMappingHandler {
         return processedResult;
     }
 
-    @Override
-    public boolean waitPreEventWhenBatch() {
-        return true;
-    }
 }
