@@ -80,11 +80,11 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
             for (int i = 0; i < mapper.length; i++) {
                 String mapperStr = mapping.mapper()[i];
                 String[] split = Config.INSTANCE.getMapperSplitExecutor().apply(mapperStr);
-                if (split.length == 1) {
+                if (split.length > 0) {
                     mapper[i] = split[0];
                     mapperOriginField[i] = split[0];
                 }
-                if (split.length == 2) {
+                if (split.length > 1) {
                     mapperOriginField[i] = split[1];
                 }
             }

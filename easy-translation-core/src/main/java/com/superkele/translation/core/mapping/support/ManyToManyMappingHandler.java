@@ -1,10 +1,8 @@
 package com.superkele.translation.core.mapping.support;
 
-import cn.hutool.core.collection.ListUtil;
 import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.property.PropertyHandler;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +53,7 @@ public class ManyToManyMappingHandler extends ReduceParamMappingHandler {
 
     private <T> Object groupByAttributesRecursive(Collection<T> collection, String[] attributes, int depth) {
         if (depth == attributes.length - 1) {
-            return collection.stream().collect(Collectors.groupingBy(createKeyExtractor(attributes[depth])));
+            return collection.stream().distinct().collect(Collectors.toMap(createKeyExtractor(attributes[depth]), Function.identity()));
         } else {
             return collection.stream().collect(Collectors.groupingBy(createKeyExtractor(attributes[depth]),
                     Collectors.collectingAndThen(Collectors.toList(), list ->

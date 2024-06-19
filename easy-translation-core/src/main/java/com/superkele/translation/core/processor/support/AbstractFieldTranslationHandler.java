@@ -1,15 +1,20 @@
 package com.superkele.translation.core.processor.support;
 
+import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.core.mapping.MappingHandler;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.processor.FieldTranslationHandler;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
+import com.superkele.translation.core.util.Pair;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class AbstractFieldTranslationHandler implements FieldTranslationHandler {
 
@@ -19,15 +24,28 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
 
     private final AtomicInteger[] activeEvents;
 
+    private final ReentrantLock[] locks;
+
+    private final Set<Pair<Integer, Short>> consumed = new ConcurrentHashSet<>();
+
+    private final Map<String, Object> cache = new ConcurrentHashMap<>();
+
     public AbstractFieldTranslationHandler(FieldTranslation fieldTranslation, List<Object> sources) {
         this.fieldTranslation = fieldTranslation;
         this.sources = sources;
+        this.locks = new ReentrantLock[sources.size()];
         this.activeEvents = new AtomicInteger[sources.size()];
         for (int i = 0; i < this.activeEvents.length; i++) {
             activeEvents[i] = new AtomicInteger(0);
         }
+        for (int i = 0; i < this.locks.length; i++) {
+            locks[i] = new ReentrantLock();
+        }
     }
 
+    protected abstract ExecutorService getExecutorService();
+
+    protected abstract boolean getAsyncEnabled();
 
     protected abstract TranslatorFactory getTranslatorFactory();
 
@@ -67,11 +85,11 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
         int totalActived = ~0;
         for (AtomicInteger activeEvent : activeEvents) {
             totalActived &= activeEvent.intValue();
+            if ((totalActived & triggerMask) != triggerMask) {
+                return;
+            }
         }
-        if ((totalActived & triggerMask) != triggerMask) {
-            return;
-        }
-        event.getMappingHandler().handleBatch(sources, event, getTranslatorFactory().findTranslator(event.getTranslator()));
+        event.getMappingHandler().handleBatch(sources, event, getTranslatorFactory().findTranslator(event.getTranslator()), cache);
         for (AtomicInteger activeEvent : activeEvents) {
             activeEvent.updateAndGet(i -> i | event.getEventValue());
         }
@@ -91,9 +109,9 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
 
     public CompletableFuture<Void> handle(int sourceIndex, FieldTranslationEvent event) {
         boolean async = event.isAsync();
-        if (async) {
+        if (async && getAsyncEnabled()) {
             return CompletableFuture.runAsync(() -> {
-                execute(sourceIndex, event);
+                executeTranslate(sourceIndex, event);
                 CompletableFuture[] child = Arrays.stream(event.getActiveEvents())
                         .filter(activeEvent -> (activeEvents[sourceIndex].get() & activeEvent.getTriggerMask()) == activeEvent.getTriggerMask())
                         .map(activeEvent -> {
@@ -107,16 +125,29 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
                         .filter(Objects::nonNull)
                         .toArray(CompletableFuture[]::new);
                 CompletableFuture.allOf(child).join();
-            });
+            }, getExecutorService());
         } else {
-            execute(sourceIndex, event);
+            executeTranslate(sourceIndex, event);
             return null;
         }
     }
 
-    public void execute(int sourceIndex, FieldTranslationEvent event) {
+    public void executeTranslate(int sourceIndex, FieldTranslationEvent event) {
+        Pair<Integer, Short> uniqueKey = Pair.of(sourceIndex, event.getEventValue());
+        if (consumed.contains(uniqueKey)) {
+            return;
+        }
+        locks[sourceIndex].lock();
+        try {
+            if (consumed.contains(uniqueKey)) {
+                return;
+            }
+            consumed.add(uniqueKey);
+        } finally {
+            locks[sourceIndex].unlock();
+        }
         if (StrUtil.isNotBlank(event.getTranslator())) {
-            event.getMappingHandler().handle(sources.get(sourceIndex), event, getTranslatorFactory().findTranslator(event.getTranslator()));
+            event.getMappingHandler().handle(sources.get(sourceIndex), event, getTranslatorFactory().findTranslator(event.getTranslator()), cache);
         }
         activeEvents[sourceIndex].updateAndGet(val -> val | event.getEventValue());
     }

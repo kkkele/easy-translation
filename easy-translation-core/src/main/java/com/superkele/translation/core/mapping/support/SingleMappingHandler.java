@@ -1,5 +1,6 @@
 package com.superkele.translation.core.mapping.support;
 
+import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.NullPointerExceptionHandler;
 import com.superkele.translation.core.mapping.MappingHandler;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
@@ -36,9 +37,10 @@ public abstract class SingleMappingHandler implements MappingHandler {
         int otherLength = other.length;
         Object[] mapperKey = buildMapperKey(source, mapperLength, mapper, event.getNullPointerExceptionHandler());
         Object mappingValue = null;
-        if (cache != null && event.isCacheEnable()) {
-            mappingValue = cache.get(event.getCacheKey());
-            if (mappingValue == null && cache.containsKey(event.getCacheKey())) {
+        if (cache != null) {
+            String cacheUnique = event.getCacheKey() + StrUtil.join(",", mapperKey);
+            mappingValue = cache.get(cacheUnique);
+            if (mappingValue == null && cache.containsKey(cacheUnique)) {
                 return null;
             }
         }
@@ -53,8 +55,9 @@ public abstract class SingleMappingHandler implements MappingHandler {
                     //翻译值
                     return translator.doTranslate(args);
                 });
-        if (cache != null && event.isCacheEnable()) {
-            cache.put(event.getCacheKey(), mappingValue);
+        if (cache != null) {
+            String cacheUnique = event.getCacheKey() + StrUtil.join(",", mapperKey);
+            cache.put(cacheUnique, mappingValue);
         }
         Optional.ofNullable(mappingValue)
                 .map(val -> processMappingValue(val, event.getMapperOriginField()))
@@ -95,12 +98,11 @@ public abstract class SingleMappingHandler implements MappingHandler {
     }
 
     @Override
-    public Object handleBatch(List<Object> collection, FieldTranslationEvent event, Translator translator,Map<String,Object> cache) {
+    public Object handleBatch(List<Object> collection, FieldTranslationEvent event, Translator translator, Map<String, Object> cache) {
         return collection.stream()
-                .map(obj -> handle(obj, event, translator,cache))
+                .map(obj -> handle(obj, event, translator, cache))
                 .collect(Collectors.toList());
     }
-
 
 
     /**

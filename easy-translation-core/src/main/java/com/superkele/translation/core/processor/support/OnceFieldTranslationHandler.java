@@ -13,10 +13,7 @@ import com.superkele.translation.core.translator.factory.TranslatorFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -28,6 +25,16 @@ public class OnceFieldTranslationHandler extends AbstractFieldTranslationHandler
     public OnceFieldTranslationHandler(FieldTranslation fieldTranslation, List<Object> sources, TranslatorFactory translatorFactory) {
         super(fieldTranslation, sources);
         this.translatorFactory = translatorFactory;
+    }
+
+    @Override
+    protected ExecutorService getExecutorService() {
+        return Config.INSTANCE.getThreadPoolExecutor();
+    }
+
+    @Override
+    protected boolean getAsyncEnabled() {
+        return false;
     }
 
     @Override

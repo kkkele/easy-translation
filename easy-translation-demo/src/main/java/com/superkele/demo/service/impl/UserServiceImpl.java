@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -30,6 +32,12 @@ public class UserServiceImpl implements UserService {
         sysUser.setUsername("username" + DateUtil.date());
         sysUser.setNickName("nickName" + DateUtil.date());
         return sysUser;
+    }
+
+    @Translation(name = "getUsers")
+    public List<SysUser> getByBatchIds(List<Integer> id){
+        return id.stream().map(this::getById)
+                .collect(Collectors.toList());
     }
 
 
