@@ -3,7 +3,6 @@ package com.superkele.translation.core.processor.support;
 
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
-import com.superkele.translation.core.metadata.support.MappingFiledTranslationBuilder;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
 

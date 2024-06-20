@@ -31,7 +31,7 @@ public abstract class AbstractAutowireCapableTranslatorFactory extends AbstractT
             case DYNAMIC_METHOD:
                 Object translatorInvoker = Optional.ofNullable(getBeanInvoker(definition.getInvokeBeanName()))
                         .orElse(getBeanInvoker(definition.getInvokeBeanClazz()));
-                Assert.notNull(translatorInvoker, "invokerBeanName: [" + definition.getInvokeBeanName() + "] is not find");
+                Assert.notNull(translatorInvoker, "translator:[" + translatorName + "],{the invokerBean name[" + definition.getInvokeBeanName() + "],type["+definition.getInvokeBeanClazz().getSimpleName()+"]} is not found");
                 origin = createTranslator(translatorInvoker, definition.getMethodHandle());
                 break;
             case STATIC_METHOD:

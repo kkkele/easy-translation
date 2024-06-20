@@ -126,9 +126,7 @@ public class Config {
 
     @FunctionalInterface
     public interface BeanNameGetter {
-
         String getDeclaringBeanName(Class clazz);
-
     }
 
     @FunctionalInterface

@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TranslationGlobalInformation {
 
-    private static List<String> packages;
+    private static List<String> packages ;
 
 
     public static void addPackage(String... packages) {

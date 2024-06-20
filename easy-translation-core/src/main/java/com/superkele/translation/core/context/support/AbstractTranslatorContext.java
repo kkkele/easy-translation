@@ -3,6 +3,7 @@ package com.superkele.translation.core.context.support;
 import com.superkele.translation.core.context.ConfigurableTranslatorContext;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.ConfigurableTranslatorFactory;
+import com.superkele.translation.core.util.LogUtils;
 
 import java.util.Arrays;
 
@@ -26,7 +27,14 @@ public abstract class AbstractTranslatorContext implements ConfigurableTranslato
 
     protected void loadTranslators(ConfigurableTranslatorFactory translatorFactory) {
         Arrays.stream(translatorFactory.getTranslatorNames())
-                .map(translatorFactory::findTranslator)
+                .map(translatorName -> {
+                    try {
+                        return translatorFactory.findTranslator(translatorName);
+                    } catch (RuntimeException e) {
+                        LogUtils.error(System.err::printf, "load translator error:\n%s\n",() ->e);
+                        return null;
+                    }
+                })
                 .forEach(translator -> {
                 });
     }

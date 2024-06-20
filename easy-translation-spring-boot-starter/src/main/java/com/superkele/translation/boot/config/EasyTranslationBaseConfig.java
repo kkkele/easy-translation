@@ -31,7 +31,7 @@ public class EasyTranslationBaseConfig {
     }
 
     @Bean
-    public DefaultTranslatorContext defaultTransExecutorContext() {
+    public DefaultTranslatorContext defaultTranslatorContext() {
         return new DefaultTranslatorContext();
     }
 

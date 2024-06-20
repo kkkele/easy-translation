@@ -1,22 +1,13 @@
 package com.superkele.translation.core.processor.support;
 
-import cn.hutool.core.collection.ConcurrentHashSet;
-import com.superkele.translation.annotation.RefTranslation;
-import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.mapping.MappingHandler;
-import com.superkele.translation.core.metadata.FieldTranslation;
-import com.superkele.translation.core.metadata.FieldTranslationEvent;
-import com.superkele.translation.core.processor.TranslationProcessor;
-import com.superkele.translation.core.thread.ContextPasser;
-import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
+import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.metadata.FieldTranslation;
+import com.superkele.translation.core.translator.factory.TranslatorFactory;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
+
 
 public class OnceFieldTranslationHandler extends AbstractFieldTranslationHandler {
 
@@ -34,7 +25,7 @@ public class OnceFieldTranslationHandler extends AbstractFieldTranslationHandler
 
     @Override
     protected boolean getAsyncEnabled() {
-        return false;
+        return Config.INSTANCE.getThreadPoolExecutor() != null;
     }
 
     @Override

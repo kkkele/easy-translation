@@ -33,7 +33,7 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
     public AbstractFieldTranslationHandler(FieldTranslation fieldTranslation, List<Object> sources) {
         this.fieldTranslation = fieldTranslation;
         this.sources = sources;
-        this.locks = new ReentrantLock[sources.size()];
+        this.locks = new ReentrantLock[sources.size() + 1];
         this.activeEvents = new AtomicInteger[sources.size()];
         for (int i = 0; i < this.activeEvents.length; i++) {
             activeEvents[i] = new AtomicInteger(0);
@@ -81,6 +81,19 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
     }
 
     public void handleBatch(FieldTranslationEvent event) {
+        Pair<Integer, Short> uniqueKey = Pair.of(null, event.getEventValue());
+        if (consumed.contains(uniqueKey)) {
+            return;
+        }
+        locks[sources.size()].lock();
+        try {
+            if (consumed.contains(uniqueKey)) {
+                return;
+            }
+            consumed.add(uniqueKey);
+        } finally {
+            locks[sources.size()].unlock();
+        }
         short triggerMask = event.getTriggerMask();
         int totalActived = ~0;
         for (AtomicInteger activeEvent : activeEvents) {

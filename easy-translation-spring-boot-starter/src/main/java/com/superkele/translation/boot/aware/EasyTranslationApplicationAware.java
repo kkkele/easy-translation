@@ -21,7 +21,7 @@ import java.util.Set;
 public class EasyTranslationApplicationAware implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        ConfigurableTranslatorContext executorContext = applicationContext.getBean("defaultTransExecutorContext", ConfigurableTranslatorContext.class);
+        ConfigurableTranslatorContext executorContext = applicationContext.getBean("defaultTranslatorContext", ConfigurableTranslatorContext.class);
         if (executorContext instanceof DefaultTranslatorContext) {
             DefaultTranslatorContext defaultTransExecutorContext = (DefaultTranslatorContext) executorContext;
             SpringInvokeBeanFactory invokeBeanFactory = applicationContext.getBean(SpringInvokeBeanFactory.class);

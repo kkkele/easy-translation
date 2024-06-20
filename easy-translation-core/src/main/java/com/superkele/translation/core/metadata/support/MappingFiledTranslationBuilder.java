@@ -55,7 +55,15 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
         List<FieldTranslationEvent> sortEvents = new ArrayList<>();
         //先将所有的mapping和field改造成FieldTranslationEvent对象
         //1.简单排序
-        mappingFields.sort(Comparator.comparingInt(o -> o.getValue().sort()));
+        mappingFields.sort((o1, o2) -> {
+            Mapping v1 = o1.getValue();
+            Mapping v2 = o2.getValue();
+            if (v1.sort() != v2.sort()) {
+                return v1.sort() - v2.sort();
+            } else {
+                return v1.async() ? -1 : 1;
+            }
+        });
         short initEvent = 1;
         short leftShift = 0;
         //第一次遍历，转化为FieldTranslationEvent对象
@@ -106,6 +114,7 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
                 uniqueNameSet.add(uniqueName);
             }
             leftShift++;
+            processAfterBuild(field, event);
         }
         //第二次遍历，划分sort事件和after事件(触发的时机不同，sort事件是按顺序直接触发（一定会），after事件是回调触发（存在不执行的可能）)
         for (Pair<Field, Mapping> pair : mappingFields) {
@@ -152,6 +161,10 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
         res.setConsumeSize(mappingFields.size());
         res.setHasSameInvoker(cacheEnabled);
         return res;
+    }
+
+    protected void processAfterBuild(Field field, FieldTranslationEvent event) {
+
     }
 
     protected MappingHandler getMappingHandler(String mappingHandler) {
