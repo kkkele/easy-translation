@@ -98,7 +98,7 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
     }
 
     public void handleBatch(FieldTranslationEvent event) {
-        Pair<Integer, Short> uniqueKey = Pair.of(null, event.getEventValue());
+/*        Pair<Integer, Short> uniqueKey = Pair.of(null, event.getEventValue());
         if (consumed.contains(uniqueKey)) {
             return;
         }
@@ -110,7 +110,7 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
             consumed.add(uniqueKey);
         } finally {
             locks[sources.size()].unlock();
-        }
+        }*/
         short triggerMask = event.getTriggerMask();
         int totalActived = ~0;
         for (AtomicInteger activeEvent : activeEvents) {
@@ -147,27 +147,33 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
         if (async && getAsyncEnabled()) {
             return CompletableFuture.runAsync(() -> {
                         executeTranslate(sourceIndex, event);
-                        CompletableFuture[] child = Arrays.stream(event.getActiveEvents())
-                                .filter(activeEvent -> (activeEvents[sourceIndex].get() & activeEvent.getTriggerMask()) == activeEvent.getTriggerMask())
-                                .map(activeEvent -> {
-                                    if (activeEvent.getMappingHandler().waitPreEventWhenBatch()) {
-                                        handleBatch(activeEvent);
-                                        return null;
-                                    } else {
-                                        return handle(sourceIndex, activeEvent);
-                                    }
-                                })
-                                .filter(Objects::nonNull)
-                                .toArray(CompletableFuture[]::new);
-                        CompletableFuture.allOf(child).join();
+                        triggerActiveEvents(sourceIndex, event);
                     }, getExecutorService())
                     .exceptionally(e -> {
                         throw new TranslationException("异步翻译异常", e);
                     });
         } else {
             executeTranslate(sourceIndex, event);
+            triggerActiveEvents(sourceIndex, event);
             return null;
         }
+    }
+
+    private void triggerActiveEvents(int sourceIndex, FieldTranslationEvent event) {
+        CompletableFuture[] child = Arrays.stream(event.getActiveEvents())
+                .filter(activeEvent -> (activeEvents[sourceIndex].get() & activeEvent.getTriggerMask()) == activeEvent.getTriggerMask())
+                .filter(activeEvent -> !consumed.contains(Pair.of(sourceIndex, activeEvent.getEventValue())))
+                .map(activeEvent -> {
+                    if (activeEvent.getMappingHandler().waitPreEventWhenBatch()) {
+                        handleBatch(activeEvent);
+                        return null;
+                    } else {
+                        return handle(sourceIndex, activeEvent);
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toArray(CompletableFuture[]::new);
+        CompletableFuture.allOf(child).join();
     }
 
     public void executeTranslate(int sourceIndex, FieldTranslationEvent event) {

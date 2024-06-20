@@ -3,6 +3,7 @@ package com.superkele.demo.test.processor_mapping_handler;
 
 import com.superkele.demo.EasyTranslationDemoApplication;
 import com.superkele.demo.processor_mapping_handler.Order;
+import com.superkele.demo.processor_mapping_handler.Sku;
 import com.superkele.translation.annotation.TranslationExecute;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -34,8 +36,11 @@ public class MappingHandlerMappingProcessTest {
     @Autowired
     private Service service;
 
+    /**
+     * 测试 同步场景下 多对多映射器的调用
+     */
     @Test
-    public void testOneToOneMappingHandler() {
+    public void testSyncManyToManyMappingHandler() {
         List<Order> mainOrder = service.getMainOrder();
         mainOrder.forEach(order -> {
             System.out.println(order);
@@ -43,6 +48,19 @@ public class MappingHandlerMappingProcessTest {
             Assert.assertNotNull(order.getCreateTime());
         });
     }
+
+    /**
+     * 测试 异步场景下 多对多映射器的调用
+     */
+    @Test
+    public void testAsyncManyToManyMappingHandler() {
+        service.getMainSkuInfo().forEach(sku -> {
+            System.out.println(sku);
+            Assert.assertNotNull(sku.getSales());
+            Assert.assertNotNull(sku.getSpuName());
+        });
+    }
+
 
 
     @Component
@@ -54,6 +72,19 @@ public class MappingHandlerMappingProcessTest {
                     .mapToObj(i -> {
                         Order order = new Order();
                         order.setId(i);
+                        return order;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        @TranslationExecute(type = Sku.class)
+        public List<Sku> getMainSkuInfo() {
+            return IntStream.range(1, 10)
+                    .mapToObj(i -> {
+                        Sku order = new Sku();
+                        order.setSkuId(i);
+                        order.setSkuName("sku" + i);
+                        order.setSpuId(new Random().nextBoolean() ? null : 1);
                         return order;
                     })
                     .collect(Collectors.toList());

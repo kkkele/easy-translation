@@ -6,8 +6,6 @@ public interface TranslationConstant {
 
     String ONE_TO_ONE_MAPPING_HANDLER = DEFAULT_PACKAGE + ".mapping.support.OneToOneMappingHandler";
     String DEFAULT_MAPPING_HANDLER = ONE_TO_ONE_MAPPING_HANDLER;
-
-    String ONE_TO_MANY_MAPPING_HANDLER = DEFAULT_PACKAGE + ".mapping.support.OneToManyMappingHandler";
     String MANY_TO_MANY_MAPPING_HANDLER = DEFAULT_PACKAGE + ".mapping.support.ManyToManyMappingHandler";
     String MANY_TO_ONE_MAPPING_HANDLER = DEFAULT_PACKAGE + ".mapping.support.ManyToOneMappingHandler";
 }

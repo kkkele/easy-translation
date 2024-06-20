@@ -26,11 +26,8 @@ public abstract class ReduceParamMappingHandler extends SingleMappingHandler {
                 .map(obj -> buildMapperKey(obj, mapperLength, mapper, event.getNullPointerExceptionHandler()))
                 .collect(Collectors.toList());
         Object mappingValue = null;
-        if (event.isCacheEnable()) {
+        if (event.isCacheEnable() && cache != null) {
             mappingValue = cache.get(event.getCacheKey());
-            if (mappingValue == null && cache.containsKey(event.getCacheKey())) {
-                return null;
-            }
         }
         mappingValue = Optional.ofNullable(mappingValue)
                 .orElseGet(() -> {
@@ -41,7 +38,7 @@ public abstract class ReduceParamMappingHandler extends SingleMappingHandler {
                     fillTranslatorArgs(args, mapperLength, processedMapperKey, otherLength, other);
                     return translator.doTranslate(args);
                 });
-        if (event.isCacheEnable()) {
+        if (event.isCacheEnable() && cache != null) {
             cache.put(event.getCacheKey(), mappingValue);
         }
         Optional.ofNullable(mappingValue)

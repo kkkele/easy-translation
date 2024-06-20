@@ -65,16 +65,17 @@ public abstract class AbstractMethodHandlePropertyHandler implements PropertyHan
     }
 
     protected MethodHandle generateGetterMethodHandle(Object temp, String property) {
-        return GETTER_METHOD_HANDLE_CACHE.computeIfAbsent(Pair.of(temp.getClass(), property), methodName -> {
+        Class<?> clazz = temp.getClass();
+        return GETTER_METHOD_HANDLE_CACHE.computeIfAbsent(Pair.of(clazz, property), methodName -> {
             String getterMethodName = convertToGetterMethodName(property);
             try {
-                return MethodConvert.getDynamicMethodHandle(Getter.class, temp.getClass().getMethod(getterMethodName));
+                return MethodConvert.getDynamicMethodHandle(Getter.class, clazz.getMethod(getterMethodName));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (LambdaConversionException e) {
                 throw new TranslationException("请仔细检查是否存在该方法名"+getterMethodName+"，静态方法是否与@Data生成的方法冲突，（同一类下方法名一致，且参数相同）",e);
             } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
+                throw new TranslationException("调用get方法获取属性时失败，方法["+clazz+"#"+getterMethodName+"]不存在",e);
             }
         });
     }
