@@ -2,10 +2,7 @@ package com.superkele.translation.core.config;
 
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.core.thread.ContextHolder;
-import com.superkele.translation.core.translator.ConditionTranslator;
-import com.superkele.translation.core.translator.ContextTranslator;
-import com.superkele.translation.core.translator.MapperTranslator;
-import com.superkele.translation.core.translator.Translator;
+import com.superkele.translation.core.translator.*;
 import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.ReflectUtils;
 import lombok.Getter;
@@ -17,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 
@@ -41,15 +39,19 @@ public class Config {
     /**
      * 全局线程池
      */
-    private ExecutorService threadPoolExecutor;
+    private Executor threadPoolExecutor;
+
     /**
      * 翻译过期时间
      */
     private volatile long timeout = 3000; //ms
+
     /**
      * 默认翻译器名称生成器
      */
     private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
+
+
     private Function<String, String[]> mapperSplitExecutor = s -> {
         String[] split = s.split(":");
         for (int i = 0; i < split.length && i < 2; i++) {
@@ -112,14 +114,14 @@ public class Config {
     }
 
     protected void init() {
-        registerTranslatorClazz(ContextTranslator.class, MapperTranslator.class, ConditionTranslator.class);
+        registerTranslatorClazz(ContextTranslator.class, MapperTranslator.class, ConditionTranslator.class, ThreeParamTranslator.class, FourParamTranslator.class, FiveParamTranslator.class);
     }
 
-    public ExecutorService getThreadPoolExecutor() {
+    public Executor getThreadPoolExecutor() {
         return threadPoolExecutor;
     }
 
-    public Config setThreadPoolExecutor(ExecutorService threadPoolExecutor) {
+    public Config setThreadPoolExecutor(Executor threadPoolExecutor) {
         this.threadPoolExecutor = threadPoolExecutor;
         return this;
     }

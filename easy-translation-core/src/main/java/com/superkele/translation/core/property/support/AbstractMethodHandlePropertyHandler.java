@@ -1,6 +1,7 @@
 package com.superkele.translation.core.property.support;
 
 import cn.hutool.core.map.WeakConcurrentMap;
+import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.property.PropertyHandler;
 import com.superkele.translation.core.convert.MethodConvert;
 import com.superkele.translation.core.property.Getter;
@@ -65,13 +66,13 @@ public abstract class AbstractMethodHandlePropertyHandler implements PropertyHan
 
     protected MethodHandle generateGetterMethodHandle(Object temp, String property) {
         return GETTER_METHOD_HANDLE_CACHE.computeIfAbsent(Pair.of(temp.getClass(), property), methodName -> {
+            String getterMethodName = convertToGetterMethodName(property);
             try {
-                String getterMethodName = convertToGetterMethodName(property);
                 return MethodConvert.getDynamicMethodHandle(Getter.class, temp.getClass().getMethod(getterMethodName));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (LambdaConversionException e) {
-                throw new RuntimeException(e);
+                throw new TranslationException("请仔细检查是否存在该方法名"+getterMethodName+"，静态方法是否与@Data生成的方法冲突，（同一类下方法名一致，且参数相同）",e);
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }

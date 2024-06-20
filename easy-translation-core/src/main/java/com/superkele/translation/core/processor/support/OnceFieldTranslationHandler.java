@@ -19,7 +19,7 @@ public class OnceFieldTranslationHandler extends AbstractFieldTranslationHandler
     }
 
     @Override
-    protected ExecutorService getExecutorService() {
+    protected Executor getExecutorService() {
         return Config.INSTANCE.getThreadPoolExecutor();
     }
 

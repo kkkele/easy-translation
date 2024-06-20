@@ -82,6 +82,7 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
             event.setEventValue(eventValue);
             event.setAsync(mapping.async());
             event.setTranslator(mapping.translator());
+            event.setNotNullMapping(mapping.notNullMapping());
             event.setOther(mapping.other());
             String[] mapper = new String[mapping.mapper().length];
             String[] mapperOriginField = new String[mapping.mapper().length];

@@ -7,7 +7,11 @@ import com.superkele.translation.annotation.constant.TranslateTiming;
 import java.lang.annotation.*;
 
 /**
- * 用以model类中翻译字段，标记了该注解的字段在被processor解析后会被翻译。
+ * 用以model类中翻译字段，标记了该注解的字段会与字段被FieldTranslationBuilder解析为FieldTranslationEvent对象
+ *
+ * @see com.superkele.translation.core.metadata.FieldTranslationBuilder
+ * 然后 processor会将 FieldTranslationEvent 交给 FieldTranslationHandler处理
+ * @see com.superkele.translation.core.processor.FieldTranslationHandler
  */
 @Inherited
 @Target(ElementType.FIELD)
@@ -44,6 +48,7 @@ public @interface Mapping {
     /**
      * 用户使用该mappingHandler字段控制映射器
      * 必须指定为mappingHandler的实现类
+     *
      * @see com.superkele.translation.core.mapping.MappingHandler
      * <ul>
      *     <li>可以使用全类名指定映射器</li>

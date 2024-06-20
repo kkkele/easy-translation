@@ -12,7 +12,7 @@ import com.superkele.translation.core.util.Pair;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -43,7 +43,7 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
         }
     }
 
-    protected abstract ExecutorService getExecutorService();
+    protected abstract Executor getExecutorService();
 
     protected abstract boolean getAsyncEnabled();
 
