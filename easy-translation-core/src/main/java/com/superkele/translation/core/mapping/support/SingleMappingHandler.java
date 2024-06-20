@@ -40,9 +40,6 @@ public abstract class SingleMappingHandler implements MappingHandler {
         if (cache != null) {
             String cacheUnique = event.getCacheKey() + StrUtil.join(",", mapperKey);
             mappingValue = cache.get(cacheUnique);
-            if (mappingValue == null && cache.containsKey(cacheUnique)) {
-                return null;
-            }
         }
         mappingValue = Optional.ofNullable(mappingValue)
                 .orElseGet(() -> {
@@ -55,7 +52,7 @@ public abstract class SingleMappingHandler implements MappingHandler {
                     //翻译值
                     return translator.doTranslate(args);
                 });
-        if (cache != null) {
+        if (cache != null && mappingValue != null) {
             String cacheUnique = event.getCacheKey() + StrUtil.join(",", mapperKey);
             cache.put(cacheUnique, mappingValue);
         }
