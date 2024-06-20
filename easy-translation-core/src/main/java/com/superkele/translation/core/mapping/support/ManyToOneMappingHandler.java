@@ -7,9 +7,6 @@ import java.util.stream.Collectors;
 
 public class ManyToOneMappingHandler extends ReduceParamMappingHandler {
 
-    protected ManyToOneMappingHandler(PropertyHandler propertyHandler) {
-        super(propertyHandler);
-    }
 
     @Override
     protected Object[] processMapperKeyBatch(List<Object[]> params) {

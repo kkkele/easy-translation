@@ -8,9 +8,8 @@ import java.lang.annotation.*;
 
 /**
  * 用以model类中翻译字段，标记了该注解的字段会与字段被FieldTranslationBuilder解析为FieldTranslationEvent对象
- *
- * @see com.superkele.translation.core.metadata.FieldTranslationBuilder
  * 然后 processor会将 FieldTranslationEvent 交给 FieldTranslationHandler处理
+ * @see com.superkele.translation.core.metadata.FieldTranslationBuilder
  * @see com.superkele.translation.core.processor.FieldTranslationHandler
  */
 @Inherited
@@ -46,14 +45,16 @@ public @interface Mapping {
     TranslateTiming timing() default TranslateTiming.AFTER_RETURN;
 
     /**
-     * 用户使用该mappingHandler字段控制映射器
+     * <p>用户使用该mappingHandler字段控制映射器
      * 必须指定为mappingHandler的实现类
-     *
-     * @see com.superkele.translation.core.mapping.MappingHandler
+     * </p>
+     * <hr/>
      * <ul>
      *     <li>可以使用全类名指定映射器</li>
      *     <li>可以 '@'+beanName 指定映射器，例如 @OneToOneMappingHandler </li>
      * </ul>
+     * @see com.superkele.translation.core.mapping.MappingHandler
+     *
      */
     String mappingHandler() default "";
 
@@ -74,10 +75,12 @@ public @interface Mapping {
     boolean async() default false;
 
     /**
-     * 在该字段翻译执行后再开始翻译，主要用于精细化控制异步翻译时的执行顺序
+     * <p>
+     *     在该字段翻译执行后再开始翻译，主要用于精细化控制异步翻译时的执行顺序
      * 当该字段生效时，无视sort的执行顺序
-     * 该字段默认是由事件驱动进行翻译的，所以即时您将async设为false,也存在不在主线程中运行的情况
+     * 该字段会使得field在前置事件执行完然后回调进行翻译，所以即时您将async设为false,也存在不在主线程中运行的情况
      * 这主要取决于最后触发该事件的翻译字段在哪个线程中
+     * </p>
      */
     String[] after() default {};
 

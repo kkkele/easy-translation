@@ -26,12 +26,6 @@ import java.util.stream.Collectors;
 
 public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
 
-    private final PropertyHandler propertyHandler;
-
-    public MappingFiledTranslationBuilder(PropertyHandler propertyHandler) {
-        this.propertyHandler = propertyHandler;
-    }
-
     @Override
     public FieldTranslation build(Class<?> clazz, boolean isJsonSerialize) {
         Field[] fields = ReflectUtils.getFields(clazz);
@@ -110,7 +104,6 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
             event.setCacheKey(uniqueName);
             if (uniqueNameSet.contains(uniqueName)) {
                 cacheEnabled = true;
-                event.setCacheEnable(true);
             } else {
                 uniqueNameSet.add(uniqueName);
             }
@@ -122,6 +115,9 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
             String fieldName = pair.getKey().getName();
             Mapping mapping = pair.getValue();
             FieldTranslationEvent event = fieldNameEventMap.get(fieldName);
+            if (uniqueNameSet.contains(event.getCacheKey())) {
+                event.setCacheEnable(true);
+            }
             if (mapping.after().length == 0) {
                 event.setTriggerMask((short) 0);
                 sortEvents.add(event);
@@ -169,7 +165,7 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
     }
 
     protected MappingHandler getMappingHandler(String mappingHandler) {
-        return Singleton.get(mappingHandler, propertyHandler);
+        return Singleton.get(mappingHandler);
     }
 
 

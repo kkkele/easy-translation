@@ -6,6 +6,7 @@ import com.superkele.translation.core.mapping.MappingHandler;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.property.PropertyHandler;
 import com.superkele.translation.core.translator.Translator;
+import com.superkele.translation.core.util.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -18,16 +19,10 @@ import java.util.stream.Collectors;
  */
 public abstract class SingleMappingHandler implements MappingHandler {
 
-    protected final PropertyHandler propertyHandler;
-
-    protected SingleMappingHandler(PropertyHandler propertyHandler) {
-        this.propertyHandler = propertyHandler;
-    }
-
     @Override
     public Object handle(Object source, FieldTranslationEvent event, Translator translator, Map<String, Object> cache) {
         if (!event.isNotNullMapping()) {
-            if (propertyHandler.invokeGetter(source, event.getPropertyName()) != null) {
+            if (getPropertyHandler().invokeGetter(source, event.getPropertyName()) != null) {
                 return null;
             }
         }
@@ -64,8 +59,9 @@ public abstract class SingleMappingHandler implements MappingHandler {
         return mappingValue;
     }
 
-    protected PropertyHandler getPropertyHandler() {
-        return propertyHandler;
+    @Override
+    public PropertyHandler getPropertyHandler() {
+        return PropertyUtils.getPropertyHandler();
     }
 
     protected Object[] buildMapperKey(Object obj, int mapperLength, String[] mapper, NullPointerExceptionHandler nullPointerExceptionHandler) {

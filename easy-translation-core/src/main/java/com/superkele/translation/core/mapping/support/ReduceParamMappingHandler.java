@@ -15,10 +15,6 @@ import java.util.stream.Collectors;
  */
 public abstract class ReduceParamMappingHandler extends SingleMappingHandler {
 
-    protected ReduceParamMappingHandler(PropertyHandler propertyHandler) {
-        super(propertyHandler);
-    }
-
     @Override
     public Object handleBatch(List<Object> sourceCollection, FieldTranslationEvent event, Translator translator, Map<String, Object> cache) {
         String[] mapper = event.getMapper();

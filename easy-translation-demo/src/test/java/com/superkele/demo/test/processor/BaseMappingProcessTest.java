@@ -17,13 +17,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.Random;
 
 /**
- * 翻译器 上下文获取
+ * 包含了对 @Mapping注解 和 TranslationProcessor 的基本使用
+ * 包括 mapper字段,other字段,async字段,after字段，notNullMapping字段的基本使用
  */
-
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @Slf4j
-public class MappingProcessTest {
+public class BaseMappingProcessTest {
 
     @Autowired
     private DefaultTranslationProcessor defaultTranslationProcessor;
@@ -125,6 +125,7 @@ public class MappingProcessTest {
         process(notNullMappingTrue);
         Assert.assertNotEquals(notNullMappingTrue.getTypeName(),"random");
     }
+
 
     private void process(Object obj) {
         log.info("beforeProcess:{}", obj);

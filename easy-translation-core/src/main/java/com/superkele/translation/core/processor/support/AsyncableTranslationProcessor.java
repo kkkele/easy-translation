@@ -4,7 +4,6 @@ import cn.hutool.core.collection.ListUtil;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
-import com.superkele.translation.core.metadata.support.MappingFiledTranslationBuilder;
 import com.superkele.translation.core.thread.ContextPasser;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
@@ -32,7 +31,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
 
     @Override
     protected void processInternal(Map<Class, List> classMap, boolean async) {
-        if (async) {
+        if (async && getAsyncEnable()) {
             List<ContextPasser> contextPassers = buildContextPasser();
             contextPassers.forEach(contextPasser -> contextPasser.setPassValue());
             CompletableFuture[] array = classMap.keySet()
@@ -42,7 +41,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
                         List list = classMap.get(clazz);
                         return CompletableFuture.runAsync(() -> {
                             contextPassers.forEach(contextPasser -> contextPasser.passContext());
-                            OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list, translatorFactory);
+                            OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list, translatorFactory,this);
                             onceFieldTranslationHandler.handle(true);
                             contextPassers.forEach(contextPasser -> contextPasser.clearContext());
                         });
@@ -52,7 +51,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
         } else {
             classMap.forEach((clazz, list) -> {
                 FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
-                OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list, translatorFactory);
+                OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list, translatorFactory,this);
                 onceFieldTranslationHandler.handle(false);
             });
         }
@@ -63,7 +62,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
     @Override
     protected void processInternal(Object obj, Class<?> clazz) {
         FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
-        OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, ListUtil.of(obj), translatorFactory);
+        OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, ListUtil.of(obj), translatorFactory,this);
         onceFieldTranslationHandler.handle(false);
     }
 

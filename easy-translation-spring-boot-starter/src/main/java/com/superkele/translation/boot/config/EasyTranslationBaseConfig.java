@@ -41,8 +41,8 @@ public class EasyTranslationBaseConfig {
     }
 
     @Bean
-    public FieldTranslationBuilder mappingFiledTranslationBuilder(PropertyHandler propertyHandler) {
-        return new MappingFiledTranslationBuilder(propertyHandler);
+    public FieldTranslationBuilder mappingFiledTranslationBuilder() {
+        return new MappingFiledTranslationBuilder();
     }
 
     @Bean

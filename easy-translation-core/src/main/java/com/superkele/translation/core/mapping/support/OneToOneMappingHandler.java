@@ -1,14 +1,8 @@
 package com.superkele.translation.core.mapping.support;
 
-import com.superkele.translation.core.property.PropertyHandler;
-
-import java.util.List;
 
 public class OneToOneMappingHandler extends SingleMappingHandler {
 
-    protected OneToOneMappingHandler(PropertyHandler propertyHandler) {
-        super(propertyHandler);
-    }
 
     @Override
     protected Object[] processMapperKey(Object[] params) {

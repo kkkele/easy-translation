@@ -7,8 +7,17 @@ import com.superkele.translation.core.translator.Translator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 映射处理器
+ * 不同的MappingHandler会根据 #waitPreEventWhenBatch 决定它有没有批处理的能力
+ * 具有批处理能力的MappingHandler可以在处理集合时聚合所有对象的mapper参数列表，然后对结果进行映射
+ * 不具有批处理能力的MappingHandler在处理集合时，会对每个对象进行单独的翻译，当然，它也具有改变参数形式和结果处理的能力
+ * 它将被AbstractFieldTranslationHandler调用控制，所以无需关心是如何做到批处理的。
+ * @see com.superkele.translation.core.processor.support.AbstractFieldTranslationHandler
+ */
 public interface MappingHandler {
 
+    PropertyHandler getPropertyHandler();
 
     /**
      * 当批处理时，是否等待前置事件执行完再执行该事件

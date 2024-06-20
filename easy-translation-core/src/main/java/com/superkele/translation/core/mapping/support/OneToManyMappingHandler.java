@@ -11,9 +11,7 @@ import java.util.stream.Collectors;
 
 public class OneToManyMappingHandler extends SingleMappingHandler {
 
-    protected OneToManyMappingHandler(PropertyHandler propertyHandler) {
-        super(propertyHandler);
-    }
+
 
     private <T> Object groupByAttributesRecursive(Collection<T> collection, String[] attributes, int depth) {
         if (depth == attributes.length - 1) {
@@ -26,13 +24,9 @@ public class OneToManyMappingHandler extends SingleMappingHandler {
     }
 
     private <T> Function<T, Object> createKeyExtractor(String attribute) {
-        return obj -> propertyHandler.invokeGetter(obj, attribute);
+        return obj -> getPropertyHandler().invokeGetter(obj, attribute);
     }
 
-    @Override
-    protected PropertyHandler getPropertyHandler() {
-        return propertyHandler;
-    }
 
     @Override
     protected Object[] processMapperKey(Object[] params) {

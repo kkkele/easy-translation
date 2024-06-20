@@ -1,7 +1,6 @@
 package com.superkele.translation.core.mapping.support;
 
 import com.superkele.translation.core.exception.TranslationException;
-import com.superkele.translation.core.property.PropertyHandler;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,11 +9,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ManyToManyMappingHandler extends ReduceParamMappingHandler {
-
-
-    protected ManyToManyMappingHandler(PropertyHandler propertyHandler) {
-        super(propertyHandler);
-    }
 
     @Override
     protected Object[] processMapperKeyBatch(List<Object[]> params) {
@@ -62,7 +56,7 @@ public class ManyToManyMappingHandler extends ReduceParamMappingHandler {
     }
 
     private <T> Function<T, Object> createKeyExtractor(String attribute) {
-        return obj -> propertyHandler.invokeGetter(obj, attribute);
+        return obj -> getPropertyHandler().invokeGetter(obj, attribute);
     }
 
 
