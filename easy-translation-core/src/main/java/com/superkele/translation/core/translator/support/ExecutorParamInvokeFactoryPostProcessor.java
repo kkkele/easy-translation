@@ -1,10 +1,13 @@
 package com.superkele.translation.core.translator.support;
 
 import cn.hutool.core.convert.Convert;
-import com.superkele.translation.core.translator.Translator;
+import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.translator.definition.ConfigurableTranslatorFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * 调整mapperKey的位置,使得调用方法参数时，按照 mapperKey0,mapperKey1,mapperKey2......other1,other2,other3的字段来传参
@@ -31,7 +34,21 @@ public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactor
                 i++;
             }
             definition.setTranslateDecorator(translator ->
-                    args -> translator.doTranslate(reWrapper(args, mapperIndex, otherIndex, parameterTypes)));
+                    args -> {
+                        Object[] reWrapper = reWrapper(args, mapperIndex, otherIndex, parameterTypes);
+                        try {
+                            return translator.doTranslate(reWrapper);
+                        } catch (ClassCastException e) {
+                            String params = Arrays.stream(reWrapper)
+                                    .map(param -> Optional.ofNullable(param)
+                                            .map(x ->   x + " : " + x.getClass().getSimpleName() )
+                                            .orElse("NULL"))
+                                    .reduce((x, y) -> x + "," + y)
+                                    .orElse("");
+                            System.err.println(translatorName +" | params=> ("+params+")");
+                            throw new TranslationException("请确认mapper顺序与@TransMapper参数顺序一致，且类型相同", e);
+                        }
+                    });
         }
     }
 

@@ -2,6 +2,7 @@ package com.superkele.demo.test.processor_mapping_handler;
 
 
 import com.superkele.demo.EasyTranslationDemoApplication;
+import com.superkele.demo.processor_mapping_handler.DictVo;
 import com.superkele.demo.processor_mapping_handler.Order;
 import com.superkele.demo.processor_mapping_handler.Sku;
 import com.superkele.translation.annotation.TranslationExecute;
@@ -30,8 +31,6 @@ import java.util.stream.IntStream;
 @Slf4j
 public class MappingHandlerMappingProcessTest {
 
-    @Autowired
-    private DefaultTranslationProcessor defaultTranslationProcessor;
 
     @Autowired
     private Service service;
@@ -61,6 +60,15 @@ public class MappingHandlerMappingProcessTest {
         });
     }
 
+    /**
+     * 测试 多mapper参数下 多对多映射器的调用
+     */
+    @Test
+    public void testMultiMapper_ManyToManyMappingHandler() {
+        DictVo dict = service.getDict();
+        System.out.println(dict);
+        Assert.assertNotNull(dict.getDictValue());
+    }
 
 
     @Component
@@ -88,6 +96,14 @@ public class MappingHandlerMappingProcessTest {
                         return order;
                     })
                     .collect(Collectors.toList());
+        }
+
+        @TranslationExecute(type = DictVo.class)
+        public DictVo getDict() {
+            DictVo dictVo = new DictVo();
+            dictVo.setDictType("sex");
+            dictVo.setDictCode(0);
+            return dictVo;
         }
     }
 }

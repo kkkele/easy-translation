@@ -39,6 +39,9 @@ public class ManyToManyMappingHandler extends ReduceParamMappingHandler {
     protected Object map(Object processedResult, Object[] mapperKey) {
         Object res = processedResult;
         for (Object key : mapperKey) {
+            if (res == null){
+                return null;
+            }
             Map map = (Map) res;
             res = map.get(key);
         }

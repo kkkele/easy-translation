@@ -17,6 +17,6 @@ public class Sku {
 
     private Integer spuId;
 
-    @Mapping(translator = "getSpuByIds", after = "sales", mappingHandler = TranslationConstant.MANY_TO_MANY_MAPPING_HANDLER, mapper = "spuId:id", receive = "spuName")
+    @Mapping(translator = "getSpuByIds",async = true ,after = "sales", mappingHandler = TranslationConstant.MANY_TO_MANY_MAPPING_HANDLER, mapper = "spuId:id", receive = "spuName")
     private String spuName;
 }
