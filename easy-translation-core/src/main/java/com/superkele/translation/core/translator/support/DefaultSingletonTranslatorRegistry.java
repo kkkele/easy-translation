@@ -13,11 +13,11 @@ public class DefaultSingletonTranslatorRegistry implements SingletonTranslatorRe
 
     @Override
     public Translator getSingleton(String translatorName) {
-        return null;
+        return singletonTranslatorCache.get(translatorName);
     }
 
     @Override
     public void addSingleton(String translatorName, Translator translator) {
-
+        singletonTranslatorCache.put(translatorName, translator);
     }
 }
