@@ -3,6 +3,7 @@ package com.superkele.demo.test.processor_mapping_handler;
 
 import com.superkele.demo.EasyTranslationDemoApplication;
 import com.superkele.demo.processor_mapping_handler.DictVo;
+import com.superkele.demo.processor_mapping_handler.DictVo2;
 import com.superkele.demo.processor_mapping_handler.Order;
 import com.superkele.demo.processor_mapping_handler.Sku;
 import com.superkele.translation.annotation.TranslationExecute;
@@ -68,6 +69,11 @@ public class MappingHandlerMappingProcessTest {
         DictVo dict = service.getDict();
         System.out.println(dict);
         Assert.assertNotNull(dict.getDictValue());
+        List<DictVo2> dictList = service.getDictList();
+        dictList.forEach(dictVo2 -> {
+            System.out.println(dictVo2);
+            Assert.assertNotNull(dictVo2.getDictValue());
+        });
     }
 
 
@@ -104,6 +110,18 @@ public class MappingHandlerMappingProcessTest {
             dictVo.setDictType("sex");
             dictVo.setDictCode(0);
             return dictVo;
+        }
+
+        @TranslationExecute(type = DictVo2.class)
+        public List<DictVo2> getDictList() {
+            return IntStream.range(1, 10)
+                    .mapToObj(i -> {
+                        DictVo2 dictVo = new DictVo2();
+                        dictVo.setDictType(new Random().nextBoolean() ? "sex" : "status");
+                        dictVo.setDictCode(new Random().nextInt(2));
+                        return dictVo;
+                    })
+                    .collect(Collectors.toList());
         }
     }
 }

@@ -12,11 +12,11 @@ public class DictVo {
 
     private Integer dictCode;
 
-    @Mapping(translator = "getDictValue",mapper = {"dictCode","dictType"})
+    @Mapping(translator = "getDictValue", mapper = {"dictType", "dictCode"})
     private String dictValue;
 
     @Translator("getDictValue")
-    public static String convertToValue(@TransMapper String dictType,@TransMapper Integer dictCode) {
+    public static String convertToValue(@TransMapper String dictType, @TransMapper Integer dictCode) {
         switch (dictType) {
             case "sex":
                 switch (dictCode) {

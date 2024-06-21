@@ -74,7 +74,7 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
 
     @Override
     public void handle(boolean asyncProcessList) {
-        FieldTranslationEvent[] sortEvents = this.fieldTranslation.getSortEvents();
+        FieldTranslationEvent[] sortEvents = this.getFieldTranslation().getSortEvents();
         //顺序执行事件
         CompletableFuture[] tasks = Arrays.stream(sortEvents)
                 .map(sortEvent -> {

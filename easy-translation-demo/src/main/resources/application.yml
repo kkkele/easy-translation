@@ -1,7 +1,6 @@
 easy-translation:
-  debug: true
+  debug: false
 logging:
   level:
     com.superkele: debug
-
 

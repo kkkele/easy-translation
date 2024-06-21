@@ -41,11 +41,6 @@ public class RefTranslationMappingProcessTest {
         Assert.assertNotNull(child.getTypeName());
     }
 
-    @Test
-    public void testManyToManyMappingHandler() {
-
-    }
-
     private void process(Object obj) {
         log.info("beforeProcess:{}", obj);
         processor.process(obj);
