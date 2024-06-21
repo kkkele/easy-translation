@@ -1,7 +1,5 @@
 package com.superkele.translation.core.mapping.support;
 
-import com.superkele.translation.core.property.PropertyHandler;
-
 import java.util.List;
 import java.util.stream.Collectors;
 

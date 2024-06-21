@@ -94,7 +94,7 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
             event.setMapper(mapper);
             event.setReceive(mapping.receive());
             event.setMapperOriginField(mapperOriginField);
-            String mappingHandler = Optional.ofNullable(mapping.mappingHandler())
+            String mappingHandler = Optional.ofNullable(mapping.mappingHandler().value())
                     .filter(StrUtil::isNotBlank)
                     .orElse(TranslationConstant.DEFAULT_MAPPING_HANDLER);
             event.setMappingHandler(getMappingHandler(mappingHandler));
