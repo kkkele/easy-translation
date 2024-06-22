@@ -3,6 +3,7 @@ package com.superkele.translation.core.metadata;
 import com.superkele.translation.annotation.NullPointerExceptionHandler;
 import com.superkele.translation.annotation.RefTranslation;
 import com.superkele.translation.core.mapping.MappingHandler;
+import com.superkele.translation.core.translator.Translator;
 import lombok.Data;
 
 
@@ -21,6 +22,8 @@ public class FieldTranslationEvent {
      * 翻译器名称
      */
     private String translator;
+
+    private TranslationResDesc translationResDesc;
 
     /**
      * 用于映射的处理器
@@ -48,12 +51,12 @@ public class FieldTranslationEvent {
      * 具体的分割方法，可以通过设置config来配置
      * @see com.superkele.translation.core.config.Config#mapperSplitExecutor
      */
-    private String[] mapperOriginField;
+    private String[] groupKey;
 
     /**
      * 映射的字段
      */
-    private String[] mapper;
+    private MapperDesc[] mapper;
 
     /**
      * 其他字段

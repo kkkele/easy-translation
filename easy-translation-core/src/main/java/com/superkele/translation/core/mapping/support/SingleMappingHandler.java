@@ -1,3 +1,4 @@
+/*
 package com.superkele.translation.core.mapping.support;
 
 import cn.hutool.core.util.StrUtil;
@@ -9,14 +10,14 @@ import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.util.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+*/
 /**
  * 单映射处理器
- */
+ *//*
+
 public abstract class SingleMappingHandler implements MappingHandler {
 
     @Override
@@ -52,7 +53,7 @@ public abstract class SingleMappingHandler implements MappingHandler {
             cache.put(cacheUnique, mappingValue);
         }
         Optional.ofNullable(mappingValue)
-                .map(val -> processMappingValue(val, event.getMapperOriginField()))
+                .map(val -> processMappingValue(val, event.getGroupKey()))
                 .map(val -> map(val, mapperKey))
                 .map(val -> getPropertyHandler().invokeGetter(val, event.getReceive()))
                 .ifPresent(val -> getPropertyHandler().invokeSetter(source, event.getPropertyName(), val));
@@ -90,20 +91,15 @@ public abstract class SingleMappingHandler implements MappingHandler {
         }
     }
 
-    @Override
-    public Object handleBatch(List<Object> collection, FieldTranslationEvent event, Translator translator, Map<String, Object> cache) {
-        return collection.stream()
-                .map(obj -> handle(obj, event, translator, cache))
-                .collect(Collectors.toList());
-    }
 
-
-    /**
+    */
+/**
      * 单个处理映射参数
      *
      * @param params 处理元素的item的mapperKey组成了params
      * @return
-     */
+     *//*
+
     protected abstract Object[] processMapperKey(Object[] params);
 
     protected abstract Object processMappingValue(Object originValue, String[] originMapperField);
@@ -112,3 +108,4 @@ public abstract class SingleMappingHandler implements MappingHandler {
 
 
 }
+*/

@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 默认实现
+ * ParamHandler默认实现
  */
 public class DefaultParamHandler implements ParamHandler<Object, Object> {
 

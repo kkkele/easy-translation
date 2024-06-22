@@ -13,6 +13,7 @@ import java.util.Map;
  * 具有批处理能力的MappingHandler可以在处理集合时聚合所有对象的mapper参数列表，然后对结果进行映射
  * 不具有批处理能力的MappingHandler在处理集合时，会对每个对象进行单独的翻译，当然，它也具有改变参数形式和结果处理的能力
  * 它将被AbstractFieldTranslationHandler调用控制，所以无需关心是如何做到批处理的。
+ *
  * @see com.superkele.translation.core.processor.support.AbstractFieldTranslationHandler
  */
 public interface MappingHandler {
@@ -36,7 +37,7 @@ public interface MappingHandler {
      * @param translator
      * @return
      */
-    default Object handleBatch(List<Object> collection, FieldTranslationEvent event, Translator translator) {
+    default Object handleBatch(ParamHandler paramHandler, ResultHandler resultHandler, List<Object> collection, FieldTranslationEvent event, Translator translator) {
         return handleBatch(collection, event, translator, null);
     }
 

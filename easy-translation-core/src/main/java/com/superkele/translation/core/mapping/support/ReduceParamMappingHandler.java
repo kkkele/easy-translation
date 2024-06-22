@@ -1,7 +1,7 @@
+/*
 package com.superkele.translation.core.mapping.support;
 
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
-import com.superkele.translation.core.property.PropertyHandler;
 import com.superkele.translation.core.translator.Translator;
 
 import java.util.Collections;
@@ -10,9 +10,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+*/
 /**
  * 聚集参数 映射处理器
- */
+ *//*
+
 public abstract class ReduceParamMappingHandler extends SingleMappingHandler {
 
     @Override
@@ -42,7 +44,7 @@ public abstract class ReduceParamMappingHandler extends SingleMappingHandler {
             cache.put(event.getCacheKey(), mappingValue);
         }
         Optional.ofNullable(mappingValue)
-                .map(val -> processMappingValue(val, event.getMapperOriginField()))
+                .map(val -> processMappingValue(val, event.getGroupKey()))
                 .ifPresent(result -> {
                     for (int i = 0; i < sourceCollection.size(); i++) {
                         Object source = sourceCollection.get(i);
@@ -66,12 +68,14 @@ public abstract class ReduceParamMappingHandler extends SingleMappingHandler {
         return handleBatch(sourceCollection, event, translator, null);
     }
 
-    /**
+    */
+/**
      * 批量处理映射参数
      *
      * @param params 列表元素为mapperKey,每个处理元素的item的mapperKey组成了params
      * @return
-     */
+     *//*
+
     protected abstract Object[] processMapperKeyBatch(List<Object[]> params);
 
     @Override
@@ -84,3 +88,4 @@ public abstract class ReduceParamMappingHandler extends SingleMappingHandler {
         return true;
     }
 }
+*/

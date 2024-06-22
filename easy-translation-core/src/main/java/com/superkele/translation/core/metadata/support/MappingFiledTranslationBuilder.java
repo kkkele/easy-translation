@@ -13,7 +13,6 @@ import com.superkele.translation.core.mapping.MappingHandler;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
-import com.superkele.translation.core.property.PropertyHandler;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.ReflectUtils;
@@ -91,9 +90,10 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
                     mapperOriginField[i] = split[1];
                 }
             }
-            event.setMapper(mapper);
+            //todo
+          //  event.setMapper(mapper);
             event.setReceive(mapping.receive());
-            event.setMapperOriginField(mapperOriginField);
+            event.setGroupKey(mapperOriginField);
             String mappingHandler = Optional.ofNullable(mapping.mappingHandler().value())
                     .filter(StrUtil::isNotBlank)
                     .orElse(TranslationConstant.DEFAULT_MAPPING_HANDLER);

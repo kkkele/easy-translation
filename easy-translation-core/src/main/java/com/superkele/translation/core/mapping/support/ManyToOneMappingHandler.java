@@ -1,3 +1,4 @@
+/*
 package com.superkele.translation.core.mapping.support;
 
 import java.util.List;
@@ -30,3 +31,4 @@ public class ManyToOneMappingHandler extends ReduceParamMappingHandler {
     }
 
 }
+*/

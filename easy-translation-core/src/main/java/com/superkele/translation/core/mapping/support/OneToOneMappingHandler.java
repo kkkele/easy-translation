@@ -1,3 +1,4 @@
+/*
 package com.superkele.translation.core.mapping.support;
 
 
@@ -20,3 +21,4 @@ public class OneToOneMappingHandler extends SingleMappingHandler {
         return processedResult;
     }
 }
+*/
