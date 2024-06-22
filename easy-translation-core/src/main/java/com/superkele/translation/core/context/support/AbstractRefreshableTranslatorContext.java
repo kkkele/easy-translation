@@ -1,7 +1,7 @@
 package com.superkele.translation.core.context.support;
 
 import com.superkele.translation.core.invoker.InvokeBeanFactory;
-import com.superkele.translation.core.translator.definition.ConfigurableTranslatorFactory;
+import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.support.DefaultTranslatorFactory;
 
 public abstract class AbstractRefreshableTranslatorContext extends AbstractTranslatorContext {
@@ -22,7 +22,7 @@ public abstract class AbstractRefreshableTranslatorContext extends AbstractTrans
     protected abstract InvokeBeanFactory getInvokeBeanFactory();
 
     @Override
-    public ConfigurableTranslatorFactory getTranslatorFactory() {
+    public ConfigurableTranslatorDefinitionFactory getTranslatorFactory() {
         return translatorFactory;
     }
 

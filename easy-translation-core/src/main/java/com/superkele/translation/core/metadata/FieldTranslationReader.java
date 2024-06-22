@@ -2,7 +2,7 @@ package com.superkele.translation.core.metadata;
 
 public interface FieldTranslationReader {
 
-    FieldTranslationRegister getRegister();
+    FieldTranslationRegistry getRegister();
 
-    void load(String[] basePath, String[] excludePath);
+    void load(String[] basePath);
 }

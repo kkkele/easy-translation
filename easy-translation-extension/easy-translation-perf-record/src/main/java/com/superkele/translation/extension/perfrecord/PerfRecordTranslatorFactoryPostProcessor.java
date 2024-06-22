@@ -3,7 +3,7 @@ package com.superkele.translation.extension.perfrecord;
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.core.decorator.TranslatorDecorator;
 import com.superkele.translation.core.translator.Translator;
-import com.superkele.translation.core.translator.definition.ConfigurableTranslatorFactory;
+import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.util.LogUtils;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 @Slf4j
 public class PerfRecordTranslatorFactoryPostProcessor implements TranslatorFactoryPostProcessor {
     @Override
-    public void postProcess(ConfigurableTranslatorFactory factory) {
+    public void postProcess(ConfigurableTranslatorDefinitionFactory factory) {
         Arrays.stream(factory.getTranslatorNames())
                 .forEach(translatorName -> {
                     TranslatorDefinition translatorDefinition = factory.findTranslatorDefinition(translatorName);

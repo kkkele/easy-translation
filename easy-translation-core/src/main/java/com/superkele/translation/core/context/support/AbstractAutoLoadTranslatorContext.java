@@ -2,7 +2,7 @@ package com.superkele.translation.core.context.support;
 
 
 import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.translator.definition.ConfigurableTranslatorFactory;
+import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 import com.superkele.translation.core.translator.support.DefaultTranslatorFactory;
@@ -25,7 +25,7 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
     }
 
     @Override
-    protected void loadTranslatorPostProcessors(ConfigurableTranslatorFactory translatorFactory) {
+    protected void loadTranslatorPostProcessors(ConfigurableTranslatorDefinitionFactory translatorFactory) {
         translatorPostProcessors.forEach(translatorFactory::addTranslatorPostProcessor);
     }
 
@@ -36,7 +36,7 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
     }
 
     @Override
-    protected void invokeTranslatorFactoryPostProcessors(ConfigurableTranslatorFactory translatorFactory) {
+    protected void invokeTranslatorFactoryPostProcessors(ConfigurableTranslatorDefinitionFactory translatorFactory) {
         addFirstTranslatorFactoryPostProcessor(new ExecutorParamInvokeFactoryPostProcessor());
         for (TranslatorFactoryPostProcessor translatorFactoryPostProcessor : translatorFactoryPostProcessors) {
             translatorFactoryPostProcessor.postProcess(translatorFactory);

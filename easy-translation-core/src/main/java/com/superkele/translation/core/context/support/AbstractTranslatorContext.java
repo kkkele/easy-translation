@@ -2,7 +2,7 @@ package com.superkele.translation.core.context.support;
 
 import com.superkele.translation.core.context.ConfigurableTranslatorContext;
 import com.superkele.translation.core.translator.Translator;
-import com.superkele.translation.core.translator.definition.ConfigurableTranslatorFactory;
+import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.util.LogUtils;
 
 import java.util.Arrays;
@@ -15,8 +15,8 @@ public abstract class AbstractTranslatorContext implements ConfigurableTranslato
     public void refresh() {
         //创建TranslatorFactory,并加载TranslatorDefinition
         refreshTranslatorFactory();
-        //获取translatorFactor
-        ConfigurableTranslatorFactory translatorFactory = getTranslatorFactory();
+        //获取translatorFactory
+        ConfigurableTranslatorDefinitionFactory translatorFactory = getTranslatorFactory();
         //在translator正式转载前，对translatorFactory进行一些初始化操作
         invokeTranslatorFactoryPostProcessors(translatorFactory);
         //装载translatorPostProcessor
@@ -25,7 +25,7 @@ public abstract class AbstractTranslatorContext implements ConfigurableTranslato
         loadTranslators(translatorFactory);
     }
 
-    protected void loadTranslators(ConfigurableTranslatorFactory translatorFactory) {
+    protected void loadTranslators(ConfigurableTranslatorDefinitionFactory translatorFactory) {
         Arrays.stream(translatorFactory.getTranslatorNames())
                 .map(translatorName -> {
                     try {
@@ -39,10 +39,10 @@ public abstract class AbstractTranslatorContext implements ConfigurableTranslato
                 });
     }
 
-    protected abstract void loadTranslatorPostProcessors(ConfigurableTranslatorFactory translatorFactory);
+    protected abstract void loadTranslatorPostProcessors(ConfigurableTranslatorDefinitionFactory translatorFactory);
 
 
-    protected abstract void invokeTranslatorFactoryPostProcessors(ConfigurableTranslatorFactory translatorFactory);
+    protected abstract void invokeTranslatorFactoryPostProcessors(ConfigurableTranslatorDefinitionFactory translatorFactory);
 
     protected abstract void refreshTranslatorFactory();
 
@@ -56,5 +56,5 @@ public abstract class AbstractTranslatorContext implements ConfigurableTranslato
         return getTranslatorFactory().containsTranslator(name);
     }
 
-    public abstract ConfigurableTranslatorFactory getTranslatorFactory();
+    public abstract ConfigurableTranslatorDefinitionFactory getTranslatorFactory();
 }

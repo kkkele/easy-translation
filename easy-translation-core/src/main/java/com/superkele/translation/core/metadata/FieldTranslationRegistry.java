@@ -1,6 +1,7 @@
 package com.superkele.translation.core.metadata;
 
-public interface FieldTranslationRegister {
+public interface FieldTranslationRegistry {
 
     void register(Class<?> clazz,boolean isJsonSerialize, FieldTranslation fieldTranslation);
+
 }
