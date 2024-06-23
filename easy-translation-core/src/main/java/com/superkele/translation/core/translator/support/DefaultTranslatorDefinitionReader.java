@@ -9,11 +9,13 @@ import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.convert.MethodConvert;
 import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.invoker.enums.TranslatorType;
+import com.superkele.translation.core.metadata.ParamDesc;
 import com.superkele.translation.core.translator.MapperTranslator;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
 import com.superkele.translation.core.util.Assert;
+import org.apache.commons.lang3.reflect.MethodUtils;
 
 import java.lang.invoke.LambdaConversionException;
 import java.lang.invoke.MethodHandle;
@@ -22,14 +24,12 @@ import java.util.*;
 
 public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinitionReader {
 
-    private final Map<Class<? extends BeanNameResolver>, BeanNameResolver> singleton = new HashMap<>();
-
     private static final Config CONFIG = Config.INSTANCE;
+    private final Map<Class<? extends BeanNameResolver>, BeanNameResolver> singleton = new HashMap<>();
 
     public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry) {
         super(registry);
     }
-
 
 
     @Override
@@ -71,7 +71,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         translatorDefinition.setTranslatorType(TranslatorType.ENUM);
         translatorDefinition.setInvokeBeanClazz(enumClass);
         translatorDefinition.setReturnType(mappedField.getType());
-        translatorDefinition.setParameterTypes(new Class[]{declaredFields[mapperIndex].getType()});
+        translatorDefinition.setParameterTypes(new ParamDesc[]{new ParamDesc(declaredFields[mapperIndex].getType(),null)});
         translatorDefinition.setTranslatorClass(MapperTranslator.class);
         translatorDefinition.setTranslateDecorator(x -> x);
         translatorDefinition.setMapperIndex(new int[1]);
@@ -95,7 +95,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         TranslatorDefinition definition = new TranslatorDefinition();
         definition.setMethodHandle(methodHandle);
         definition.setReturnType(method.getReturnType());
-        definition.setParameterTypes(method.getParameterTypes());
+        definition.setParameterTypes(buildParamDesc(method));
         definition.setTranslatorClass(translatorClazz);
         definition.setMapperIndex(getIndexPair(method));
         definition.setTranslatorType(TranslatorType.STATIC_METHOD);
@@ -135,7 +135,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         });
         TranslatorDefinition definition = new TranslatorDefinition();
         definition.setReturnType(method.getReturnType());
-        definition.setParameterTypes(method.getParameterTypes());
+        definition.setParameterTypes(buildParamDesc(method));
         definition.setTranslatorClass(translatorClazz);
         definition.setMapperIndex(getIndexPair(method));
         definition.setMethodHandle(methodHandle);
@@ -163,5 +163,31 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         return mapperIndexList.stream().mapToInt(Integer::intValue).toArray();
     }
 
+    public ParamDesc[] buildParamDesc(Method method) {
+        Type[] genericParameterTypes = method.getGenericParameterTypes();
+        return Arrays.stream(genericParameterTypes)
+                .map(type -> {
+                    ParamDesc paramDesc = new ParamDesc();
+                    if (type instanceof ParameterizedType) {
+                        ParameterizedType parameterizedType = (ParameterizedType) type;
+                        paramDesc.setTargetClass(searchForClass(parameterizedType.getRawType().getTypeName()));
+                        paramDesc.setTypes(Arrays.stream(parameterizedType.getActualTypeArguments())
+                                .map(t -> searchForClass(t.getTypeName()))
+                                .toArray(Class[]::new));
+                    } else {
+                        paramDesc.setTargetClass(searchForClass(type.getTypeName()));
+                    }
+                    return paramDesc;
+                })
+                .toArray(ParamDesc[]::new);
+    }
+
+    public Class<?> searchForClass(String className) {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            return Object.class;
+        }
+    }
 
 }

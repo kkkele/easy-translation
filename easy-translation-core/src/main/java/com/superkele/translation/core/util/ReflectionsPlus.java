@@ -26,18 +26,18 @@ public class ReflectionsPlus extends Reflections {
         super(configuration);
     }
 
-    public static ReflectionsPlus getReflectionsPlus(String... locations) {
+    public static ReflectionsPlus getReflectionsPlus(List<ScannerEnum> scanners, String... locations) {
         ReflectionsPlus reflections = new ReflectionsPlus(new ConfigurationBuilder()
                 .setUrls(Arrays.stream(locations)
                         .map(ClasspathHelper::forPackage)
                         .flatMap(Collection::stream)
                         .distinct()
                         .collect(Collectors.toList()))
-                .setScanners(new MethodMergedAnnotationsScanner(),
-                        new FieldMergedAnnotationsScanner(),
-                        new SubTypesScanner(),
-                        new TypeMergedAnnotationsScanner(),
-                        new TypeAnnotationsScanner())
+                .setScanners(
+                        scanners.stream()
+                                .map(scannerEnum -> scannerEnum.scanner.get())
+                                .toArray(Scanner[]::new)
+                )
         );
         return reflections;
     }

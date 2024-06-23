@@ -92,12 +92,12 @@ public class MappingFiledTranslationBuilder implements FieldTranslationBuilder {
             }
             //todo
           //  event.setMapper(mapper);
-            event.setReceive(mapping.receive());
+/*            event.setReceive(mapping.receive());
             event.setGroupKey(mapperOriginField);
             String mappingHandler = Optional.ofNullable(mapping.mappingHandler().value())
                     .filter(StrUtil::isNotBlank)
                     .orElse(TranslationConstant.DEFAULT_MAPPING_HANDLER);
-            event.setMappingHandler(getMappingHandler(mappingHandler));
+            event.setMappingHandler(getMappingHandler(mappingHandler));*/
             event.setNullPointerExceptionHandler(Singleton.get(mapping.nullPointerHandler()));
             fieldNameEventMap.put(field.getName(), event);
             String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());

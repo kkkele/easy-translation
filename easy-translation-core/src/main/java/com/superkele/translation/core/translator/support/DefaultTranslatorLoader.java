@@ -1,10 +1,12 @@
 package com.superkele.translation.core.translator.support;
 
+import cn.hutool.core.collection.ListUtil;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.superkele.translation.annotation.Translation;
 import com.superkele.translation.core.translator.definition.TranslatorLoader;
 import com.superkele.translation.core.util.ReflectionsPlus;
+import com.superkele.translation.core.util.ScannerEnum;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -23,7 +25,7 @@ public class DefaultTranslatorLoader implements TranslatorLoader {
 
     @Override
     public Map<Class<?>, Set<Method>> getTranslator(String location) {
-        ReflectionsPlus reflections = ReflectionsPlus.getReflectionsPlus(location);
+        ReflectionsPlus reflections = ReflectionsPlus.getReflectionsPlus(ListUtil.of(ScannerEnum.METHOD,ScannerEnum.TYPE),location);
         //装载枚举
         Set<Class<?>> enumClazzSet = reflections.getTypesMergedAnnotatedWith(Translation.class,false);
         //装载方法

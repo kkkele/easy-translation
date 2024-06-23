@@ -2,6 +2,7 @@ package com.superkele.translation.core.translator.support;
 
 import cn.hutool.core.convert.Convert;
 import com.superkele.translation.core.exception.TranslationException;
+import com.superkele.translation.core.metadata.ParamDesc;
 import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
@@ -19,23 +20,26 @@ public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactor
         for (String translatorName : translatorNames) {
             TranslatorDefinition definition = factory.findTranslatorDefinition(translatorName);
             int[] mapperIndex = definition.getMapperIndex();
-            Class<?>[] parameterTypes = definition.getParameterTypes();
-            int[] otherIndex = new int[parameterTypes.length - mapperIndex.length];
-            boolean[] flag = new boolean[parameterTypes.length];
+            ParamDesc[] parameterDescs = definition.getParameterTypes();
+            int[] otherIndex = new int[parameterDescs.length - mapperIndex.length];
+            boolean[] flag = new boolean[parameterDescs.length];
             for (int index : mapperIndex) {
                 flag[index] = true;
             }
             int i = 0;
             int j = 0;
-            while (i < parameterTypes.length) {
+            while (i < parameterDescs.length) {
                 if (!flag[i]) {
                     otherIndex[j++] = i;
                 }
                 i++;
             }
+            Class[] paramTypes = Arrays.stream(parameterDescs)
+                    .map(ParamDesc::getTargetClass)
+                    .toArray(Class[]::new);
             definition.setTranslateDecorator(translator ->
                     args -> {
-                        Object[] reWrapper = reWrapper(args, mapperIndex, otherIndex, parameterTypes);
+                        Object[] reWrapper = reWrapper(args, mapperIndex, otherIndex, paramTypes);
                         try {
                             return translator.doTranslate(reWrapper);
                         } catch (ClassCastException e) {

@@ -2,6 +2,7 @@ package com.superkele.translation.annotation;
 
 
 import com.superkele.translation.annotation.constant.DefaultNullPointerExceptionHandler;
+import com.superkele.translation.annotation.constant.MappingStrategy;
 import com.superkele.translation.annotation.constant.TranslateTiming;
 
 import java.lang.annotation.*;
@@ -44,6 +45,11 @@ public @interface Mapping {
      * 执行时机
      */
     TranslateTiming timing() default TranslateTiming.AFTER_RETURN;
+
+    /**
+     * 映射策略，是单个处理还是批量处理
+     */
+    MappingStrategy strategy() default MappingStrategy.SINGLE_MAPPING;
 
     /**
      * <p>用户使用该mappingHandler字段控制映射器

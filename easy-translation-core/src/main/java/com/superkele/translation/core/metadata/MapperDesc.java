@@ -9,4 +9,8 @@ public class MapperDesc {
     private String mapper;
 
     private Class<?> sourceClass;
+
+    private Class<?> targetClass;
+
+    private Class<?>[] types;
 }

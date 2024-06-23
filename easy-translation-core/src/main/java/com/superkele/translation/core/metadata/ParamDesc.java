@@ -1,14 +1,18 @@
 package com.superkele.translation.core.metadata;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class TranslationResDesc {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ParamDesc {
 
 
     /**
-     * 返回类型
+     * 参数类型
      */
     private Class<?> targetClass;
 

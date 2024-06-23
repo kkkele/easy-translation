@@ -2,8 +2,8 @@ package com.superkele.translation.core.metadata;
 
 import com.superkele.translation.annotation.NullPointerExceptionHandler;
 import com.superkele.translation.annotation.RefTranslation;
+import com.superkele.translation.annotation.constant.MappingStrategy;
 import com.superkele.translation.core.mapping.MappingHandler;
-import com.superkele.translation.core.translator.Translator;
 import lombok.Data;
 
 
@@ -23,12 +23,15 @@ public class FieldTranslationEvent {
      */
     private String translator;
 
-    private TranslationResDesc translationResDesc;
+    /**
+     * 翻译器各方法参数desc
+     */
+    private ParamDesc[] translationDesc;
 
     /**
-     * 用于映射的处理器
+     * tubs个策略
      */
-    private MappingHandler mappingHandler;
+    private MappingStrategy mappingStrategy;
 
     /**
      * 属性名称
@@ -49,6 +52,7 @@ public class FieldTranslationEvent {
      * 映射字段对应的类的属性
      * 例如：@Mapping中将 mapper="stuId:id" 则mapper=“stuId",mapperOriginField="id",如果是从一个结果集中以属性分组时，将会使用该字段
      * 具体的分割方法，可以通过设置config来配置
+     *
      * @see com.superkele.translation.core.config.Config#mapperSplitExecutor
      */
     private String[] groupKey;

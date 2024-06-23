@@ -12,6 +12,9 @@ public enum MappingStrategy {
      * 批量处理
      */
     BATCH_MAPPING,
-    ELSE;
+    /**
+     * 自定义处理
+     */
+    DIY;
 
 }

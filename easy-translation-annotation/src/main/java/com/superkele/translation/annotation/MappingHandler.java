@@ -7,7 +7,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface MappingHandler {
-    String value() default "";
 
     String[] groupKey() default {};
 

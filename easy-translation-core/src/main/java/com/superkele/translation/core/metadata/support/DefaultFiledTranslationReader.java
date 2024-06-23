@@ -1,11 +1,13 @@
 package com.superkele.translation.core.metadata.support;
 
+import cn.hutool.core.collection.ListUtil;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
 import com.superkele.translation.core.metadata.FieldTranslationReader;
 import com.superkele.translation.core.metadata.FieldTranslationRegistry;
 import com.superkele.translation.core.util.ReflectionsPlus;
+import com.superkele.translation.core.util.ScannerEnum;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -29,7 +31,7 @@ public class DefaultFiledTranslationReader implements FieldTranslationReader {
 
     @Override
     public void load(String[] basePath) {
-        ReflectionsPlus reflectionsPlus = ReflectionsPlus.getReflectionsPlus();
+        ReflectionsPlus reflectionsPlus = ReflectionsPlus.getReflectionsPlus(ListUtil.of(ScannerEnum.FILED),basePath);
         Set<Field> fieldsMergedAnnotatedWith = reflectionsPlus.getFieldsMergedAnnotatedWith(Mapping.class);
         Set<Class<?>> clazzSet = new HashSet<>();
         fieldsMergedAnnotatedWith.forEach(field -> {

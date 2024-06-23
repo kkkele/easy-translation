@@ -21,7 +21,7 @@ public class DefaultParamHandler implements ParamHandler<Object, Object> {
         if (targetClazz.isArray()) {
             Class<?> componentType = targetClazz.getComponentType();
             Object array = Array.newInstance(componentType, 1);
-            if (sourceClazz.isAssignableFrom(componentType)) {
+            if (param == null || sourceClazz.isAssignableFrom(componentType)) {
                 Array.set(array, 0, param);
             } else {
                 Array.set(array, 0, Convert.convert(componentType, param));
@@ -56,7 +56,7 @@ public class DefaultParamHandler implements ParamHandler<Object, Object> {
      */
     private Object predictAndProcess(Object param, Class[] types) {
         if (types != null && types.length > 0 && param != null) {
-            if (!types[0].isInstance(param)) {
+            if (param != null && !types[0].isInstance(param)) {
                 param = Convert.convert(types[0], param);
             }
         }
