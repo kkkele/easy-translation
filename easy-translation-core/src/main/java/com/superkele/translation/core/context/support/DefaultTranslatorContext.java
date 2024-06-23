@@ -1,6 +1,5 @@
 package com.superkele.translation.core.context.support;
 
-import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.invoker.InvokeBeanFactory;
 
 /**
@@ -13,22 +12,11 @@ public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext 
 
     private InvokeBeanFactory invokeBeanFactory;
 
-    public DefaultTranslatorContext() {
-    }
 
-    public DefaultTranslatorContext(String[] basePackages, InvokeBeanFactory invokeBeanFactory) {
+    public DefaultTranslatorContext(InvokeBeanFactory invokeBeanFactory,String... basePackages) {
         this.basePackages = basePackages;
         this.invokeBeanFactory = invokeBeanFactory;
-    }
-
-
-    public DefaultTranslatorContext(String[] basePackages) {
-        this(basePackages, null);
-    }
-
-    @Override
-    public Config getConfig() {
-        return Config.INSTANCE;
+        refresh();
     }
 
 

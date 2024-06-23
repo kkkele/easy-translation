@@ -10,7 +10,7 @@ public @interface MappingHandler {
 
     String[] groupKey() default {};
 
-    String resultResolver() default "";
+    String resultHandler() default "";
 
-    String paramResolver() default "";
+    String paramHandler() default "";
 }

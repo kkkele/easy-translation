@@ -4,6 +4,7 @@ import cn.hutool.core.collection.ListUtil;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
+import com.superkele.translation.core.metadata.support.DefaultConfigurableFieldTranslationFactory;
 import com.superkele.translation.core.thread.ContextPasser;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
@@ -20,14 +21,14 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
      * key：主类
      * value：处理后的，需要翻译的字段
      */
-    private final Map<Class<?>, FieldTranslation> fieldTranslationMap = new ConcurrentHashMap<>();
     private final TranslatorFactory translatorFactory;
+    private final DefaultConfigurableFieldTranslationFactory fieldTranslationFactory;
 
-    protected AsyncableTranslationProcessor(TranslatorFactory translatorFactory) {
+    protected AsyncableTranslationProcessor(TranslatorFactory translatorFactory, DefaultConfigurableFieldTranslationFactory fieldTranslationFactory) {
         this.translatorFactory = translatorFactory;
+        this.fieldTranslationFactory = fieldTranslationFactory;
     }
 
-    protected abstract FieldTranslationBuilder getMappingFieldTranslationBuilder();
 
     @Override
     protected void processInternal(Map<Class, List> classMap, boolean async) {
@@ -37,7 +38,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
             CompletableFuture[] array = classMap.keySet()
                     .stream()
                     .map(clazz -> {
-                        FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
+                        FieldTranslation fieldTranslation = fieldTranslationFactory.get(clazz, false);
                         List list = classMap.get(clazz);
                         return CompletableFuture.runAsync(() -> {
                             contextPassers.forEach(contextPasser -> contextPasser.passContext());
@@ -50,7 +51,7 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
             CompletableFuture.allOf(array).join();
         } else {
             classMap.forEach((clazz, list) -> {
-                FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
+                FieldTranslation fieldTranslation = fieldTranslationFactory.get(clazz, false);
                 OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list, translatorFactory,this);
                 onceFieldTranslationHandler.handle(false);
             });
@@ -61,17 +62,14 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
 
     @Override
     protected void processInternal(Object obj, Class<?> clazz) {
-        FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
+        FieldTranslation fieldTranslation = fieldTranslationFactory.get(clazz, false);
         OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, ListUtil.of(obj), translatorFactory,this);
         onceFieldTranslationHandler.handle(false);
     }
 
     @Override
     protected Boolean predictFilter(Class<?> clazz) {
-        FieldTranslation fieldTranslation = getMappingFieldTranslationBuilder().build(clazz, false);
-        Optional.ofNullable(fieldTranslation)
-                .ifPresent(res -> fieldTranslationMap.put(clazz, res));
-        return fieldTranslationMap.containsKey(clazz);
+        return fieldTranslationFactory.get(clazz, false) != null;
     }
 
     protected List<ContextPasser> buildContextPasser() {

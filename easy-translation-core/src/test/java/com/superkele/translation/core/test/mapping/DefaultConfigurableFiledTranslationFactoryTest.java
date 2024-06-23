@@ -1,8 +1,6 @@
 package com.superkele.translation.core.test.mapping;
 
 import com.superkele.translation.core.metadata.ParamDesc;
-import com.superkele.translation.core.metadata.support.DefaultConfigurableFieldTranslationFactory;
-import com.superkele.translation.core.metadata.support.MappingFiledTranslationBuilder;
 import org.junit.Test;
 
 import java.lang.reflect.Method;

@@ -1,7 +1,6 @@
 package com.superkele.translation.boot.config;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.superkele.translation.boot.config.properties.TranslationProperties;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.config.TranslationAutoConfigurationCustomizer;
@@ -10,7 +9,6 @@ import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 import com.superkele.translation.core.util.LogUtils;
-import com.superkele.translation.extension.serialize.jackson.TranslationJsonNodeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +16,8 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 import java.util.Optional;
 
-@Configuration
 @Slf4j
+@Configuration
 public class EasyTranslationInterceptorConfig {
 
     @Autowired(required = false)
@@ -68,9 +66,9 @@ public class EasyTranslationInterceptorConfig {
     }
 
 
-    @Autowired(required = false)
+/*    @Autowired(required = false)
     public void customizer(ObjectMapper objectMapper, TranslationJsonNodeModule translationFieldSerializeModifier) {
         objectMapper.registerModules(translationFieldSerializeModifier);
-    }
+    }*/
 
 }

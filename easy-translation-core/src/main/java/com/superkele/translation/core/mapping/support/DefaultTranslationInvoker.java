@@ -21,7 +21,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
     @Override
     public void invoke(Object source, Translator translator, TranslationEnvironment environment) {
         FieldTranslationEvent event = environment.getEvent();
-        ParamHandler paramHandler = environment.getParamHandler();
+        ParamHandler paramHandler = event.getParamHandler();
         Map<String, Object> cache = environment.getCache();
         if (!event.isNotNullMapping()) {
             if (PropertyUtils.invokeGetter(source, event.getPropertyName()) != null) {
@@ -74,7 +74,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
             cache.put(cacheUnique, mappingValue);
         }
         //结果处理
-        ResultHandler resultHandler = environment.getResultHandler();
+        ResultHandler resultHandler = event.getResultHandler();
         //处理翻译结果
         Object processedResult = resultHandler.handle(mappingValue, event.getGroupKey(), false);
         //分配结果
@@ -85,7 +85,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
     @Override
     public void invokeBatch(List<Object> sources, Translator translator, TranslationEnvironment environment) {
         FieldTranslationEvent event = environment.getEvent();
-        ParamHandler paramHandler = environment.getParamHandler();
+        ParamHandler paramHandler = event.getParamHandler();
         Map<String, Object> cache = environment.getCache();
         MapperDesc[] mappers = event.getMapper();
         String[] others = event.getOther();
@@ -139,7 +139,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
             cache.put(event.getCacheKey(), mappingValue);
         }
         //结果处理
-        ResultHandler resultHandler = environment.getResultHandler();
+        ResultHandler resultHandler = event.getResultHandler();
         //处理翻译结果
         Object processedResult = resultHandler.handle(mappingValue, event.getGroupKey(), true);
         for (int i = 0; i < sources.size(); i++) {

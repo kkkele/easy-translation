@@ -2,8 +2,12 @@ package com.superkele.translation.core.processor.support;
 
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.util.StrUtil;
+import com.superkele.translation.annotation.constant.MappingStrategy;
 import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.mapping.MappingHandler;
+import com.superkele.translation.core.mapping.TranslationInvoker;
+import com.superkele.translation.core.mapping.support.DefaultTranslationInvoker;
+import com.superkele.translation.core.mapping.support.TranslationEnvironment;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.processor.FieldTranslationHandler;
@@ -31,16 +35,12 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class AbstractFieldTranslationHandler implements FieldTranslationHandler {
 
+    public final TranslationInvoker translatorInvoker = new DefaultTranslationInvoker();
     protected final FieldTranslation fieldTranslation;
-
     protected final List<Object> sources;
-
     private final AtomicInteger[] activeEvents;
-
     private final ReentrantLock[] locks;
-
     private final Set<Pair<Integer, Short>> consumed = new ConcurrentHashSet<>();
-
     private final Map<String, Object> cache = new ConcurrentHashMap<>();
 
     public AbstractFieldTranslationHandler(FieldTranslation fieldTranslation, List<Object> sources) {
@@ -78,8 +78,8 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
         //顺序执行事件
         CompletableFuture[] tasks = Arrays.stream(sortEvents)
                 .map(sortEvent -> {
-                    MappingHandler mappingHandler = sortEvent.getMappingHandler();
-                    if (mappingHandler.waitPreEventWhenBatch()) {
+                    MappingStrategy mappingStrategy = sortEvent.getMappingStrategy();
+                    if (mappingStrategy == MappingStrategy.BATCH_MAPPING) {
                         handleBatch(sortEvent);
                         return null;
                     } else {
@@ -98,19 +98,6 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
     }
 
     public void handleBatch(FieldTranslationEvent event) {
-/*        Pair<Integer, Short> uniqueKey = Pair.of(null, event.getEventValue());
-        if (consumed.contains(uniqueKey)) {
-            return;
-        }
-        locks[sources.size()].lock();
-        try {
-            if (consumed.contains(uniqueKey)) {
-                return;
-            }
-            consumed.add(uniqueKey);
-        } finally {
-            locks[sources.size()].unlock();
-        }*/
         short triggerMask = event.getTriggerMask();
         int totalActived = ~0;
         for (AtomicInteger activeEvent : activeEvents) {
@@ -119,7 +106,10 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
                 return;
             }
         }
-        event.getMappingHandler().handleBatch(sources, event, getTranslatorFactory().findTranslator(event.getTranslator()), cache);
+        TranslationEnvironment translationEnvironment = new TranslationEnvironment();
+        translationEnvironment.setCache(cache);
+        translationEnvironment.setEvent(event);
+        translatorInvoker.invokeBatch(sources, getTranslatorFactory().findTranslator(event.getTranslator()), translationEnvironment);
         for (AtomicInteger activeEvent : activeEvents) {
             activeEvent.updateAndGet(i -> i | event.getEventValue());
         }
@@ -129,8 +119,8 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
             }
         }
         for (FieldTranslationEvent activeEvent : event.getActiveEvents()) {
-            MappingHandler mappingHandler = activeEvent.getMappingHandler();
-            if (mappingHandler.waitPreEventWhenBatch()) {
+            MappingStrategy mappingStrategy = activeEvent.getMappingStrategy();
+            if (mappingStrategy == MappingStrategy.BATCH_MAPPING) {
                 handleBatch(activeEvent);
             } else {
                 for (int i = 0; i < sources.size(); i++) {
@@ -164,7 +154,8 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
                 .filter(activeEvent -> (activeEvents[sourceIndex].get() & activeEvent.getTriggerMask()) == activeEvent.getTriggerMask())
                 .filter(activeEvent -> !consumed.contains(Pair.of(sourceIndex, activeEvent.getEventValue())))
                 .map(activeEvent -> {
-                    if (activeEvent.getMappingHandler().waitPreEventWhenBatch()) {
+                    MappingStrategy mappingStrategy = activeEvent.getMappingStrategy();
+                    if (mappingStrategy == MappingStrategy.BATCH_MAPPING) {
                         handleBatch(activeEvent);
                         return null;
                     } else {
@@ -191,7 +182,10 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
             locks[sourceIndex].unlock();
         }
         if (StrUtil.isNotBlank(event.getTranslator())) {
-            event.getMappingHandler().handle(sources.get(sourceIndex), event, getTranslatorFactory().findTranslator(event.getTranslator()), cache);
+            TranslationEnvironment translationEnvironment = new TranslationEnvironment();
+            translationEnvironment.setCache(cache);
+            translationEnvironment.setEvent(event);
+            translatorInvoker.invoke(sources.get(sourceIndex), getTranslatorFactory().findTranslator(event.getTranslator()), translationEnvironment);
         }
         activeEvents[sourceIndex].updateAndGet(val -> val | event.getEventValue());
         processHook(sourceIndex, event);

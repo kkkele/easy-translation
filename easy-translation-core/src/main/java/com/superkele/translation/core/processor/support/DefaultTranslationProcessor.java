@@ -3,23 +3,15 @@ package com.superkele.translation.core.processor.support;
 
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
+import com.superkele.translation.core.metadata.support.DefaultConfigurableFieldTranslationFactory;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
 
 public class DefaultTranslationProcessor extends AsyncableTranslationProcessor {
 
 
-    private final FieldTranslationBuilder mappingFiledTranslationBuilder;
-
-    public DefaultTranslationProcessor(TranslatorFactory translatorFactory, FieldTranslationBuilder mappingFiledTranslationBuilder) {
-        super(translatorFactory);
-        this.mappingFiledTranslationBuilder = mappingFiledTranslationBuilder;
-    }
-
-
-    @Override
-    protected FieldTranslationBuilder getMappingFieldTranslationBuilder() {
-        return mappingFiledTranslationBuilder;
+    public DefaultTranslationProcessor(TranslatorFactory translatorFactory, DefaultConfigurableFieldTranslationFactory fieldTranslationFactory) {
+        super(translatorFactory, fieldTranslationFactory);
     }
 
     @Override

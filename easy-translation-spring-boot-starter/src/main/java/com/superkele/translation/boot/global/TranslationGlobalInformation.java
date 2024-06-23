@@ -7,17 +7,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class TranslationGlobalInformation {
 
-    private static List<String> packages ;
-
+    private static List<String> packages = new CopyOnWriteArrayList();
 
     public static void addPackage(String... packages) {
-        if (TranslationGlobalInformation.packages == null) {
-            synchronized (TranslationGlobalInformation.class) {
-                if (TranslationGlobalInformation.packages == null) {
-                    TranslationGlobalInformation.packages = new CopyOnWriteArrayList();
-                }
-            }
-        }
         for (String aPackage : packages) {
             TranslationGlobalInformation.packages.add(aPackage);
         }

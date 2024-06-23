@@ -7,6 +7,7 @@ import com.superkele.translation.core.util.LogUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.util.List;
@@ -17,6 +18,9 @@ public class TranslationScanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         Class<?> clazz = bean.getClass();
+        if (clazz.isAnnotationPresent(SpringBootApplication.class)){
+            TranslationGlobalInformation.addPackage(clazz.getPackage().getName());
+        }
         TranslatorScan translatorScan = AnnotatedElementUtils.getMergedAnnotation(clazz, TranslatorScan.class);
         if (translatorScan != null) {
             TranslationGlobalInformation.addPackage(translatorScan.basePackages());

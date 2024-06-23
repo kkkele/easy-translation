@@ -60,15 +60,15 @@
             <artifactId>spring-web</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>io.github.kkkele</groupId>
-            <artifactId>easy-translation-execute-callback</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.github.kkkele</groupId>-->
+<!--            <artifactId>easy-translation-execute-callback</artifactId>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>io.github.kkkele</groupId>
-            <artifactId>easy-translation-jackson-serialize</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.github.kkkele</groupId>-->
+<!--            <artifactId>easy-translation-jackson-serialize</artifactId>-->
+<!--        </dependency>-->
 
     </dependencies>
 

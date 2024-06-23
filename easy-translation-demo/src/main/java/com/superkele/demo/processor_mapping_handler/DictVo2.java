@@ -3,6 +3,7 @@ package com.superkele.demo.processor_mapping_handler;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.MappingHandler;
 import com.superkele.translation.annotation.TransMapper;
+import com.superkele.translation.annotation.constant.MappingStrategy;
 import com.superkele.translation.boot.annotation.Translator;
 import com.superkele.translation.core.constant.TranslationConstant;
 import lombok.Data;
@@ -20,7 +21,7 @@ public class DictVo2 {
     @Mapping(translator = "getDictValues",
             mapper = {"dictType", "dictCode"},
             receive = "dictValue",
-            mappingHandler = @MappingHandler(TranslationConstant.MANY_TO_MANY_MAPPING_HANDLER))
+            strategy = MappingStrategy.BATCH_MAPPING)
     private String dictValue;
 
     @Translator("getDictValues")

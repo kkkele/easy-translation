@@ -27,6 +27,11 @@ public class ReflectionsPlus extends Reflections {
     }
 
     public static ReflectionsPlus getReflectionsPlus(List<ScannerEnum> scanners, String... locations) {
+        List<AbstractScanner> collect = scanners.stream()
+                .map(scannerEnum -> scannerEnum.scanner.get())
+                .collect(Collectors.toList());
+        collect.add(new TypeAnnotationsScanner());
+        collect.add(new SubTypesScanner());
         ReflectionsPlus reflections = new ReflectionsPlus(new ConfigurationBuilder()
                 .setUrls(Arrays.stream(locations)
                         .map(ClasspathHelper::forPackage)
@@ -34,9 +39,7 @@ public class ReflectionsPlus extends Reflections {
                         .distinct()
                         .collect(Collectors.toList()))
                 .setScanners(
-                        scanners.stream()
-                                .map(scannerEnum -> scannerEnum.scanner.get())
-                                .toArray(Scanner[]::new)
+                        collect.stream().toArray(Scanner[]::new)
                 )
         );
         return reflections;

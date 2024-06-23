@@ -3,7 +3,6 @@ package com.superkele.translation.core.mapping.support;
 import com.superkele.translation.core.mapping.ResultHandler;
 import com.superkele.translation.core.util.PropertyUtils;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -15,13 +14,6 @@ import java.util.stream.Collectors;
  * 当然，也存在需要将结果完整分给每一个对象的情况，需要开发者编写类自行处理
  */
 public class DefaultResultHandler implements ResultHandler<Object, Object, Object> {
-
-    public static void main(String[] args) {
-        Object res = new Integer[10];
-        Object[] arr = (Object[]) res;
-        List<Object> list = Arrays.asList(arr);
-        list.forEach(System.out::println);
-    }
 
     @Override
     public Object handle(Object result, String[] groupKey, boolean isBatch) {

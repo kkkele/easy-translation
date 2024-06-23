@@ -77,7 +77,5 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
         translatorFactoryPostProcessors.add(translatorFactoryPostProcessor);
     }
 
-    protected abstract Config getConfig();
-
     protected abstract String[] getBasePackages();
 }
