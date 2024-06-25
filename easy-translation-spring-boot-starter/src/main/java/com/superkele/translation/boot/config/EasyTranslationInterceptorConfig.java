@@ -2,6 +2,7 @@ package com.superkele.translation.boot.config;
 
 
 import com.superkele.translation.boot.config.properties.TranslationProperties;
+import com.superkele.translation.boot.global.TranslationGlobalInformation;
 import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.config.TranslationAutoConfigurationCustomizer;
 import com.superkele.translation.core.context.support.DefaultTranslatorContext;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Configuration
@@ -26,6 +28,10 @@ public class EasyTranslationInterceptorConfig {
                 .ifPresent(p -> {
                     LogUtils.printLog = p.isDebug();
                     LogUtils.debug(log::debug,"debug mode enabled");
+                    Set<String> translator = properties.getBasePackage().getTranslator();
+                    TranslationGlobalInformation.addTranslatorPackage(translator);
+                    Set<String> domain = properties.getBasePackage().getDomain();
+                    TranslationGlobalInformation.addDomainPackage(domain);
                 });
     }
 

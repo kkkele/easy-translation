@@ -19,12 +19,12 @@ public class TranslationScanPostProcessor implements BeanPostProcessor {
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         Class<?> clazz = bean.getClass();
         if (clazz.isAnnotationPresent(SpringBootApplication.class)){
-            TranslationGlobalInformation.addPackage(clazz.getPackage().getName());
+            TranslationGlobalInformation.addTranslatorPackage(clazz.getPackage().getName());
         }
         TranslatorScan translatorScan = AnnotatedElementUtils.getMergedAnnotation(clazz, TranslatorScan.class);
         if (translatorScan != null) {
-            TranslationGlobalInformation.addPackage(translatorScan.basePackages());
-            TranslationGlobalInformation.addPackage(clazz.getPackage().getName());
+            TranslationGlobalInformation.addTranslatorPackage(translatorScan.basePackages());
+            TranslationGlobalInformation.addTranslatorPackage(clazz.getPackage().getName());
             LogUtils.debug(log::debug,"增加包扫描:{}", () -> {
                 List<String> packages = ListUtil.toList(translatorScan.basePackages());
                 packages.add(clazz.getPackage().getName());

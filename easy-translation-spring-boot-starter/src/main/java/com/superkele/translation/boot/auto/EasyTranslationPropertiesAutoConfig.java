@@ -1,7 +1,6 @@
 package com.superkele.translation.boot.auto;
 
 
-import com.superkele.translation.boot.config.EasyTranslationConfig;
 import com.superkele.translation.boot.config.EasyTranslationInterceptorConfig;
 import com.superkele.translation.boot.config.properties.TranslationProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;

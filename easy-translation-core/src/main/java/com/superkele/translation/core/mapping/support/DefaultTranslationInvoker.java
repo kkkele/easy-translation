@@ -19,10 +19,8 @@ import static com.superkele.translation.core.util.PropertyUtils.getPropertyHandl
 
 public class DefaultTranslationInvoker implements TranslationInvoker {
     @Override
-    public void invoke(Object source, Translator translator, TranslationEnvironment environment) {
-        FieldTranslationEvent event = environment.getEvent();
+    public void invoke(Object source, Translator translator, FieldTranslationEvent event, Map<String,Object> cache) {
         ParamHandler paramHandler = event.getParamHandler();
-        Map<String, Object> cache = environment.getCache();
         if (!event.isNotNullMapping()) {
             if (PropertyUtils.invokeGetter(source, event.getPropertyName()) != null) {
                 return;
@@ -83,10 +81,8 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
     }
 
     @Override
-    public void invokeBatch(List<Object> sources, Translator translator, TranslationEnvironment environment) {
-        FieldTranslationEvent event = environment.getEvent();
+    public void invokeBatch(List<Object> sources, Translator translator, FieldTranslationEvent event, Map<String,Object> cache) {
         ParamHandler paramHandler = event.getParamHandler();
-        Map<String, Object> cache = environment.getCache();
         MapperDesc[] mappers = event.getMapper();
         String[] others = event.getOther();
         int mapperLength = mappers.length;

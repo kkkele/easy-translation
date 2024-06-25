@@ -33,6 +33,7 @@ public class EasyTranslationConfig {
         return new TranslationScanPostProcessor();
     }
 
+
     @Bean
     @ConditionalOnMissingBean
     public SpringInvokeBeanFactory springInvokeBeanFactory() {
@@ -41,7 +42,7 @@ public class EasyTranslationConfig {
 
     @Bean
     public DefaultTranslatorContext defaultTranslatorContext(SpringInvokeBeanFactory springInvokeBeanFactory) {
-        String[] scanPackages = TranslationGlobalInformation.getPackages()
+        String[] scanPackages = TranslationGlobalInformation.getTranslatorPackages()
                 .stream().toArray(String[]::new);
         return new DefaultTranslatorContext(springInvokeBeanFactory, scanPackages);
     }

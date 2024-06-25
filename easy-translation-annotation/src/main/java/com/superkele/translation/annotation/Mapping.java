@@ -52,15 +52,6 @@ public @interface Mapping {
     MappingStrategy strategy() default MappingStrategy.SINGLE_MAPPING;
 
     /**
-     * <p>用户使用该mappingHandler字段控制映射器
-     * 必须指定为mappingHandler的实现类
-     * </p>
-     * <hr/>
-     * <ul>
-     *     <li>可以使用全类名指定映射器</li>
-     *     <li>可以 '@'+beanName 指定映射器，例如 @OneToOneMappingHandler </li>
-     * </ul>
-     *
      * @see com.superkele.translation.core.mapping.MappingHandler
      */
     MappingHandler mappingHandler() default @MappingHandler;

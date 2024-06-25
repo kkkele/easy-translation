@@ -1,6 +1,11 @@
 easy-translation:
   enable: true
-  debug: false
+  debug: true
+  base-package:
+    domain:
+      - com.czy
+    translator:
+      - com.superkele.demo
 logging:
   level:
     com.superkele: debug

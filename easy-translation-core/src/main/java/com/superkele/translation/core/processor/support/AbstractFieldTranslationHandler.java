@@ -4,7 +4,6 @@ import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.constant.MappingStrategy;
 import com.superkele.translation.core.exception.TranslationException;
-import com.superkele.translation.core.mapping.MappingHandler;
 import com.superkele.translation.core.mapping.TranslationInvoker;
 import com.superkele.translation.core.mapping.support.DefaultTranslationInvoker;
 import com.superkele.translation.core.mapping.support.TranslationEnvironment;
@@ -109,7 +108,7 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
         TranslationEnvironment translationEnvironment = new TranslationEnvironment();
         translationEnvironment.setCache(cache);
         translationEnvironment.setEvent(event);
-        translatorInvoker.invokeBatch(sources, getTranslatorFactory().findTranslator(event.getTranslator()), translationEnvironment);
+        translatorInvoker.invokeBatch(sources, getTranslatorFactory().findTranslator(event.getTranslator()), event,cache);
         for (AtomicInteger activeEvent : activeEvents) {
             activeEvent.updateAndGet(i -> i | event.getEventValue());
         }
@@ -182,10 +181,7 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
             locks[sourceIndex].unlock();
         }
         if (StrUtil.isNotBlank(event.getTranslator())) {
-            TranslationEnvironment translationEnvironment = new TranslationEnvironment();
-            translationEnvironment.setCache(cache);
-            translationEnvironment.setEvent(event);
-            translatorInvoker.invoke(sources.get(sourceIndex), getTranslatorFactory().findTranslator(event.getTranslator()), translationEnvironment);
+            translatorInvoker.invoke(sources.get(sourceIndex), getTranslatorFactory().findTranslator(event.getTranslator()), event,cache);
         }
         activeEvents[sourceIndex].updateAndGet(val -> val | event.getEventValue());
         processHook(sourceIndex, event);

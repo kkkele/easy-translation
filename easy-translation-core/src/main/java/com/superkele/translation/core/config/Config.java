@@ -52,13 +52,6 @@ public class Config {
     private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
 
 
-    private Function<String, String[]> mapperSplitExecutor = s -> {
-        String[] split = s.split(":");
-        for (int i = 0; i < split.length && i < 2; i++) {
-            split[i] = split[i].trim();
-        }
-        return split;
-    };
     /**
      * 多线程上下文Holder
      */
@@ -66,16 +59,6 @@ public class Config {
 
     private Config() {
         init();
-    }
-
-    public Config setMapperSplitExecutor(Function<String, String[]> mapperSplitExecutor) {
-        this.mapperSplitExecutor = mapperSplitExecutor;
-        return this;
-    }
-
-    public Config setTimeout(long timeout) {
-        this.timeout = timeout;
-        return this;
     }
 
     public Config setBeanNameGetter(BeanNameGetter beanNameGetter) {
