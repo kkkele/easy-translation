@@ -43,7 +43,7 @@ public @interface Mapping {
     /**
      * 映射策略，是单个处理还是批量处理
      */
-    MappingStrategy strategy() default MappingStrategy.SINGLE_MAPPING;
+    MappingStrategy strategy() default MappingStrategy.SINGLE;
 
     /**
      * 替代原先的mapper字段

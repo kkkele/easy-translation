@@ -7,6 +7,6 @@ public interface FieldTranslationHandler {
 
     FieldTranslation getFieldTranslation();
 
-    void handle(boolean async);
+    void handle();
 
 }

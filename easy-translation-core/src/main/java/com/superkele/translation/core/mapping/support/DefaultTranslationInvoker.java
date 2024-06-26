@@ -7,6 +7,7 @@ import com.superkele.translation.core.mapping.TranslationInvoker;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.metadata.MapperDesc;
 import com.superkele.translation.core.translator.Translator;
+import com.superkele.translation.core.translator.factory.TranslatorFactory;
 import com.superkele.translation.core.util.PropertyUtils;
 
 import java.util.Arrays;
@@ -19,9 +20,14 @@ import static com.superkele.translation.core.util.PropertyUtils.getPropertyHandl
 
 public class DefaultTranslationInvoker implements TranslationInvoker {
 
+    private final TranslatorFactory translatorFactory;
+
+    public DefaultTranslationInvoker(TranslatorFactory translatorFactory) {
+        this.translatorFactory = translatorFactory;
+    }
 
     @Override
-    public void invoke(Object source, Translator translator, FieldTranslationEvent event, Map<String, Object> cache) {
+    public void invoke(Object source, FieldTranslationEvent event, Map<String, Object> cache) {
         if (filterNotMapping(source, event)) return;
         MapperDesc[] mappers = event.getMappers();
         String[] others = event.getOthers();
@@ -47,6 +53,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
                     }
                     fillTranslatorArgs(args, mapperLength, processedMapperKey, otherLength, others);
                     //翻译值
+                    Translator translator = translatorFactory.findTranslator(event.getTranslator());
                     return translator.doTranslate(args);
                 });
         if (mappingValue == null) {
@@ -67,7 +74,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
 
 
     @Override
-    public void invokeBatch(List<Object> sources, Translator translator, FieldTranslationEvent event, Map<String, Object> cache) {
+    public void invokeBatch(List<Object> sources, FieldTranslationEvent event, Map<String, Object> cache) {
         MapperDesc[] mappers = event.getMappers();
         String[] others = event.getOthers();
         int mapperLength = mappers.length;
@@ -95,6 +102,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
                         processedMapperKey[i] = mappers[i].getParamHandler().wrapperBatch(params, mappers[i].getSourceClass(), mappers[i].getTargetClass(), mappers[i].getTypes());
                     }
                     fillTranslatorArgs(args, mapperLength, processedMapperKey, otherLength, others);
+                    Translator translator = translatorFactory.findTranslator(event.getTranslator());
                     return translator.doTranslate(args);
                 });
         if (mappingValue == null) {

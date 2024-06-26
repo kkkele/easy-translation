@@ -15,7 +15,4 @@ public class FieldTranslation {
      * 使用sort顺序触发的event
      */
     private FieldTranslationEvent[] sortEvents;
-
-
-    private boolean hasSameInvoker;
 }

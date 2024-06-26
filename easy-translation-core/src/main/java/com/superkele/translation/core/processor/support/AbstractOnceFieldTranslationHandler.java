@@ -5,14 +5,9 @@ import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.constant.MappingStrategy;
 import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.mapping.TranslationInvoker;
-import com.superkele.translation.core.mapping.support.DefaultTranslationInvoker;
-import com.superkele.translation.core.mapping.support.TranslationEnvironment;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.processor.FieldTranslationHandler;
-import com.superkele.translation.core.processor.TranslationProcessor;
-import com.superkele.translation.core.property.PropertyHandler;
-import com.superkele.translation.core.translator.factory.TranslatorFactory;
 import com.superkele.translation.core.util.Pair;
 
 import java.util.*;
@@ -25,27 +20,25 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * 该抽象类实现了FieldTranslationHandler接口
  * 具体的工作原理是通过FieldTranslationEvent对象来控制翻译流程
- * 每个event对象中存储了字段的映射策略 MappingHandler,
- * 不同的MappingHandler会根据 #waitPreEventWhenBatch 决定它有没有批处理的能力
- * 具有批处理能力的MappingHandler可以在处理集合时聚合所有对象的mapper参数列表，然后对结果进行映射
- * 不具有批处理能力的MappingHandler在处理集合时，会对每个对象进行单独的翻译，当然，它也具有改变参数形式和结果处理的能力
+ * 每个event对象中存储了字段的映射策略 strategy,
+ * 会根据 strategy 决定调用invokeBatch方法还是invoke方法
  *
- * @see com.superkele.translation.core.mapping.MappingHandler
+ * @see com.superkele.translation.core.mapping.TranslationInvoker#invoke
+ * @see com.superkele.translation.core.mapping.TranslationInvoker#invokeBatch
  */
-public abstract class AbstractFieldTranslationHandler implements FieldTranslationHandler {
+public abstract class AbstractOnceFieldTranslationHandler implements FieldTranslationHandler {
 
-    public final TranslationInvoker translatorInvoker = new DefaultTranslationInvoker();
     protected final FieldTranslation fieldTranslation;
     protected final List<Object> sources;
     private final AtomicInteger[] activeEvents;
     private final ReentrantLock[] locks;
     private final Set<Pair<Integer, Short>> consumed = new ConcurrentHashSet<>();
-    private final Map<String, Object> cache = new ConcurrentHashMap<>();
+    private final Map<String, Object> cache;
 
-    public AbstractFieldTranslationHandler(FieldTranslation fieldTranslation, List<Object> sources) {
+    public AbstractOnceFieldTranslationHandler(FieldTranslation fieldTranslation, List<Object> sources) {
         this.fieldTranslation = fieldTranslation;
         this.sources = sources;
-        this.locks = new ReentrantLock[sources.size() + 1];
+        this.locks = new ReentrantLock[sources.size()];
         this.activeEvents = new AtomicInteger[sources.size()];
         for (int i = 0; i < this.activeEvents.length; i++) {
             activeEvents[i] = new AtomicInteger(0);
@@ -53,17 +46,20 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
         for (int i = 0; i < this.locks.length; i++) {
             locks[i] = new ReentrantLock();
         }
+        if (getCacheEnabled()) {
+            this.cache = new ConcurrentHashMap<>();
+        } else {
+            this.cache = null;
+        }
     }
 
-    protected abstract TranslationProcessor getTranslationProcessor();
+    protected abstract boolean getCacheEnabled();
 
-    protected abstract Executor getExecutorService();
+    protected abstract TranslationInvoker getTranslationInvoker();
+
+    protected abstract Executor getExecutor();
 
     protected abstract boolean getAsyncEnabled();
-
-    protected abstract TranslatorFactory getTranslatorFactory();
-
-    protected abstract PropertyHandler getPropertyHandler();
 
 
     @Override
@@ -72,19 +68,19 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
     }
 
     @Override
-    public void handle(boolean asyncProcessList) {
+    public void handle() {
         FieldTranslationEvent[] sortEvents = this.getFieldTranslation().getSortEvents();
         //顺序执行事件
         CompletableFuture[] tasks = Arrays.stream(sortEvents)
                 .map(sortEvent -> {
                     MappingStrategy mappingStrategy = sortEvent.getMappingStrategy();
-                    if (mappingStrategy == MappingStrategy.BATCH_MAPPING) {
-                        handleBatch(sortEvent);
+                    if (mappingStrategy == MappingStrategy.BATCH) {
+                        translateBatch(sortEvent);
                         return null;
                     } else {
                         CompletableFuture[] futures = new CompletableFuture[sources.size()];
                         for (int i = 0; i < sources.size(); i++) {
-                            futures[i] = handle(i, sortEvent);
+                            futures[i] = translateSingle(i, sortEvent);
                         }
                         return futures;
                     }
@@ -96,7 +92,12 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
         CompletableFuture.allOf(tasks).join();
     }
 
-    public void handleBatch(FieldTranslationEvent event) {
+    /**
+     * 批量翻译
+     *
+     * @param event
+     */
+    public void translateBatch(FieldTranslationEvent event) {
         short triggerMask = event.getTriggerMask();
         int totalActived = ~0;
         for (AtomicInteger activeEvent : activeEvents) {
@@ -105,41 +106,52 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
                 return;
             }
         }
-        TranslationEnvironment translationEnvironment = new TranslationEnvironment();
-        translationEnvironment.setCache(cache);
-        translationEnvironment.setEvent(event);
-        translatorInvoker.invokeBatch(sources, getTranslatorFactory().findTranslator(event.getTranslator()), event,cache);
+        getTranslationInvoker().invokeBatch(sources, event, cache);
         for (AtomicInteger activeEvent : activeEvents) {
             activeEvent.updateAndGet(i -> i | event.getEventValue());
         }
-        if (event.getRefTranslation() != null) {
-            for (int i = 0; i < sources.size(); i++) {
-                processHook(i, event);
-            }
+        for (int i = 0; i < sources.size(); i++) {
+            processHook(i, event);
         }
         for (FieldTranslationEvent activeEvent : event.getActiveEvents()) {
             MappingStrategy mappingStrategy = activeEvent.getMappingStrategy();
-            if (mappingStrategy == MappingStrategy.BATCH_MAPPING) {
-                handleBatch(activeEvent);
+            if (mappingStrategy == MappingStrategy.BATCH) {
+                translateBatch(activeEvent);
             } else {
                 for (int i = 0; i < sources.size(); i++) {
                     if ((activeEvents[i].get() & activeEvent.getTriggerMask()) == activeEvent.getTriggerMask()) {
-                        handle(i, activeEvent);
+                        translateSingle(i, activeEvent);
                     }
                 }
             }
         }
     }
 
-    public CompletableFuture<Void> handle(int sourceIndex, FieldTranslationEvent event) {
+    /**
+     * 执行单体翻译
+     *
+     * @param sourceIndex
+     * @param event
+     * @return
+     */
+    public CompletableFuture<Void> translateSingle(int sourceIndex, FieldTranslationEvent event) {
         boolean async = event.isAsync();
         if (async && getAsyncEnabled()) {
             return CompletableFuture.runAsync(() -> {
-                        executeTranslate(sourceIndex, event);
-                        triggerActiveEvents(sourceIndex, event);
-                    }, getExecutorService())
-                    .exceptionally(e -> {
-                        throw new TranslationException("异步翻译异常", e);
+                        buildAsyncEnv();
+                        try {
+                            executeTranslate(sourceIndex, event);
+                            triggerActiveEvents(sourceIndex, event);
+                        } finally {
+                            cleanAsyncEnv();
+                        }
+                    }, getExecutor())
+                    .handle((v, e) -> {
+                        if (e != null) {
+                            throw new TranslationException("异步翻译异常", e);
+                        } else {
+                            return v;
+                        }
                     });
         } else {
             executeTranslate(sourceIndex, event);
@@ -148,17 +160,33 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
         }
     }
 
+    /**
+     * 进行前置处理，传递环境变量等
+     */
+    protected abstract void cleanAsyncEnv();
+
+    /**
+     * 异步处理结束，消除环境变量等操作
+     */
+    protected abstract void buildAsyncEnv();
+
+    /**
+     * 触发子事件
+     *
+     * @param sourceIndex
+     * @param event
+     */
     private void triggerActiveEvents(int sourceIndex, FieldTranslationEvent event) {
         CompletableFuture[] child = Arrays.stream(event.getActiveEvents())
                 .filter(activeEvent -> (activeEvents[sourceIndex].get() & activeEvent.getTriggerMask()) == activeEvent.getTriggerMask())
                 .filter(activeEvent -> !consumed.contains(Pair.of(sourceIndex, activeEvent.getEventValue())))
                 .map(activeEvent -> {
                     MappingStrategy mappingStrategy = activeEvent.getMappingStrategy();
-                    if (mappingStrategy == MappingStrategy.BATCH_MAPPING) {
-                        handleBatch(activeEvent);
+                    if (mappingStrategy == MappingStrategy.BATCH) {
+                        translateBatch(activeEvent);
                         return null;
                     } else {
-                        return handle(sourceIndex, activeEvent);
+                        return translateSingle(sourceIndex, activeEvent);
                     }
                 })
                 .filter(Objects::nonNull)
@@ -166,6 +194,12 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
         CompletableFuture.allOf(child).join();
     }
 
+    /**
+     * 执行翻译
+     *
+     * @param sourceIndex
+     * @param event
+     */
     public void executeTranslate(int sourceIndex, FieldTranslationEvent event) {
         Pair<Integer, Short> uniqueKey = Pair.of(sourceIndex, event.getEventValue());
         if (consumed.contains(uniqueKey)) {
@@ -181,17 +215,18 @@ public abstract class AbstractFieldTranslationHandler implements FieldTranslatio
             locks[sourceIndex].unlock();
         }
         if (StrUtil.isNotBlank(event.getTranslator())) {
-            translatorInvoker.invoke(sources.get(sourceIndex), getTranslatorFactory().findTranslator(event.getTranslator()), event,cache);
+            getTranslationInvoker().invoke(sources.get(sourceIndex), event, cache);
         }
         activeEvents[sourceIndex].updateAndGet(val -> val | event.getEventValue());
         processHook(sourceIndex, event);
     }
 
-    protected void processHook(int sourceIndex, FieldTranslationEvent event) {
-        if (event.getRefTranslation() != null) {
-            getTranslationProcessor().process(getPropertyHandler().invokeGetter(sources.get(sourceIndex), event.getPropertyName()), event.getRefTranslation().type(),
-                    event.getRefTranslation().field(), event.isAsync(), event.getRefTranslation().listTypeHandler());
-        }
-    }
+    /**
+     * 钩子方法
+     *
+     * @param sourceIndex
+     * @param event
+     */
+    protected abstract void processHook(int sourceIndex, FieldTranslationEvent event);
 
 }

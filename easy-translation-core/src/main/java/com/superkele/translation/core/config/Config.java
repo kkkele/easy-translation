@@ -1,103 +1,55 @@
 package com.superkele.translation.core.config;
 
 import cn.hutool.core.util.StrUtil;
-import com.superkele.translation.core.thread.ContextHolder;
+import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.translator.*;
 import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.ReflectUtils;
-import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Easy-Translation 全局配置类
  */
-@Getter
 public class Config {
-
-    public static final Config INSTANCE = new Config();
-
     /**
      * key: 参数长度
      * value: 被映射成的翻译器类
      */
     private Map<Integer, Class<? extends Translator>> translatorClazzMap = new ConcurrentHashMap<>(16);
-
     /**
-     * beanName生成器
+     * 翻译线程池
      */
-    private BeanNameGetter beanNameGetter = clazz -> StrUtil.lowerFirst(clazz.getSimpleName());
+    private Executor threadPoolExecutor = null;
     /**
-     * 全局线程池
+     * 是否开启异步翻译
      */
-    private Executor threadPoolExecutor;
-
-    /**
-     * 翻译过期时间
-     */
-    private volatile long timeout = 3000; //ms
-
+    private Supplier<Boolean> asyncEnabled = () -> this.threadPoolExecutor != null;
     /**
      * 默认翻译器名称生成器
      */
-    private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazzName, methodName) -> StringUtils.join(clazzName, ".", methodName);
-
-
+    private DefaultTranslatorNameGenerator defaultTranslatorNameGenerator = (clazz, methodName) -> {
+        String beanName = Optional.of(clazz)
+                .map(Class::getSimpleName)
+                .map(str -> StrUtil.lowerFirst(str))
+                .orElseThrow(() -> new TranslationException("DefaultTranslatorNameGenerator生成名字失败"));
+        return Optional.ofNullable(methodName)
+                .map(str -> beanName + "." + str)
+                .orElse(beanName);
+    };
     /**
-     * 多线程上下文Holder
+     * 是否开启事务翻译缓存
      */
-    private List<ContextHolder> contextHolders = new ArrayList<>();
+    private Supplier<Boolean> cacheEnabled = () -> true;
 
-    private Config() {
-        init();
-    }
-
-    public Config setBeanNameGetter(BeanNameGetter beanNameGetter) {
-        this.beanNameGetter = beanNameGetter;
-        return this;
-    }
-
-    public Config setDefaultTranslatorNameGenerator(DefaultTranslatorNameGenerator defaultTranslatorNameGenerator) {
-        this.defaultTranslatorNameGenerator = defaultTranslatorNameGenerator;
-        return this;
-    }
-
-    /**
-     * 仅支持函数式接口
-     *
-     * @param translatorClazz
-     * @return
-     */
-    public Config registerTranslatorClazz(Class<? extends Translator> translatorClazz) {
-        Pair<Method, MethodType> pair = ReflectUtils.findFunctionInterfaceMethodType(translatorClazz);
-        translatorClazzMap.put(pair.getKey().getParameterCount(), translatorClazz);
-        return this;
-    }
-
-    public void addContextHolders(ContextHolder contextHolder) {
-        contextHolders.remove(contextHolder);
-        contextHolders.add(contextHolder);
-    }
-
-    public Config registerTranslatorClazz(Class<? extends Translator>... translatorClazzArr) {
-        for (Class<? extends Translator> translatorClazz : translatorClazzArr) {
-            Pair<Method, MethodType> pair = ReflectUtils.findFunctionInterfaceMethodType(translatorClazz);
-            translatorClazzMap.put(pair.getKey().getParameterCount(), translatorClazz);
-        }
-        return this;
-    }
-
-    protected void init() {
-        registerTranslatorClazz(ContextTranslator.class, MapperTranslator.class, ConditionTranslator.class, ThreeParamTranslator.class, FourParamTranslator.class, FiveParamTranslator.class);
+    public Map<Integer, Class<? extends Translator>> getTranslatorClazzMap() {
+        return translatorClazzMap;
     }
 
     public Executor getThreadPoolExecutor() {
@@ -109,15 +61,47 @@ public class Config {
         return this;
     }
 
-    @FunctionalInterface
-    public interface BeanNameGetter {
-        String getDeclaringBeanName(Class clazz);
+    public Supplier<Boolean> getAsyncEnabled() {
+        return asyncEnabled;
     }
 
-    @FunctionalInterface
-    public interface DefaultTranslatorNameGenerator {
-        String genName(String beanName, String methodName);
+    public Config setAsyncEnabled(Supplier<Boolean> asyncEnabled) {
+        this.asyncEnabled = asyncEnabled;
+        return this;
     }
 
+    public DefaultTranslatorNameGenerator getDefaultTranslatorNameGenerator() {
+        return defaultTranslatorNameGenerator;
+    }
+
+    public Config setDefaultTranslatorNameGenerator(DefaultTranslatorNameGenerator defaultTranslatorNameGenerator) {
+        this.defaultTranslatorNameGenerator = defaultTranslatorNameGenerator;
+        return this;
+    }
+
+    public Supplier<Boolean> getCacheEnabled() {
+        return cacheEnabled;
+    }
+
+    public Config setCacheEnabled(Supplier<Boolean> cacheEnabled) {
+        this.cacheEnabled = cacheEnabled;
+        return this;
+    }
+
+    public Config registerTranslatorClazz(Class<? extends Translator>... translatorClazzArr) {
+        for (Class<? extends Translator> translatorClazz : translatorClazzArr) {
+            Pair<Method, MethodType> pair = ReflectUtils.findFunctionInterfaceMethodType(translatorClazz);
+            translatorClazzMap.put(pair.getKey().getParameterCount(), translatorClazz);
+        }
+        return this;
+    }
+
+    public Config() {
+        init();
+    }
+
+    protected void init() {
+        registerTranslatorClazz(ContextTranslator.class, MapperTranslator.class, ConditionTranslator.class, ThreeParamTranslator.class, FourParamTranslator.class, FiveParamTranslator.class);
+    }
 
 }

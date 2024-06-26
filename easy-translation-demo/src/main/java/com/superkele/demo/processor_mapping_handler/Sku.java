@@ -3,9 +3,7 @@ package com.superkele.demo.processor_mapping_handler;
 
 import com.superkele.translation.annotation.Mapper;
 import com.superkele.translation.annotation.Mapping;
-import com.superkele.translation.annotation.MappingHandler;
 import com.superkele.translation.annotation.constant.MappingStrategy;
-import com.superkele.translation.core.constant.TranslationConstant;
 import lombok.Data;
 
 @Data
@@ -23,7 +21,7 @@ public class Sku {
     @Mapping(translator = "getSpuByIds",
             async = true,
             after = "sales",
-            strategy = MappingStrategy.BATCH_MAPPING,
+            strategy = MappingStrategy.BATCH,
             groupKey = "id",
             mappers = @Mapper("spuId"),
             receive = "spuName")

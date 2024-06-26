@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.superkele.translation.boot.auto.EasyTranslationPropertiesAutoConfig, \
-  com.superkele.translation.boot.config.EasyTranslationConfig
+  com.superkele.translation.boot.config.EasyTranslationConfig,\
+  com.superkele.translation.boot.config.EasyTranslationInterceptorConfig

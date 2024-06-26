@@ -1,12 +1,12 @@
 package com.superkele.translation.core.processor.support;
 
-import cn.hutool.core.collection.ListUtil;
-import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.mapping.TranslationInvoker;
 import com.superkele.translation.core.metadata.FieldTranslation;
-import com.superkele.translation.core.metadata.FieldTranslationBuilder;
-import com.superkele.translation.core.metadata.support.DefaultConfigurableFieldTranslationFactory;
+import com.superkele.translation.core.metadata.FieldTranslationEvent;
+import com.superkele.translation.core.metadata.FieldTranslationFactory;
+import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.thread.ContextPasser;
-import com.superkele.translation.core.translator.factory.TranslatorFactory;
+import com.superkele.translation.core.util.PropertyUtils;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -21,50 +21,64 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
      * key：主类
      * value：处理后的，需要翻译的字段
      */
-    private final TranslatorFactory translatorFactory;
-    private final DefaultConfigurableFieldTranslationFactory fieldTranslationFactory;
+    private final FieldTranslationFactory fieldTranslationFactory;
 
-    protected AsyncableTranslationProcessor(TranslatorFactory translatorFactory, DefaultConfigurableFieldTranslationFactory fieldTranslationFactory) {
-        this.translatorFactory = translatorFactory;
+    /**
+     * 多线程上下文Holder
+     */
+    private final List<ContextHolder> contextHolders = new CopyOnWriteArrayList<>();
+
+    protected AsyncableTranslationProcessor(FieldTranslationFactory fieldTranslationFactory) {
         this.fieldTranslationFactory = fieldTranslationFactory;
     }
 
+    /**
+     * 添加多线程上下文Holder
+     */
+    public void addContextHolder(ContextHolder contextHolder) {
+        contextHolders.remove(contextHolder);
+        contextHolders.add(contextHolder);
+    }
+
+    /**
+     * 添加多线程上下文Holder
+     */
+    public void addContextHolders(Iterator<ContextHolder> contextHolders) {
+        Optional.ofNullable(contextHolders)
+                .ifPresent(iterator -> {
+                    while (iterator.hasNext()) {
+                        ContextHolder contextHolder = iterator.next();
+                        this.contextHolders.remove(contextHolder);
+                        this.contextHolders.add(contextHolder);
+                    }
+                });
+    }
 
     @Override
     protected void processInternal(Map<Class, List> classMap, boolean async) {
-        if (async && getAsyncEnable()) {
-            List<ContextPasser> contextPassers = buildContextPasser();
-            contextPassers.forEach(contextPasser -> contextPasser.setPassValue());
-            CompletableFuture[] array = classMap.keySet()
-                    .stream()
+        if (async && getAsyncEnabled()) {
+            CompletableFuture[] futures = classMap.keySet().stream()
                     .map(clazz -> {
                         FieldTranslation fieldTranslation = fieldTranslationFactory.get(clazz, false);
-                        List list = classMap.get(clazz);
-                        return CompletableFuture.runAsync(() -> {
-                            contextPassers.forEach(contextPasser -> contextPasser.passContext());
-                            OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list, translatorFactory,this);
-                            onceFieldTranslationHandler.handle(true);
-                            contextPassers.forEach(contextPasser -> contextPasser.clearContext());
-                        });
+                        OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, classMap.get(clazz));
+                        return CompletableFuture.runAsync(() -> onceFieldTranslationHandler.handle(), getExecutor());
                     })
                     .toArray(CompletableFuture[]::new);
-            CompletableFuture.allOf(array).join();
+            CompletableFuture.allOf(futures).join();
         } else {
             classMap.forEach((clazz, list) -> {
                 FieldTranslation fieldTranslation = fieldTranslationFactory.get(clazz, false);
-                OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list, translatorFactory,this);
-                onceFieldTranslationHandler.handle(false);
+                OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list);
+                onceFieldTranslationHandler.handle();
             });
         }
     }
 
-    protected abstract boolean getAsyncEnable();
-
     @Override
     protected void processInternal(Object obj, Class<?> clazz) {
         FieldTranslation fieldTranslation = fieldTranslationFactory.get(clazz, false);
-        OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, ListUtil.of(obj), translatorFactory,this);
-        onceFieldTranslationHandler.handle(false);
+        OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, Collections.singletonList(obj));
+        onceFieldTranslationHandler.handle();
     }
 
     @Override
@@ -72,13 +86,66 @@ public abstract class AsyncableTranslationProcessor extends AbstractTranslationP
         return fieldTranslationFactory.get(clazz, false) != null;
     }
 
-    protected List<ContextPasser> buildContextPasser() {
-        return Config.INSTANCE
-                .getContextHolders()
-                .stream()
+    protected List<ContextPasser> buildPassers() {
+        return this.contextHolders.stream()
                 .map(ContextPasser::new)
                 .collect(Collectors.toList());
     }
 
+    protected abstract boolean getAsyncEnabled();
+
+    protected abstract TranslationInvoker getTranslationInvoker();
+
+    protected abstract Executor getExecutor();
+
+    protected abstract boolean getCacheEnabled();
+
+    public class OnceFieldTranslationHandler extends AbstractOnceFieldTranslationHandler {
+
+        private final List<ContextPasser> contextPassers = buildPassers();
+
+        public OnceFieldTranslationHandler(FieldTranslation fieldTranslation, List<Object> sources) {
+            super(fieldTranslation, sources);
+        }
+
+        @Override
+        protected boolean getCacheEnabled() {
+            return AsyncableTranslationProcessor.this.getCacheEnabled();
+        }
+
+        @Override
+        protected TranslationInvoker getTranslationInvoker() {
+            return AsyncableTranslationProcessor.this.getTranslationInvoker();
+        }
+
+        @Override
+        protected Executor getExecutor() {
+            return AsyncableTranslationProcessor.this.getExecutor();
+        }
+
+        @Override
+        protected boolean getAsyncEnabled() {
+            return AsyncableTranslationProcessor.this.getAsyncEnabled();
+        }
+
+        @Override
+        protected void buildAsyncEnv() {
+            contextPassers.forEach(ContextPasser::passContext);
+        }
+
+        @Override
+        protected void cleanAsyncEnv() {
+            contextPassers.forEach(ContextPasser::clearContext);
+        }
+
+
+        @Override
+        protected void processHook(int sourceIndex, FieldTranslationEvent event) {
+            if (event.getRefTranslation() != null) {
+                process(PropertyUtils.invokeGetter(sources.get(sourceIndex), event.getPropertyName()), event.getRefTranslation().type(),
+                        event.getRefTranslation().field(), event.isAsync(), event.getRefTranslation().listTypeHandler());
+            }
+        }
+    }
 }
 

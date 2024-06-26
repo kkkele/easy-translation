@@ -61,17 +61,19 @@ public class MappingHandlerMappingProcessTest {
         });
     }
 
+
+    @Test
+    public void testSingle_mappingHandler(){
+        DictVo dict = service.getDict();
+        Assert.assertNotNull(dict.getDictValue());
+    }
     /**
      * 测试 多mapper参数下 多对多映射器的调用
      */
     @Test
     public void testMultiMapper_ManyToManyMappingHandler() {
-        DictVo dict = service.getDict();
-        System.out.println(dict);
-        Assert.assertNotNull(dict.getDictValue());
         List<DictVo2> dictList = service.getDictList();
         dictList.forEach(dictVo2 -> {
-            System.out.println(dictVo2);
             Assert.assertNotNull(dictVo2.getDictValue());
         });
     }

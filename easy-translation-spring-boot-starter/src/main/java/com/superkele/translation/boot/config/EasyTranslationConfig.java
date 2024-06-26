@@ -6,6 +6,7 @@ import com.superkele.translation.boot.resolver.SpringParamHandlerResolver;
 import com.superkele.translation.boot.resolver.SpringResultHandlerResolver;
 import com.superkele.translation.boot.scanner.TranslationScanPostProcessor;
 import com.superkele.translation.core.aop.TranslationAspect;
+import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.context.support.DefaultTranslatorContext;
 import com.superkele.translation.core.mapping.support.DefaultParamHandler;
 import com.superkele.translation.core.mapping.support.DefaultResultHandler;
@@ -41,10 +42,10 @@ public class EasyTranslationConfig {
     }
 
     @Bean
-    public DefaultTranslatorContext defaultTranslatorContext(SpringInvokeBeanFactory springInvokeBeanFactory) {
+    public DefaultTranslatorContext defaultTranslatorContext(Config config,SpringInvokeBeanFactory springInvokeBeanFactory) {
         String[] scanPackages = TranslationGlobalInformation.getTranslatorPackages()
                 .stream().toArray(String[]::new);
-        return new DefaultTranslatorContext(springInvokeBeanFactory, scanPackages);
+        return new DefaultTranslatorContext(config,springInvokeBeanFactory, scanPackages);
     }
 
     @Bean
@@ -80,10 +81,10 @@ public class EasyTranslationConfig {
 
     @Bean
     public DefaultTranslationProcessor defaultTranslationProcessor(DefaultTranslatorContext defaultTransExecutorContext,
-                                                                   DefaultConfigurableFieldTranslationFactory defaultConfigurableFieldTranslationFactory) {
-        return new DefaultTranslationProcessor(defaultTransExecutorContext,defaultConfigurableFieldTranslationFactory);
+                                                                   DefaultConfigurableFieldTranslationFactory defaultConfigurableFieldTranslationFactory,
+                                                                   Config config) {
+        return new DefaultTranslationProcessor(defaultTransExecutorContext,defaultConfigurableFieldTranslationFactory,config);
     }
-
 
     @Bean
     public TranslationAspect translationAspect(TranslationProcessor defaultTranslationProcessor) {

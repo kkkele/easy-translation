@@ -7,11 +7,11 @@ public enum MappingStrategy {
     /**
      * 单条处理
      */
-    SINGLE_MAPPING,
+    SINGLE,
     /**
      * 批量处理
      */
-    BATCH_MAPPING,
+    BATCH,
     /**
      * 自定义处理
      */

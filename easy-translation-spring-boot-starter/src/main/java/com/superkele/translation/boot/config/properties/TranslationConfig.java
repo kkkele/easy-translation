@@ -1,6 +1,7 @@
 package com.superkele.translation.boot.config.properties;
 
 
+import com.superkele.translation.core.config.Config;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -9,7 +10,7 @@ import java.util.Set;
 
 @Data
 @ConfigurationProperties(prefix = "easy-translation")
-public class TranslationProperties {
+public class TranslationConfig extends Config {
 
     /**
      * 是否开启翻译功能

@@ -25,7 +25,7 @@ public class FieldTranslationEvent {
     private String translator;
 
     /**
-     * tubs个策略
+     * 映射策略
      */
     private MappingStrategy mappingStrategy;
 

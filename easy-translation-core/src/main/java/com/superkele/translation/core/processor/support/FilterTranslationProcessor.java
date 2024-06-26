@@ -14,7 +14,6 @@ public abstract class FilterTranslationProcessor implements TranslationProcessor
 
     @Override
     public void process(Object obj) {
-        System.out.println(obj);
         if (obj == null) {
             return;
         }

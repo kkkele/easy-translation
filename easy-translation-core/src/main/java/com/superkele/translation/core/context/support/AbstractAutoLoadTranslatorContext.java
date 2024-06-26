@@ -1,7 +1,8 @@
 package com.superkele.translation.core.context.support;
 
 
-import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.config.DefaultTranslatorNameGenerator;
+import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
@@ -10,6 +11,7 @@ import com.superkele.translation.core.translator.support.ExecutorParamInvokeFact
 import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefreshableTranslatorContext {
@@ -31,9 +33,13 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
 
     @Override
     protected void loadTranslatorDefinition(DefaultTranslatorFactory translatorFactory) {
-        DefaultTranslatorDefinitionReader definitionReader = new DefaultTranslatorDefinitionReader(translatorFactory);
+        DefaultTranslatorDefinitionReader definitionReader = new DefaultTranslatorDefinitionReader(translatorFactory, getTranslatorNameGenerator(), getTranslatorClazzMap());
         definitionReader.loadTranslatorDefinitions(getBasePackages());
     }
+
+    protected abstract Map<Integer, Class<? extends Translator>> getTranslatorClazzMap();
+
+    protected abstract DefaultTranslatorNameGenerator getTranslatorNameGenerator();
 
     @Override
     protected void invokeTranslatorFactoryPostProcessors(ConfigurableTranslatorDefinitionFactory translatorFactory) {

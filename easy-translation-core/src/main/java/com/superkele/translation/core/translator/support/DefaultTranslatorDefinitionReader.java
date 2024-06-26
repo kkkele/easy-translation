@@ -1,11 +1,7 @@
 package com.superkele.translation.core.translator.support;
 
-import com.superkele.translation.annotation.BeanNameResolver;
-import com.superkele.translation.annotation.TransMapper;
-import com.superkele.translation.annotation.TransValue;
-import com.superkele.translation.annotation.Translation;
-import com.superkele.translation.annotation.constant.InvokeBeanScope;
-import com.superkele.translation.core.config.Config;
+import com.superkele.translation.annotation.*;
+import com.superkele.translation.core.config.DefaultTranslatorNameGenerator;
 import com.superkele.translation.core.convert.MethodConvert;
 import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.invoker.enums.TranslatorType;
@@ -15,7 +11,6 @@ import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
 import com.superkele.translation.core.util.Assert;
-import org.apache.commons.lang3.reflect.MethodUtils;
 
 import java.lang.invoke.LambdaConversionException;
 import java.lang.invoke.MethodHandle;
@@ -24,23 +19,27 @@ import java.util.*;
 
 public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinitionReader {
 
-    private static final Config CONFIG = Config.INSTANCE;
     private final Map<Class<? extends BeanNameResolver>, BeanNameResolver> singleton = new HashMap<>();
 
-    public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry) {
+    private final DefaultTranslatorNameGenerator defaultTranslatorNameGenerator;
+
+    private final Map<Integer, Class<? extends Translator>> translatorClazzMap;
+
+    public DefaultTranslatorDefinitionReader(TranslatorDefinitionRegistry registry, DefaultTranslatorNameGenerator defaultTranslatorNameGenerator, Map<Integer, Class<? extends Translator>> translatorClazzMap) {
         super(registry);
+        this.defaultTranslatorNameGenerator = defaultTranslatorNameGenerator;
+        this.translatorClazzMap = translatorClazzMap;
     }
 
 
     @Override
     protected String getDefaultTranslatorName(Method method) {
-        String beanName = CONFIG.getBeanNameGetter().getDeclaringBeanName(method.getDeclaringClass());
-        return CONFIG.getDefaultTranslatorNameGenerator().genName(beanName, method.getName());
+        return defaultTranslatorNameGenerator.genName(method.getDeclaringClass(), method);
     }
 
     @Override
     protected String getDefaultTranslatorName(Class<?> clazz) {
-        return CONFIG.getBeanNameGetter().getDeclaringBeanName(clazz);
+        return defaultTranslatorNameGenerator.genName(clazz, null);
     }
 
     /**
@@ -71,7 +70,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         translatorDefinition.setTranslatorType(TranslatorType.ENUM);
         translatorDefinition.setInvokeBeanClazz(enumClass);
         translatorDefinition.setReturnType(mappedField.getType());
-        translatorDefinition.setParameterTypes(new ParamDesc[]{new ParamDesc(declaredFields[mapperIndex].getType(),null)});
+        translatorDefinition.setParameterTypes(new ParamDesc[]{new ParamDesc(declaredFields[mapperIndex].getType(), null)});
         translatorDefinition.setTranslatorClass(MapperTranslator.class);
         translatorDefinition.setTranslateDecorator(x -> x);
         translatorDefinition.setMapperIndex(new int[1]);
@@ -80,7 +79,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
 
     @Override
     protected TranslatorDefinition convertStaticMethodToTranslatorDefinition(Class<?> clazz, Method method) {
-        Class<? extends Translator> translatorClazz = CONFIG.getTranslatorClazzMap().get(method.getParameterCount());
+        Class<? extends Translator> translatorClazz = translatorClazzMap.get(method.getParameterCount());
         if (translatorClazz == null) {
             throw new TranslationException("Do not find the translator type with " + method.getParameterCount() + "params ,see https://kkkele.github.io/easy-translation/#/zh-cn/config/ for more information");
         }
@@ -107,7 +106,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
 
     @Override
     protected TranslatorDefinition convertDynamicMethodToTranslatorDefinition(Class<?> clazz, Method method, Translation translation) {
-        Class<? extends Translator> translatorClazz = CONFIG.getTranslatorClazzMap().get(method.getParameterCount());
+        Class<? extends Translator> translatorClazz = translatorClazzMap.get(method.getParameterCount());
         if (translatorClazz == null) {
             throw new TranslationException("Do not find the translator type with " + method.getParameterCount() + " params ,see https://kkkele.github.io/easy-translation/#/zh-cn/config/ for more information");
         }
@@ -149,15 +148,19 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
 
     public int[] getIndexPair(Method method) {
         List<Integer> mapperIndexList = new LinkedList<>();
+        List<Integer> otherIndexList = new LinkedList<>();
         Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
             if (parameter.isAnnotationPresent(TransMapper.class)) {
                 mapperIndexList.add(i);
+            }else if (parameter.isAnnotationPresent(TransOther.class)){
+                otherIndexList.add(i);
             }
         }
         //如果没有直接标注，则默认第一个参数为mapper,其他为other补充字段
-        if (mapperIndexList.size() == 0 && parameters.length >= 1) {
+        //如果有任何一个标记了@TransOther注解的方法参数，则上述规则不生效
+        if (mapperIndexList.isEmpty() && parameters.length >= 1 && otherIndexList.isEmpty()) {
             return new int[1];
         }
         return mapperIndexList.stream().mapToInt(Integer::intValue).toArray();

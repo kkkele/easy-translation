@@ -3,7 +3,6 @@ package com.superkele.translation.core.metadata.support;
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.Mapper;
 import com.superkele.translation.annotation.Mapping;
-import com.superkele.translation.annotation.MappingHandler;
 import com.superkele.translation.annotation.RefTranslation;
 import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.mapping.ParamHandlerResolver;
