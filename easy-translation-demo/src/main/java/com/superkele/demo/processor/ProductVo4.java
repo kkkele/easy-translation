@@ -1,5 +1,6 @@
 package com.superkele.demo.processor;
 
+import com.superkele.translation.annotation.Mapper;
 import com.superkele.translation.annotation.Mapping;
 import lombok.Data;
 
@@ -13,6 +14,6 @@ public class ProductVo4 {
 
     private Integer typeId;
 
-    @Mapping(translator = "getTypeById", mapper = "typeId",receive = "typeName",notNullMapping = true)
+    @Mapping(translator = "getTypeById", mappers = @Mapper("typeId"),receive = "typeName",notNullMapping = true)
     private String typeName;
 }

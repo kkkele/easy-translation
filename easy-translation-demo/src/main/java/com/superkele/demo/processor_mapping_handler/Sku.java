@@ -1,6 +1,7 @@
 package com.superkele.demo.processor_mapping_handler;
 
 
+import com.superkele.translation.annotation.Mapper;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.MappingHandler;
 import com.superkele.translation.annotation.constant.MappingStrategy;
@@ -14,17 +15,17 @@ public class Sku {
 
     private String skuName;
 
-    @Mapping(translator = "getSales", async = true, mapper = "skuId")
+    @Mapping(translator = "getSales", async = true, mappers = @Mapper("skuId"))
     private Integer sales;
 
     private Integer spuId;
 
     @Mapping(translator = "getSpuByIds",
-            async = true ,
+            async = true,
             after = "sales",
             strategy = MappingStrategy.BATCH_MAPPING,
-            mappingHandler = @MappingHandler(groupKey = "id"),
-            mapper = "spuId",
+            groupKey = "id",
+            mappers = @Mapper("spuId"),
             receive = "spuName")
     private String spuName;
 }

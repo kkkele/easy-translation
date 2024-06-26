@@ -1,5 +1,6 @@
 package com.superkele.demo.processor_mapping_handler;
 
+import com.superkele.translation.annotation.Mapper;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.TransMapper;
 import com.superkele.translation.boot.annotation.Translator;
@@ -12,7 +13,7 @@ public class DictVo {
 
     private Integer dictCode;
 
-    @Mapping(translator = "getDictValue", mapper = {"dictType", "dictCode"})
+    @Mapping(translator = "getDictValue", mappers = @Mapper({"dictType", "dictCode"}))
     private String dictValue;
 
     @Translator("getDictValue")

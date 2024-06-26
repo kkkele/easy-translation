@@ -40,11 +40,6 @@ public class FieldTranslationEvent {
     private boolean cacheEnable;
 
     /**
-     * 复用结果的关键key
-     */
-    private String cacheKey;
-
-    /**
      * 映射字段对应的类的属性
      */
     private String[] groupKey;
@@ -52,20 +47,21 @@ public class FieldTranslationEvent {
     /**
      * 映射的字段
      */
-    private MapperDesc[] mapper;
+    private MapperDesc[] mappers;
 
     /**
      * 其他字段
      */
-    private String[] other;
+    private String[] others;
 
     /**
      * 接收参数
      */
     private String receive;
 
-    private ParamHandler paramHandler;
-
+    /**
+     * 结果处理器
+     */
     private ResultHandler resultHandler;
 
     /**

@@ -19,15 +19,14 @@ import static com.superkele.translation.core.util.PropertyUtils.getPropertyHandl
 
 public class DefaultTranslationInvoker implements TranslationInvoker {
     @Override
-    public void invoke(Object source, Translator translator, FieldTranslationEvent event, Map<String,Object> cache) {
-        ParamHandler paramHandler = event.getParamHandler();
+    public void invoke(Object source, Translator translator, FieldTranslationEvent event, Map<String, Object> cache) {
         if (!event.isNotNullMapping()) {
             if (PropertyUtils.invokeGetter(source, event.getPropertyName()) != null) {
                 return;
             }
         }
-        MapperDesc[] mappers = event.getMapper();
-        String[] others = event.getOther();
+        MapperDesc[] mappers = event.getMappers();
+        String[] others = event.getOthers();
         int mapperLength = mappers.length;
         int otherLength = others.length;
         Object[] mapperKey = Arrays.stream(mappers)
@@ -57,7 +56,8 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
                     Object[] args = new Object[16];
                     Object[] processedMapperKey = new Object[mapperLength];
                     for (int i = 0; i < mappers.length; i++) {
-                        processedMapperKey[i] = paramHandler.wrapper(mapperKey[i], mappers[i].getSourceClass(), mappers[i].getTargetClass(), mappers[i].getTypes());
+                        processedMapperKey[i] = mappers[i].getParamHandler()
+                                .wrapper(mapperKey[i], mappers[i].getSourceClass(), mappers[i].getTargetClass(), mappers[i].getTypes());
                     }
                     fillTranslatorArgs(args, mapperLength, processedMapperKey, otherLength, others);
                     //翻译值
@@ -81,10 +81,9 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
     }
 
     @Override
-    public void invokeBatch(List<Object> sources, Translator translator, FieldTranslationEvent event, Map<String,Object> cache) {
-        ParamHandler paramHandler = event.getParamHandler();
-        MapperDesc[] mappers = event.getMapper();
-        String[] others = event.getOther();
+    public void invokeBatch(List<Object> sources, Translator translator, FieldTranslationEvent event, Map<String, Object> cache) {
+        MapperDesc[] mappers = event.getMappers();
+        String[] others = event.getOthers();
         int mapperLength = mappers.length;
         int otherLength = others.length;
         List<Object[]> mapperKeys = sources.stream()
@@ -122,7 +121,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
                         List<Object> params = mapperKeys.stream()
                                 .map(mapperKey -> mapperKey[_index])
                                 .collect(Collectors.toList());
-                        processedMapperKey[i] = paramHandler.wrapperBatch(params, mappers[i].getSourceClass(), mappers[i].getTargetClass(), mappers[i].getTypes());
+                        processedMapperKey[i] = mappers[i].getParamHandler().wrapperBatch(params, mappers[i].getSourceClass(), mappers[i].getTargetClass(), mappers[i].getTypes());
                     }
                     fillTranslatorArgs(args, mapperLength, processedMapperKey, otherLength, others);
                     return translator.doTranslate(args);

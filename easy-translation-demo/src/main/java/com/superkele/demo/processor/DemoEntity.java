@@ -1,6 +1,7 @@
 package com.superkele.demo.processor;
 
 
+import com.superkele.translation.annotation.Mapper;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.TransMapper;
 import com.superkele.translation.boot.annotation.Translator;
@@ -12,21 +13,21 @@ public class DemoEntity {
     @Mapping(translator = "demo_getName", sort = -1)
     private String var0;
 
-    @Mapping(translator = "demo_getName1", mapper = "var0")
+    @Mapping(translator = "demo_getName1", mappers = @Mapper("var0"))
     private String var1;
 
-    @Mapping(translator = "demo_getName2", mapper = "var0", other = "1")
+    @Mapping(translator = "demo_getName2", mappers = @Mapper("var0"), other = "1")
     private String var2;
 
-    @Mapping(translator = "demo_getName3", mapper = "var0", other = {"程序员", "1"})
+    @Mapping(translator = "demo_getName3", mappers = @Mapper("var0"), other = {"程序员", "1"})
     private String var3;
 
-    @Mapping(translator = "demo_getName4", mapper = "var0", other = {"程序员", "1"})
+    @Mapping(translator = "demo_getName4", mappers = @Mapper("var0"), other = {"程序员", "1"})
     private String var4;
 
     private Integer sort;
 
-    @Mapping(translator = "demo_getName5", mapper = {"var0", "sort"}, other = "程序员")
+    @Mapping(translator = "demo_getName5", mappers = @Mapper({"var0", "sort"}), other = "程序员")
     private String var5;
 
     @Translator("demo_getName")

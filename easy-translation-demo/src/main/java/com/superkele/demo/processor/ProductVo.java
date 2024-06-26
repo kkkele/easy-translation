@@ -2,6 +2,7 @@ package com.superkele.demo.processor;
 
 
 import cn.hutool.core.date.DateUtil;
+import com.superkele.translation.annotation.Mapper;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.boot.annotation.Translator;
 import lombok.Data;
@@ -15,7 +16,7 @@ public class ProductVo {
 
     private Integer typeId;
 
-    @Mapping(translator = "getTypeById", mapper = "typeId",receive = "typeName")
+    @Mapping(translator = "getTypeById", mappers = @Mapper("typeId"), receive = "typeName")
     private String typeName;
 
 

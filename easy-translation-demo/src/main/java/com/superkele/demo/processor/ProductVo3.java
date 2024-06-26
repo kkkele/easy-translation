@@ -1,6 +1,7 @@
 package com.superkele.demo.processor;
 
 import cn.hutool.core.date.DateUtil;
+import com.superkele.translation.annotation.Mapper;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.boot.annotation.Translator;
 import lombok.Data;
@@ -13,10 +14,10 @@ public class ProductVo3 {
 
     private String productName;
 
-    @Mapping(translator = "getTypeId", async = true, mapper = "productId", sort = 0)
+    @Mapping(translator = "getTypeId", async = true, mappers = @Mapper("productId"), sort = 0)
     private Integer typeId;
 
-    @Mapping(translator = "getTypeById",  async = true,after = "typeId", mapper = "typeId",receive = "typeName")
+    @Mapping(translator = "getTypeById",  async = true,after = "typeId", mappers = @Mapper("typeId"),receive = "typeName")
     private String typeName;
 
     @Mapping(translator = "getCurrentTime", async = true,sort = 0)

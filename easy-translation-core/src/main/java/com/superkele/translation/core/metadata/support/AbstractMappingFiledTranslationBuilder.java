@@ -3,9 +3,7 @@ package com.superkele.translation.core.metadata.support;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.Mapping;
-import com.superkele.translation.annotation.RefTranslation;
 import com.superkele.translation.annotation.constant.TranslateTiming;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
@@ -13,13 +11,15 @@ import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.util.Assert;
 import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.ReflectUtils;
-import com.superkele.translation.core.util.Singleton;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 基于@Mapping注解的字段翻译构建器
+ */
 public abstract class AbstractMappingFiledTranslationBuilder implements FieldTranslationBuilder {
 
     @Override
@@ -59,30 +59,24 @@ public abstract class AbstractMappingFiledTranslationBuilder implements FieldTra
         //第一次遍历，转化为FieldTranslationEvent对象
         //并放入map收集基本情况
         //查看是否需要开启缓存功能
-        Set<String> uniqueNameSet = new HashSet<>();
         for (Pair<Field, Mapping> pair : mappingFields) {
+            short eventValue = (short) (initEvent << leftShift++);
             Field field = pair.getKey();
             Mapping mapping = pair.getValue();
             FieldTranslationEvent event = new FieldTranslationEvent();
-            short eventValue = (short) (initEvent << leftShift);
-            RefTranslation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, RefTranslation.class);
-            event.setRefTranslation(mergedAnnotation);
-            event.setPropertyName(field.getName());
             event.setEventValue(eventValue);
-            event.setAsync(mapping.async());
-            event.setTranslator(mapping.translator());
-            event.setNotNullMapping(mapping.notNullMapping());
-            event.setOther(mapping.other());
-            event.setNullPointerExceptionHandler(Singleton.get(mapping.nullPointerHandler()));
-            event.setMappingStrategy(mapping.strategy());
-            event.setReceive(mapping.receive());
-            String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());
-            event.setCacheKey(uniqueName);
-            buildGroupKey(event, field, mapping);
-            buildMapper(event, field, mapping);
-            buildParamHandler(event,field,mapping);
-            buildResultHandler(event,field,mapping);
-            leftShift++;
+            setPropertyName(event,field,mapping);
+            setAsync(event,field,mapping);
+            setTranslator(event,field,mapping);
+            setNotNullMapping(event,field,mapping);
+            setOthers(event,field,mapping);
+            setNullPointerExceptionHandler(event,field,mapping);
+            setMappingStrategy(event,field,mapping);
+            setReceive(event,field,mapping);
+            setRefTranslation(event,field,mapping);
+            setGroupKey(event, field, mapping);
+            setMapperDesc(event, field, mapping);
+            setResultHandler(event,field,mapping);
             processAfterBuild(field, event);
             fieldNameEventMap.put(field.getName(), event);
         }
@@ -91,9 +85,6 @@ public abstract class AbstractMappingFiledTranslationBuilder implements FieldTra
             String fieldName = pair.getKey().getName();
             Mapping mapping = pair.getValue();
             FieldTranslationEvent event = fieldNameEventMap.get(fieldName);
-            if (uniqueNameSet.contains(event.getCacheKey())) {
-                event.setCacheEnable(true);
-            }
             if (mapping.after().length == 0) {
                 event.setTriggerMask((short) 0);
                 sortEvents.add(event);
@@ -135,13 +126,29 @@ public abstract class AbstractMappingFiledTranslationBuilder implements FieldTra
         return res;
     }
 
-    protected abstract void buildParamHandler(FieldTranslationEvent event, Field field, Mapping mapping);
+    protected abstract void setReceive(FieldTranslationEvent event, Field field, Mapping mapping);
 
-    protected abstract void buildResultHandler(FieldTranslationEvent event, Field field, Mapping mapping);
+    protected abstract void setMappingStrategy(FieldTranslationEvent event, Field field, Mapping mapping);
 
-    protected abstract void buildMapper(FieldTranslationEvent event, Field field, Mapping mapping);
+    protected abstract void setNullPointerExceptionHandler(FieldTranslationEvent event, Field field, Mapping mapping);
 
-    protected abstract void buildGroupKey(FieldTranslationEvent event, Field field, Mapping mapping);
+    protected abstract void setOthers(FieldTranslationEvent event, Field field, Mapping mapping);
+
+    protected abstract void setNotNullMapping(FieldTranslationEvent event, Field field, Mapping mapping);
+
+    protected abstract void setTranslator(FieldTranslationEvent event, Field field, Mapping mapping);
+
+    protected abstract void setAsync(FieldTranslationEvent event, Field field, Mapping mapping);
+
+    protected abstract void setPropertyName(FieldTranslationEvent event, Field field, Mapping mapping);
+
+    protected abstract void setRefTranslation(FieldTranslationEvent event, Field field, Mapping mapping);
+
+    protected abstract void setResultHandler(FieldTranslationEvent event, Field field, Mapping mapping);
+
+    protected abstract void setMapperDesc(FieldTranslationEvent event, Field field, Mapping mapping);
+
+    protected abstract void setGroupKey(FieldTranslationEvent event, Field field, Mapping mapping);
 
     protected abstract void processAfterBuild(Field field, FieldTranslationEvent event);
 

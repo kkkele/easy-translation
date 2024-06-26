@@ -26,18 +26,12 @@ public @interface Mapping {
     String translator() default "";
 
     /**
-     * 映射的字段
-     */
-    String[] mapper() default {};
-
-
-    /**
      * 接收的属性内容
      */
     String receive() default "";
 
     /**
-     * 其他字段
+     * 辅助条件，将值修改成对应类型后直接传递给翻译器
      */
     String[] other() default {};
 
@@ -52,9 +46,27 @@ public @interface Mapping {
     MappingStrategy strategy() default MappingStrategy.SINGLE_MAPPING;
 
     /**
-     * @see com.superkele.translation.core.mapping.MappingHandler
+     * 替代原先的mapper字段
+     * 后续将逐步替换掉mapper字段的使用
+     * @since 1.4.0
+     * @return
      */
-    MappingHandler mappingHandler() default @MappingHandler;
+    Mapper[] mappers() default {};
+
+    /**
+     * <p>分组依据
+     * <p>辅助结果处理器进行结果筛选
+     * <p>具体用法，可以查考默认结果处理器
+     * @see com.superkele.translation.core.mapping.ResultHandler
+     * @see com.superkele.translation.core.mapping.support.DefaultResultHandler
+     */
+    String[] groupKey() default {};
+
+    /**
+     * 结果处理器
+     * @see com.superkele.translation.core.mapping.ResultHandler
+     */
+    String resultHandler() default "";
 
     /**
      * 当不为null时，是否也映射
@@ -73,20 +85,16 @@ public @interface Mapping {
     boolean async() default false;
 
     /**
-     * <p>
      * 在该字段翻译执行后再开始翻译，主要用于精细化控制异步翻译时的执行顺序
      * 当该字段生效时，无视sort的执行顺序
      * 该字段会使得field在前置事件执行完然后回调进行翻译，所以即时您将async设为false,也存在不在主线程中运行的情况
      * 这主要取决于最后触发该事件的翻译字段在哪个线程中
-     * </p>
      */
     String[] after() default {};
 
 
     /**
      * 当翻译时，属性为空导致了空指针异常的解决方案
-     *
-     * @return
      */
     Class<? extends NullPointerExceptionHandler> nullPointerHandler() default DefaultNullPointerExceptionHandler.class;
 
