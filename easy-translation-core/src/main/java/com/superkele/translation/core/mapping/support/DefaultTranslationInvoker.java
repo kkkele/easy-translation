@@ -18,36 +18,22 @@ import java.util.stream.Collectors;
 import static com.superkele.translation.core.util.PropertyUtils.getPropertyHandler;
 
 public class DefaultTranslationInvoker implements TranslationInvoker {
+
+
     @Override
     public void invoke(Object source, Translator translator, FieldTranslationEvent event, Map<String, Object> cache) {
-        if (!event.isNotNullMapping()) {
-            if (PropertyUtils.invokeGetter(source, event.getPropertyName()) != null) {
-                return;
-            }
-        }
+        if (filterNotMapping(source, event)) return;
         MapperDesc[] mappers = event.getMappers();
         String[] others = event.getOthers();
         int mapperLength = mappers.length;
         int otherLength = others.length;
-        Object[] mapperKey = Arrays.stream(mappers)
-                .map(mapperDesc -> {
-                    String mapper = mapperDesc.getMapper();
-                    Object param = null;
-                    if (StrUtil.isNotBlank(mapper)) {
-                        try {
-                            param = getPropertyHandler().invokeGetter(source, mapper);
-                        } catch (NullPointerException e) {
-                            event.getNullPointerExceptionHandler().handle(e);
-                        }
-                    }
-                    return param;
-                })
-                .toArray(Object[]::new);
+        Object[] mapperKey = buildSingleMapperKey(source, event, mappers);
         Object mappingValue = null;
         //loadFromCache
+        String cacheKey = null;
         if (cache != null) {
-            String cacheUnique = event.getCacheKey() + StrUtil.join(",", mapperKey);
-            mappingValue = cache.get(cacheUnique);
+            cacheKey = event.getTranslator() + StrUtil.join(",", mapperKey);
+            mappingValue = cache.get(cacheKey);
         }
         //缓存未命中
         mappingValue = Optional.ofNullable(mappingValue)
@@ -68,8 +54,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         }
         //加载至缓存中
         if (cache != null) {
-            String cacheUnique = event.getCacheKey() + StrUtil.join(",", mapperKey);
-            cache.put(cacheUnique, mappingValue);
+            cache.put(cacheKey, mappingValue);
         }
         //结果处理
         ResultHandler resultHandler = event.getResultHandler();
@@ -80,6 +65,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         PropertyUtils.invokeSetter(source, event.getPropertyName(), PropertyUtils.invokeGetter(mapResult, event.getReceive()));
     }
 
+
     @Override
     public void invokeBatch(List<Object> sources, Translator translator, FieldTranslationEvent event, Map<String, Object> cache) {
         MapperDesc[] mappers = event.getMappers();
@@ -87,30 +73,15 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         int mapperLength = mappers.length;
         int otherLength = others.length;
         List<Object[]> mapperKeys = sources.stream()
-                .map(source -> Arrays.stream(mappers)
-                        .map(mapperDesc -> {
-                            String mapper = mapperDesc.getMapper();
-                            Object param = null;
-                            if (StrUtil.isNotBlank(mapper)) {
-                                try {
-                                    param = getPropertyHandler().invokeGetter(source, mapper);
-                                } catch (NullPointerException e) {
-                                    event.getNullPointerExceptionHandler().handle(e);
-                                }
-                            }
-                            return param;
-                        })
-                        .toArray(Object[]::new))
+                .map(source -> buildSingleMapperKey(source, event, mappers))
                 .collect(Collectors.toList());
-        Object mappingValue = Optional.ofNullable(cache)
-                .map(c -> {
-                    if (event.isCacheEnable()) {
-                        return c.get(event.getCacheKey());
-                    } else {
-                        return null;
-                    }
-                })
-                .orElse(null);
+        //loadFromCache
+        String cacheKey = null;
+        Object mappingValue = null;
+        if (cache != null) {
+            cacheKey = event.getTranslator() + StrUtil.join(",", event.getMappers(), event.getOthers(), event.getMappingStrategy());
+            mappingValue = cache.get(cacheKey);
+        }
         mappingValue = Optional.ofNullable(mappingValue)
                 .orElseGet(() -> {
                     //组建参数
@@ -130,8 +101,8 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
             return;
         }
         //加载至缓存中
-        if (event.isCacheEnable() && cache != null) {
-            cache.put(event.getCacheKey(), mappingValue);
+        if (cache != null) {
+            cache.put(cacheKey, mappingValue);
         }
         //结果处理
         ResultHandler resultHandler = event.getResultHandler();
@@ -139,6 +110,9 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         Object processedResult = resultHandler.handle(mappingValue, event.getGroupKey(), true);
         for (int i = 0; i < sources.size(); i++) {
             Object source = sources.get(i);
+            if (filterNotMapping(source, event)) {
+                continue;
+            }
             Object[] mapperKey = mapperKeys.get(i);
             //分配结果
             Object mapResult = resultHandler.map(processedResult, mapperKey, true);
@@ -147,6 +121,35 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         }
     }
 
+    /**
+     * 组建单的对象的基础映射键
+     *
+     * @param source  对象
+     * @param event   事件
+     * @param mappers 映射详细描述
+     * @return
+     */
+    protected Object[] buildSingleMapperKey(Object source, FieldTranslationEvent event, MapperDesc[] mappers) {
+        Object[] mapperKey = Arrays.stream(mappers)
+                .map(mapperDesc -> {
+                    String mapper = mapperDesc.getMapper();
+                    Object param = null;
+                    if (StrUtil.isNotBlank(mapper)) {
+                        try {
+                            param = getPropertyHandler().invokeGetter(source, mapper);
+                        } catch (NullPointerException e) {
+                            event.getNullPointerExceptionHandler().handle(e);
+                        }
+                    }
+                    return param;
+                })
+                .toArray(Object[]::new);
+        return mapperKey;
+    }
+
+    /**
+     * 组建翻译参数
+     */
     protected void fillTranslatorArgs(Object[] args, int mapperLength, Object[] mapperKeys, int otherLength, String[] others) {
         for (int i = 0; i < mapperLength; i++) {
             args[i] = mapperKeys[i];
@@ -157,6 +160,22 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         while (i < mapperLength + otherLength) {
             args[i++] = others[j++];
         }
+    }
+
+    /**
+     * 过滤不需要映射的对象
+     *
+     * @param source
+     * @param event
+     * @return
+     */
+    protected boolean filterNotMapping(Object source, FieldTranslationEvent event) {
+        if (!event.isNotNullMapping()) {
+            if (PropertyUtils.invokeGetter(source, event.getPropertyName()) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
