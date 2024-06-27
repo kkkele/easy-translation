@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 @SpringBootTest(classes = {ParamHandlerTest.TestConfig.class, EasyTranslationDemoApplication.class})
