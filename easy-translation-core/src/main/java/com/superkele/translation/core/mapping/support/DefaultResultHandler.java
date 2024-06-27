@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 public class DefaultResultHandler implements ResultHandler<Object, Object, Object> {
 
     @Override
-    public Object handle(Object result, String[] groupKey, boolean isBatch) {
-        if (!isBatch || groupKey.length == 0) {
+    public Object handle(Object result, String[] groupKey) {
+        if (groupKey.length == 0) {
             return result;
         }
         if (result instanceof Collection) {
@@ -33,8 +33,8 @@ public class DefaultResultHandler implements ResultHandler<Object, Object, Objec
 
 
     @Override
-    public Object map(Object processResult,int index ,Object[] mapperKey, boolean isBatch) {
-        if (!isBatch || mapperKey.length == 0) {
+    public Object map(Object processResult, int index, Object source, Object[] mapperKey) {
+        if (mapperKey.length == 0) {
             return processResult;
         }
         if (processResult instanceof Map) {
@@ -48,13 +48,16 @@ public class DefaultResultHandler implements ResultHandler<Object, Object, Objec
                 }
             }
             return res;
-        }else if (processResult instanceof List){
+        } else if (processResult instanceof List) {
             try {
                 List<Object> list = (List<Object>) processResult;
                 return list.get(index);
             } catch (IndexOutOfBoundsException e) {
-                throw new TranslationException("无法顺利执行结果分配，重自定义ResultHandler，重写分配规则",e);
+                throw new TranslationException("无法顺利执行结果分配，重自定义ResultHandler，重写分配规则", e);
             }
+        } else if (processResult instanceof Object[]) {
+            Object[] arr = (Object[]) processResult;
+            return arr[index];
         }
         return processResult;
     }

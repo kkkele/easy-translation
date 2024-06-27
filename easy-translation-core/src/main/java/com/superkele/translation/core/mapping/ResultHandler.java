@@ -16,10 +16,9 @@ public interface ResultHandler<T, R, S> {
      *
      * @param result   翻译的结果
      * @param groupKey 批量翻译时的分组依据
-     * @param isBatch  是否是批量翻译
      * @return
      */
-    R handle(T result, String[] groupKey, boolean isBatch);
+    R handle(T result, String[] groupKey);
 
     /**
      * 结果选择
@@ -27,8 +26,7 @@ public interface ResultHandler<T, R, S> {
      * @param processResult #handle 处理后的结果
      * @param index         对象的索引
      * @param mapperKey     对象的映射key数组 例如@Mapping(mapper={"spuId","createTime"})，则会选取spuId和createTime两个属性的值
-     * @param isBatch       是否是批量翻译
      * @return
      */
-    S map(R processResult, int index, Object[] mapperKey, boolean isBatch);
+    S map(R processResult, int index,Object source,Object[] mapperKey);
 }

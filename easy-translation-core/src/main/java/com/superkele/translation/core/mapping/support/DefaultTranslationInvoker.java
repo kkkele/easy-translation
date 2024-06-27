@@ -65,9 +65,9 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         //结果处理
         ResultHandler resultHandler = event.getResultHandler();
         //处理翻译结果
-        Object processedResult = resultHandler.handle(mappingValue, event.getGroupKey(), false);
+        Object processedResult = resultHandler.handle(mappingValue, event.getGroupKey());
         //分配结果
-        Object mapResult = resultHandler.map(processedResult, 0,mapperKey, false);
+        Object mapResult = resultHandler.map(processedResult, 0, source, mapperKey);
         PropertyUtils.invokeSetter(source, event.getPropertyName(), PropertyUtils.invokeGetter(mapResult, event.getReceive()));
     }
 
@@ -114,7 +114,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         //结果处理
         ResultHandler resultHandler = event.getResultHandler();
         //处理翻译结果
-        Object processedResult = resultHandler.handle(mappingValue, event.getGroupKey(), true);
+        Object processedResult = resultHandler.handle(mappingValue, event.getGroupKey());
         for (int i = 0; i < sources.size(); i++) {
             Object source = sources.get(i);
             if (filterNotMapping(source, event)) {
@@ -122,9 +122,11 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
             }
             Object[] mapperKey = mapperKeys.get(i);
             //分配结果
-            Object mapResult = resultHandler.map(processedResult,i, mapperKey, true);
+            Object mapResult = resultHandler.map(processedResult, i, source, mapperKey);
             //注入值
-            PropertyUtils.invokeSetter(source, event.getPropertyName(), PropertyUtils.invokeGetter(mapResult, event.getReceive()));
+            Object value = null;
+            value = PropertyUtils.invokeGetter(mapResult, event.getReceive());
+            PropertyUtils.invokeSetter(source, event.getPropertyName(), value);
         }
     }
 
