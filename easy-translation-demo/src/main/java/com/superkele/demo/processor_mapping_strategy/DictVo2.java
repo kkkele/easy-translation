@@ -1,4 +1,4 @@
-package com.superkele.demo.processor_mapping_handler;
+package com.superkele.demo.processor_mapping_strategy;
 
 import com.superkele.translation.annotation.Mapper;
 import com.superkele.translation.annotation.Mapping;

@@ -45,7 +45,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         mappingValue = Optional.ofNullable(mappingValue)
                 .orElseGet(() -> {
                     //组建参数
-                    Object[] args = new Object[16];
+                    Object[] args = new Object[mapperLength + otherLength];
                     Object[] processedMapperKey = new Object[mapperLength];
                     for (int i = 0; i < mappers.length; i++) {
                         processedMapperKey[i] = mappers[i].getParamHandler()
@@ -92,7 +92,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         mappingValue = Optional.ofNullable(mappingValue)
                 .orElseGet(() -> {
                     //组建参数
-                    Object[] args = new Object[16];
+                    Object[] args = new Object[mapperLength + otherLength];
                     Object[] processedMapperKey = new Object[mapperLength];
                     for (int i = 0; i < mappers.length; i++) {
                         final int _index = i;

@@ -5,7 +5,6 @@ import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.mapping.TranslationInvoker;
 import com.superkele.translation.core.mapping.support.DefaultTranslationInvoker;
 import com.superkele.translation.core.metadata.FieldTranslationFactory;
-import com.superkele.translation.core.metadata.support.DefaultConfigurableFieldTranslationFactory;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
 import java.util.concurrent.Executor;

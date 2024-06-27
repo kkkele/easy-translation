@@ -2,6 +2,7 @@ package com.superkele.translation.core.context.support;
 
 
 import com.superkele.translation.core.config.DefaultTranslatorNameGenerator;
+import com.superkele.translation.core.context.ConfigurableTranslatorContext;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
@@ -10,9 +11,11 @@ import com.superkele.translation.core.translator.support.DefaultTranslatorFactor
 import com.superkele.translation.core.translator.support.ExecutorParamInvokeFactoryPostProcessor;
 import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefreshableTranslatorContext {
 
@@ -20,6 +23,14 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
 
     protected List<TranslatorPostProcessor> translatorPostProcessors = new CopyOnWriteArrayList<>();
 
+    private List<Consumer<ConfigurableTranslatorContext>> listeners = new LinkedList<>();
+
+    @Override
+    protected void noticeListeners() {
+        for (Consumer<ConfigurableTranslatorContext> listener : listeners) {
+            listener.accept(this);
+        }
+    }
 
     public void addTranslatorPostProcessor(TranslatorPostProcessor translatorPostProcessor) {
         translatorPostProcessors.remove(translatorPostProcessor);
@@ -84,4 +95,11 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
     }
 
     protected abstract String[] getBasePackages();
+
+    @Override
+    public void register(Consumer<ConfigurableTranslatorContext> consumer) {
+        this.listeners.remove(consumer);
+        this.listeners.add(consumer);
+    }
+
 }

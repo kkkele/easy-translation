@@ -1,10 +1,10 @@
 package com.superkele.translation.core.thread;
 
-public interface ContextHolder {
+public interface ContextHolder<T> {
 
-    Object getContext();
+    T getContext();
 
-    void passContext(Object context);
+    void passContext(T context);
 
     void clearContext();
 }

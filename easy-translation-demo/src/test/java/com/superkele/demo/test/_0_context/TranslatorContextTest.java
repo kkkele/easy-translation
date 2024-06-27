@@ -1,4 +1,4 @@
-package com.superkele.demo.test.context;
+package com.superkele.demo.test._0_context;
 
 
 import com.superkele.demo.context.Status;
@@ -29,6 +29,8 @@ public class TranslatorContextTest {
 
     /**
      * 测试静态方法创建的translator （无需invokeBean激活，单例的翻译器）
+     *
+     * @see com.superkele.demo.context.AppUserService#produceRandomUser(Integer)
      */
     @Test
     public void testStaticTranslator() {
@@ -41,6 +43,8 @@ public class TranslatorContextTest {
 
     /**
      * 测试 单例的动态方法（只有第一次加载的时候会创建，只从beanFactory中获取一次invokeBean，然后一直复用该translator）
+     *
+     * @see com.superkele.demo.context.AppUserService#getUserByIdSingleton(Integer)
      */
     @Test
     public void testSingletonDynamicTranslator() {
@@ -56,6 +60,8 @@ public class TranslatorContextTest {
 
     /**
      * 测试 原型的动态方法 （每次调用translator会重新创建，从beanFactory中重新获取bean）
+     *
+     * @see com.superkele.demo.context.AppUserService#getUserByIdPrototype(Integer)
      */
     @Test
     public void testPrototypeDynamicTranslator() {
@@ -72,6 +78,9 @@ public class TranslatorContextTest {
 
     /**
      * 测试 将translator标记在接口上，然后动态查找翻译器实现
+     *
+     * @see com.superkele.demo.context.AppUserService#getUserById(Integer)
+     * @see com.superkele.demo.context.AppUserService#getUserById2(Integer)
      */
     @Test
     public void testInterfaceTranslator() {
@@ -90,6 +99,8 @@ public class TranslatorContextTest {
 
     /**
      * 测试 使用enum创建的translator
+     *
+     * @see com.superkele.demo.context.Status
      */
     @Test
     public void testEnumTranslator() {

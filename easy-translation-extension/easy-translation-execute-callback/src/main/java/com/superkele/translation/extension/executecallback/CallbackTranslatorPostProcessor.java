@@ -11,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CallbackTranslatorPostProcessor implements TranslatorPostProcessor {
 
-    private final List<CallBackRegister> callBackRegisters;
+    private final List<TranslationCallBack> callBackRegisters;
 
     @Override
     public Translator postProcessorBeforeInit(Translator translator, String translatorName) {
@@ -19,13 +19,12 @@ public class CallbackTranslatorPostProcessor implements TranslatorPostProcessor 
             return translator;
         }
         Translator translatorPlus = translator;
-        for (CallBackRegister callBackRegister : callBackRegisters) {
-            TranslateExecuteCallBack translateExecuteCallBack = callBackRegister.callBack();
+        for (TranslationCallBack callBackRegister : callBackRegisters) {
             if (ReUtil.isMatch(callBackRegister.match(), translatorName)) {
                 Translator copyTranslator = translatorPlus;
                 translatorPlus = args -> {
                     Object result = copyTranslator.doTranslate(args);
-                    translateExecuteCallBack.onSuccess(result);
+                    callBackRegister.onSuccess(result);
                     return result;
                 };
             }

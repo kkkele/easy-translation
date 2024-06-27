@@ -11,6 +11,8 @@ import java.util.Arrays;
  * 抽象翻译器上下文
  */
 public abstract class AbstractTranslatorContext implements ConfigurableTranslatorContext {
+
+
     @Override
     public void refresh() {
         //创建TranslatorFactory,并加载TranslatorDefinition
@@ -23,7 +25,11 @@ public abstract class AbstractTranslatorContext implements ConfigurableTranslato
         loadTranslatorPostProcessors(translatorFactory);
         //实例化translator
         loadTranslators(translatorFactory);
+        //回调触发其他事件
+        noticeListeners();
     }
+
+    protected abstract void noticeListeners();
 
     protected void loadTranslators(ConfigurableTranslatorDefinitionFactory translatorFactory) {
         Arrays.stream(translatorFactory.getTranslatorNames())
@@ -31,7 +37,7 @@ public abstract class AbstractTranslatorContext implements ConfigurableTranslato
                     try {
                         return translatorFactory.findTranslator(translatorName);
                     } catch (RuntimeException e) {
-                        LogUtils.error(System.err::printf, "load translator error:\n%s\n",() ->e);
+                        LogUtils.error(System.err::printf, "load translator error:\n%s\n", () -> e);
                         return null;
                     }
                 })
@@ -40,7 +46,6 @@ public abstract class AbstractTranslatorContext implements ConfigurableTranslato
     }
 
     protected abstract void loadTranslatorPostProcessors(ConfigurableTranslatorDefinitionFactory translatorFactory);
-
 
     protected abstract void invokeTranslatorFactoryPostProcessors(ConfigurableTranslatorDefinitionFactory translatorFactory);
 

@@ -16,30 +16,23 @@ public class TranslationGlobalInformation {
     private static List<String> translatorPackages = new CopyOnWriteArrayList();
     private static List<String> domainPackages = new CopyOnWriteArrayList();
 
-    public static void addTranslatorPackage(String... packages) {
-        for (String aPackage : packages) {
-            TranslationGlobalInformation.translatorPackages.add(aPackage);
-            LogUtils.debug(log::debug," translator 增加包扫描:{}",()->aPackage);
-        }
-    }
-
-    public static void addTranslatorPackage(Collection<String> packages) {
+    public static void addTranslatorPackage(Iterable<String> packages) {
         Optional.ofNullable(packages)
                 .ifPresent(p -> {
                     for (String aPackage : p) {
                         TranslationGlobalInformation.translatorPackages.add(aPackage);
-                        LogUtils.debug(log::debug," translator 增加包扫描:{}",()->aPackage);
+                        LogUtils.debug(log::debug, " translator 增加包扫描:{}", () -> aPackage);
                     }
                 });
     }
 
 
-    public static void addDomainPackage(Collection<String> packages) {
+    public static void addDomainPackage(Iterable<String> packages) {
         Optional.ofNullable(packages)
                 .ifPresent(p -> {
                     for (String aPackage : packages) {
                         TranslationGlobalInformation.domainPackages.add(aPackage);
-                        LogUtils.debug(log::debug," domain 增加包扫描:{}",()->aPackage);
+                        LogUtils.debug(log::debug, " domain 增加包扫描:{}", () -> aPackage);
                     }
                 });
     }

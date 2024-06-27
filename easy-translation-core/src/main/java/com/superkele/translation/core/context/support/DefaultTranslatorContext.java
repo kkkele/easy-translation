@@ -23,7 +23,6 @@ public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext 
         this.config = config;
         this.basePackages = basePackages;
         this.invokeBeanFactory = invokeBeanFactory;
-        refresh();
     }
 
     public DefaultTranslatorContext(InvokeBeanFactory invokeBeanFactory, String... basePackages) {

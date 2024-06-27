@@ -96,7 +96,6 @@ public class DefaultMappingFiledTranslationBuilder extends AbstractMappingFiledT
         ParamDesc[] parameterTypes = translatorDefinition.getParameterTypes();
         //获取key的下标
         int[] mapperIndexs = translatorDefinition.getMapperIndex();
-        int i = 0;
         Mapper[] mappers = mapping.mappers();
         List<Pair<String, String>> mapperParamHandlerPair = Arrays.stream(mappers)
                 .map(mapper -> Arrays.stream(mapper.value())
@@ -105,8 +104,10 @@ public class DefaultMappingFiledTranslationBuilder extends AbstractMappingFiledT
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
         Class<?> declaringClass = field.getDeclaringClass();
-        MapperDesc[] mapperDescs = new MapperDesc[mapperParamHandlerPair.size()];
-        for (Pair<String, String> pair : mapperParamHandlerPair) {
+        MapperDesc[] mapperDescs = new MapperDesc[mapperIndexs.length];
+        int i = 0;
+        while (i < mapperParamHandlerPair.size() && i < mapperIndexs.length) {
+            Pair<String, String> pair = mapperParamHandlerPair.get(i);
             try {
                 String mapperFieldName = pair.getKey();
                 Field declaredField = declaringClass.getDeclaredField(mapperFieldName);
@@ -121,6 +122,13 @@ public class DefaultMappingFiledTranslationBuilder extends AbstractMappingFiledT
             } catch (NoSuchFieldException e) {
                 throw new TranslationException("请填写正确的mapper字段名,传递多个参数时请使用数组", e);
             }
+        }
+        while (i < mapperIndexs.length) {
+            ParamDesc parameterType = parameterTypes[mapperIndexs[i]];
+            MapperDesc mapperDesc = new MapperDesc();
+            mapperDesc.setParamHandler(paramHandlerResolver.resolve(""));
+            mapperDesc.setTargetClass(parameterType.getTargetClass());
+            mapperDescs[i++] = mapperDesc;
         }
         event.setMappers(mapperDescs);
     }

@@ -19,24 +19,32 @@ public class PerfRecordTranslatorFactoryPostProcessor implements TranslatorFacto
         Arrays.stream(factory.getTranslatorNames())
                 .forEach(translatorName -> {
                     TranslatorDefinition translatorDefinition = factory.findTranslatorDefinition(translatorName);
-                    int length = translatorDefinition.getParameterTypes().length;
                     TranslatorDecorator originTranslatorDecorator = translatorDefinition.getTranslateDecorator();
                     translatorDefinition.setTranslateDecorator(translator -> {
-                        Translator decorate = originTranslatorDecorator.decorate(translator);
+                        Translator preTranslator = originTranslatorDecorator.decorate(translator);
                         Translator res = args -> {
                             LogUtils.info(log::debug, "{}接收参数 {}", () -> translatorName, () -> {
                                 StringBuilder sb = new StringBuilder();
                                 sb.append("[");
-                                Object[] arr = Arrays.copyOf(args, length);
-                                sb.append(StrUtil.join(",", arr));
+                                sb.append(StrUtil.join(",", args));
                                 sb.append("]");
                                 return sb;
                             });
                             LogUtils.debug(log::debug, "{}开始执行", () -> translatorName);
                             long start = System.currentTimeMillis();
-                            Object result = decorate.doTranslate(args);
+                            Object result = preTranslator.doTranslate(args);
                             long end = System.currentTimeMillis();
-                            LogUtils.debug(log::debug, "{}执行完成，耗时{}ms，翻译结果为：{}", () -> translatorName, () -> end - start, () -> result);
+                            LogUtils.debug(log::debug, "{}执行完成，耗时{}ms，翻译结果为=>{}", () -> translatorName, () -> end - start, () -> {
+                                if (result instanceof Iterable) {
+                                    Iterable<Object> iterable = ((Iterable) result);
+                                    StringBuilder sb = new StringBuilder();
+                                    sb.append("\n{\n");
+                                    sb.append(StrUtil.join(",\n",iterable));
+                                    sb.append("\n}\n");
+                                    return sb.toString();
+                                }
+                                return result;
+                            });
                             return result;
                         };
                         return res;

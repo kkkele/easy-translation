@@ -1,4 +1,4 @@
-package com.superkele.demo.processor_mapping_handler;
+package com.superkele.demo.processor_mapping_strategy;
 
 import cn.hutool.core.date.DateUtil;
 import com.superkele.translation.boot.annotation.Translator;

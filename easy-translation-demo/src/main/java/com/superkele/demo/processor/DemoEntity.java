@@ -4,6 +4,7 @@ package com.superkele.demo.processor;
 import com.superkele.translation.annotation.Mapper;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.TransMapper;
+import com.superkele.translation.annotation.TransOther;
 import com.superkele.translation.boot.annotation.Translator;
 import lombok.Data;
 
@@ -16,19 +17,23 @@ public class DemoEntity {
     @Mapping(translator = "demo_getName1", mappers = @Mapper("var0"))
     private String var1;
 
-    @Mapping(translator = "demo_getName2", mappers = @Mapper("var0"), other = "1")
+    @Mapping(translator = "demo_getNameByCondition2", other = {"小红","小绿","小青"})
     private String var2;
 
-    @Mapping(translator = "demo_getName3", mappers = @Mapper("var0"), other = {"程序员", "1"})
+    @Mapping(translator = "demo_getName2", mappers = @Mapper("var0"), other = "1")
     private String var3;
 
-    @Mapping(translator = "demo_getName4", mappers = @Mapper("var0"), other = {"程序员", "1"})
+    @Mapping(translator = "demo_getName3", mappers = @Mapper("var0"), other = {"程序员", "1"})
     private String var4;
 
-    private Integer sort;
+    @Mapping(translator = "demo_getName4", mappers = @Mapper("var0"), other = {"程序员", "1"})
+    private String var5;
+
+    private Integer sort = 1;
 
     @Mapping(translator = "demo_getName5", mappers = @Mapper({"var0", "sort"}), other = "程序员")
-    private String var5;
+    private String var6;
+
 
     @Translator("demo_getName")
     public static String getName() {
@@ -37,6 +42,11 @@ public class DemoEntity {
 
     @Translator("demo_getName1")
     public static String getName1(String name) {
+        return "超级" + name;
+    }
+
+    @Translator("demo_getNameByCondition2")
+    public static String getNameByCondition2(@TransOther String name) {
         return "超级" + name;
     }
 

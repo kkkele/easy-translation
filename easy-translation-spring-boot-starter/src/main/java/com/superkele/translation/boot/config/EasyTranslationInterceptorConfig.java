@@ -12,9 +12,12 @@ import com.superkele.translation.core.translator.definition.TranslatorPostProces
 import com.superkele.translation.core.util.LogUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +27,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "easy-translation", name = "enable", havingValue = "true")
-public class EasyTranslationInterceptorConfig {
+public class EasyTranslationInterceptorConfig implements ApplicationContextAware {
 
     private final TranslationConfig config;
 
@@ -32,18 +35,6 @@ public class EasyTranslationInterceptorConfig {
 
     private final DefaultTranslationProcessor defaultTranslationProcessor;
 
-    @Autowired
-    public void setLog(TranslationConfig properties) {
-        Optional.ofNullable(properties)
-                .ifPresent(p -> {
-                    LogUtils.printLog = p.isDebug();
-                    LogUtils.debug(log::debug, "debug mode enabled");
-                    Set<String> translator = properties.getBasePackage().getTranslator();
-                    TranslationGlobalInformation.addTranslatorPackage(translator);
-                    Set<String> domain = properties.getBasePackage().getDomain();
-                    TranslationGlobalInformation.addDomainPackage(domain);
-                });
-    }
 
     @Autowired(required = false)
     public void customize(List<TranslationAutoConfigurationCustomizer> configCustomizers) {
@@ -81,4 +72,8 @@ public class EasyTranslationInterceptorConfig {
             });
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.defaultTransExecutorContext.refresh();
+    }
 }

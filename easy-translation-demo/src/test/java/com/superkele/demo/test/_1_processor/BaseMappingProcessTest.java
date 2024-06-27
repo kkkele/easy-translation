@@ -1,4 +1,4 @@
-package com.superkele.demo.test.processor;
+package com.superkele.demo.test._1_processor;
 
 import com.superkele.demo.processor.*;
 import com.superkele.demo.test.utils.PropertyUtils;
@@ -35,6 +35,7 @@ public class BaseMappingProcessTest {
 
     /**
      * 测试 单mapper参数翻译
+     * @see com.superkele.demo.processor.ProductVo
      */
     @Test
     @Repeat(10)
@@ -54,6 +55,7 @@ public class BaseMappingProcessTest {
 
     /**
      * 测试 排序映射是否满足要求
+     * @see com.superkele.demo.processor.ProductVo2
      */
     @Test
     @Repeat(10)
@@ -69,6 +71,7 @@ public class BaseMappingProcessTest {
 
     /**
      * 测试 异步翻译
+     * @see com.superkele.demo.processor.ProductVo3
      */
     @Test
     @Repeat(100)
@@ -88,14 +91,13 @@ public class BaseMappingProcessTest {
      *
      * @see com.superkele.demo.processor.DemoEntity
      * 在@Translator标记的方法里，添加了@TransMapper注的参数将会成为mapper字段，其余不添加的将会成为other字段
-     * 注意，当方法中没有任何参数添加@TransMapper时，会默认指定第一个参数为mapper字段,
+     * 注意，当方法中没有任何参数添加@TransMapper，且没有任何参数添加@TransOther时，会默认指定第一个参数为mapper字段,
      * mapper字段即获取对象的mapper属性的值，other字段为补充条件，直接传递给方法。
      */
     @Test
     @Repeat(5)
     public void testMultiParamMapping() {
         DemoEntity demoEntity = new DemoEntity();
-        demoEntity.setSort(new Random().nextInt(10));
         process(demoEntity);
         PropertyUtils.getProperties(demoEntity).forEach((k, v) -> {
             Assert.assertNotNull(v);
@@ -105,6 +107,7 @@ public class BaseMappingProcessTest {
 
     /**
      * 测试 notNullMapping 在关闭notNullMapping后，当对象原本就有值时，是否执行翻译
+     * @see com.superkele.demo.processor.ProductVo4
      */
     @Test
     public void testNotNullMapping() {

@@ -1,6 +1,6 @@
 package com.superkele.translation.extension.executecallback;
 
-public interface CallBackRegister<T> {
+public interface TranslationCallBack<T> {
 
     /**
      * 匹配翻译器名称，当匹配到时，为该翻译器执行增加回调
@@ -9,7 +9,7 @@ public interface CallBackRegister<T> {
      */
     String match();
 
-    TranslateExecuteCallBack<T> callBack();
+    void onSuccess(T result);
 
     default int sort(){
         return 0;

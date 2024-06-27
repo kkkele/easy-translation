@@ -36,16 +36,15 @@ public class EasyTranslationConfig {
 
 
     @Bean
-    @ConditionalOnMissingBean
     public SpringInvokeBeanFactory springInvokeBeanFactory() {
         return new SpringInvokeBeanFactory();
     }
 
     @Bean
-    public DefaultTranslatorContext defaultTranslatorContext(Config config,SpringInvokeBeanFactory springInvokeBeanFactory) {
+    public DefaultTranslatorContext defaultTranslatorContext(Config config, SpringInvokeBeanFactory springInvokeBeanFactory) {
         String[] scanPackages = TranslationGlobalInformation.getTranslatorPackages()
                 .stream().toArray(String[]::new);
-        return new DefaultTranslatorContext(config,springInvokeBeanFactory, scanPackages);
+        return new DefaultTranslatorContext(config, springInvokeBeanFactory, scanPackages);
     }
 
     @Bean
@@ -57,6 +56,7 @@ public class EasyTranslationConfig {
     public SpringResultHandlerResolver springResultHandlerResolver() {
         return new SpringResultHandlerResolver();
     }
+
     @Bean
     public DefaultParamHandler defaultParamHandler() {
         return Singleton.get(DefaultParamHandler.class);
@@ -68,22 +68,19 @@ public class EasyTranslationConfig {
     }
 
     @Bean
-    public DefaultMappingFiledTranslationBuilder defaultMappingFiledTranslationBuilder(DefaultTranslatorContext defaultTransExecutorContext,
-                                                                                       SpringParamHandlerResolver parameterHandlerResolver,
-                                                                                       SpringResultHandlerResolver resultHandlerResolver) {
-        return new DefaultMappingFiledTranslationBuilder(defaultTransExecutorContext.getTranslatorFactory(), parameterHandlerResolver, resultHandlerResolver);
-    }
-
-    @Bean
-    public DefaultConfigurableFieldTranslationFactory defaultConfigurableFieldTranslationFactory(DefaultMappingFiledTranslationBuilder defaultMappingFiledTranslationBuilder) {
-        return new DefaultConfigurableFieldTranslationFactory(defaultMappingFiledTranslationBuilder);
+    public DefaultConfigurableFieldTranslationFactory defaultConfigurableFieldTranslationFactory(DefaultTranslatorContext defaultTranslatorContext,
+                                                                                                 SpringParamHandlerResolver parameterHandlerResolver,
+                                                                                                 SpringResultHandlerResolver resultHandlerResolver) {
+        String[] domainPackages = TranslationGlobalInformation.getDomainPackages()
+                .stream().toArray(String[]::new);
+        return new DefaultConfigurableFieldTranslationFactory(defaultTranslatorContext, parameterHandlerResolver, resultHandlerResolver, domainPackages);
     }
 
     @Bean
     public DefaultTranslationProcessor defaultTranslationProcessor(DefaultTranslatorContext defaultTransExecutorContext,
                                                                    DefaultConfigurableFieldTranslationFactory defaultConfigurableFieldTranslationFactory,
                                                                    Config config) {
-        return new DefaultTranslationProcessor(defaultTransExecutorContext,defaultConfigurableFieldTranslationFactory,config);
+        return new DefaultTranslationProcessor(defaultTransExecutorContext, defaultConfigurableFieldTranslationFactory, config);
     }
 
     @Bean
