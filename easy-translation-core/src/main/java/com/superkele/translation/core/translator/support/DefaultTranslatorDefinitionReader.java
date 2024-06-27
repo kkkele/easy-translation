@@ -44,9 +44,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
 
     /**
      * 枚举翻译暂且只支持一个mapper参数
-     *
-     * @param enumClass
-     * @return
+     * @param enumClass 枚举类
      */
     @Override
     protected TranslatorDefinition convertEnumToTranslatorDefinition(Class<? extends Enum> enumClass) {
@@ -114,22 +112,22 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         try {
             methodHandle = MethodConvert.getDynamicMethodHandle(translatorClazz, method);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new TranslationException("TranslatorDefinition produce failed",e);
         } catch (LambdaConversionException e) {
-            throw new RuntimeException(e);
+            throw new TranslationException("TranslatorDefinition produce failed",e);
         }
         BeanNameResolver beanNameResolver = singleton.computeIfAbsent(translation.beanNameResolver(), key -> {
             try {
                 Constructor<? extends BeanNameResolver> constructor = key.getConstructor();
                 return constructor.newInstance();
             } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
+                throw new TranslationException("TranslatorDefinition produce failed",e);
             } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
+                throw new TranslationException("TranslatorDefinition produce failed",e);
             } catch (InstantiationException e) {
-                throw new RuntimeException(e);
+                throw new TranslationException("TranslatorDefinition produce failed",e);
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new TranslationException("TranslatorDefinition produce failed",e);
             }
         });
         TranslatorDefinition definition = new TranslatorDefinition();

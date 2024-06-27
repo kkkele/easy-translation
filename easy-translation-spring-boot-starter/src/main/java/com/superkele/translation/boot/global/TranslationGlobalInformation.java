@@ -12,8 +12,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public class TranslationGlobalInformation {
 
-    private static final List<String> TRANSLATOR_PACKAGES = new CopyOnWriteArrayList();
-    private static final List<String> DOMAIN_PACKAGES = new CopyOnWriteArrayList();
+    private static final List<String> TRANSLATOR_PACKAGES = new CopyOnWriteArrayList<>();
+    private static final List<String> DOMAIN_PACKAGES = new CopyOnWriteArrayList<>();
 
     public static void addTranslatorPackage(Iterable<String> packages) {
         Optional.ofNullable(packages)

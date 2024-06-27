@@ -3,7 +3,6 @@ package com.superkele.translation.core.metadata;
 import com.superkele.translation.annotation.NullPointerExceptionHandler;
 import com.superkele.translation.annotation.RefTranslation;
 import com.superkele.translation.annotation.constant.MappingStrategy;
-import com.superkele.translation.core.mapping.ParamHandler;
 import com.superkele.translation.core.mapping.ResultHandler;
 import lombok.Data;
 

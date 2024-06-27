@@ -32,7 +32,7 @@ public class ReflectionsPlus extends Reflections {
                 .collect(Collectors.toList());
         collect.add(new TypeAnnotationsScanner());
         collect.add(new SubTypesScanner());
-        ReflectionsPlus reflections = new ReflectionsPlus(new ConfigurationBuilder()
+        return new ReflectionsPlus(new ConfigurationBuilder()
                 .setUrls(Arrays.stream(locations)
                         .map(ClasspathHelper::forPackage)
                         .flatMap(Collection::stream)
@@ -42,7 +42,6 @@ public class ReflectionsPlus extends Reflections {
                         collect.stream().toArray(Scanner[]::new)
                 )
         );
-        return reflections;
     }
 
     private static String index(Class<? extends Scanner> scannerClass) {

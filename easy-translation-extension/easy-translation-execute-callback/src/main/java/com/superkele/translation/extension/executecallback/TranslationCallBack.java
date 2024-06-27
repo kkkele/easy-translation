@@ -10,8 +10,4 @@ public interface TranslationCallBack<T> {
     String match();
 
     void onSuccess(T result);
-
-    default int sort(){
-        return 0;
-    }
 }

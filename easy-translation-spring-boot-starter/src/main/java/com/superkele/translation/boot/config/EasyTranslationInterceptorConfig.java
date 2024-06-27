@@ -2,7 +2,6 @@ package com.superkele.translation.boot.config;
 
 
 import com.superkele.translation.boot.config.properties.TranslationConfig;
-import com.superkele.translation.boot.global.TranslationGlobalInformation;
 import com.superkele.translation.core.config.TranslationAutoConfigurationCustomizer;
 import com.superkele.translation.core.context.support.DefaultTranslatorContext;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
@@ -20,8 +19,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,7 +61,7 @@ public class EasyTranslationInterceptorConfig implements ApplicationContextAware
     }
 
     @Autowired(required = false)
-    public void addContextHolder(List<ContextHolder> contextHolders) {
+    public void addContextHolder(List<ContextHolder<Object>> contextHolders) {
         if (contextHolders != null)
             contextHolders.forEach(contextHolder -> {
                 defaultTranslationProcessor.addContextHolder(contextHolder);

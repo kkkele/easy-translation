@@ -2,11 +2,11 @@ package com.superkele.translation.core.thread;
 
 public class ContextPasser {
 
-    private final ContextHolder contextHolder;
+    private final ContextHolder<Object> contextHolder;
     private Object context;
     private final Thread mainThread;
 
-    public ContextPasser(ContextHolder contextHolder) {
+    public ContextPasser(ContextHolder<Object> contextHolder) {
         this.contextHolder = contextHolder;
         this.mainThread = Thread.currentThread();
         init();

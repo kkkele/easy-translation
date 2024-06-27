@@ -1,7 +1,6 @@
 package com.superkele.translation.core.mapping.support;
 
 import cn.hutool.core.util.StrUtil;
-import com.superkele.translation.core.mapping.ParamHandler;
 import com.superkele.translation.core.mapping.ResultHandler;
 import com.superkele.translation.core.mapping.TranslationInvoker;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
@@ -135,7 +134,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
      * @param source  对象
      * @param event   事件
      * @param mappers 映射详细描述
-     * @return
+     * @return 映射键
      */
     protected Object[] buildSingleMapperKey(Object source, FieldTranslationEvent event, MapperDesc[] mappers) {
         Object[] mapperKey = Arrays.stream(mappers)
@@ -170,10 +169,6 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
 
     /**
      * 过滤不需要映射的对象
-     *
-     * @param source
-     * @param event
-     * @return
      */
     protected boolean filterNotMapping(Object source, FieldTranslationEvent event) {
         if (!event.isNotNullMapping()) {

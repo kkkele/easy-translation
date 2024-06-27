@@ -5,7 +5,6 @@ import com.superkele.translation.boot.config.properties.TranslationConfig;
 import com.superkele.translation.boot.global.TranslationGlobalInformation;
 import com.superkele.translation.core.util.LogUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

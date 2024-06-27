@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class ContextHolderRegister {
 
     @Bean
-    public ContextHolder securityContextHolder() {
+    public ContextHolder<String> securityContextHolder() {
         return new ContextHolder<String>() {
             @Override
             public String getContext() {
@@ -28,7 +28,7 @@ public class ContextHolderRegister {
     }
 
     @Bean
-    public ContextHolder timeRecorderHolder() {
+    public ContextHolder<Long> timeRecorderHolder() {
         return new ContextHolder<Long>() {
             @Override
             public Long getContext() {

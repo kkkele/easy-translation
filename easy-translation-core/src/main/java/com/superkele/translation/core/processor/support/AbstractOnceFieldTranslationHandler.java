@@ -86,7 +86,7 @@ public abstract class AbstractOnceFieldTranslationHandler implements FieldTransl
                     }
                 })
                 .filter(Objects::nonNull)
-                .flatMap(futures -> Arrays.stream(futures))
+                .flatMap(Arrays::stream)
                 .filter(Objects::nonNull)
                 .toArray(CompletableFuture[]::new);
         CompletableFuture.allOf(tasks).join();
@@ -130,9 +130,9 @@ public abstract class AbstractOnceFieldTranslationHandler implements FieldTransl
     /**
      * 执行单体翻译
      *
-     * @param sourceIndex
-     * @param event
-     * @return
+     * @param sourceIndex source下标
+     * @param event 事件
+     * @return 异步事件
      */
     public CompletableFuture<Void> translateSingle(int sourceIndex, FieldTranslationEvent event) {
         boolean async = event.isAsync();
@@ -173,8 +173,8 @@ public abstract class AbstractOnceFieldTranslationHandler implements FieldTransl
     /**
      * 触发子事件
      *
-     * @param sourceIndex
-     * @param event
+     * @param sourceIndex source下标
+     * @param event 事件
      */
     private void triggerActiveEvents(int sourceIndex, FieldTranslationEvent event) {
         CompletableFuture[] child = Arrays.stream(event.getActiveEvents())
@@ -197,8 +197,8 @@ public abstract class AbstractOnceFieldTranslationHandler implements FieldTransl
     /**
      * 执行翻译
      *
-     * @param sourceIndex
-     * @param event
+     * @param sourceIndex source下标
+     * @param event 翻译事件
      */
     public void executeTranslate(int sourceIndex, FieldTranslationEvent event) {
         Pair<Integer, Short> uniqueKey = Pair.of(sourceIndex, event.getEventValue());
@@ -224,8 +224,8 @@ public abstract class AbstractOnceFieldTranslationHandler implements FieldTransl
     /**
      * 钩子方法
      *
-     * @param sourceIndex
-     * @param event
+     * @param sourceIndex source下标
+     * @param event 翻译事件
      */
     protected abstract void processHook(int sourceIndex, FieldTranslationEvent event);
 

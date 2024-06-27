@@ -11,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CallbackTranslatorPostProcessor implements TranslatorPostProcessor {
 
-    private final List<TranslationCallBack> callBackRegisters;
+    private final List<TranslationCallBack<Object>> callBackRegisters;
 
     @Override
     public Translator postProcessorBeforeInit(Translator translator, String translatorName) {
@@ -19,7 +19,7 @@ public class CallbackTranslatorPostProcessor implements TranslatorPostProcessor 
             return translator;
         }
         Translator translatorPlus = translator;
-        for (TranslationCallBack callBackRegister : callBackRegisters) {
+        for (TranslationCallBack<Object> callBackRegister : callBackRegisters) {
             if (ReUtil.isMatch(callBackRegister.match(), translatorName)) {
                 Translator copyTranslator = translatorPlus;
                 translatorPlus = args -> {

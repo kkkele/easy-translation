@@ -75,9 +75,7 @@ public class MappingStrategyProcessTest {
     @Test
     public void test_multi_mapper_async_batch_process() {
         List<DictVo2> dictList = service.getDictList();
-        dictList.forEach(dictVo2 -> {
-            Assert.assertNotNull(dictVo2.getDictValue());
-        });
+        dictList.forEach(dictVo2 -> Assert.assertNotNull(dictVo2.getDictValue()));
     }
 
 
@@ -106,14 +104,6 @@ public class MappingStrategyProcessTest {
                         return order;
                     })
                     .collect(Collectors.toList());
-        }
-
-        @TranslationExecute(type = DictVo.class)
-        public DictVo getDict() {
-            DictVo dictVo = new DictVo();
-            dictVo.setDictType("sex");
-            dictVo.setDictCode(0);
-            return dictVo;
         }
 
         @TranslationExecute(type = DictVo2.class)

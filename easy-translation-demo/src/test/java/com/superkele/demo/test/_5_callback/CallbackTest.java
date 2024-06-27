@@ -5,7 +5,6 @@ import com.superkele.translation.annotation.Translation;
 import com.superkele.translation.core.context.support.DefaultTranslatorContext;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.util.Pair;
-import com.superkele.translation.extension.executecallback.ResultConsumer;
 import com.superkele.translation.extension.executecallback.TranslationCallBack;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
