@@ -34,7 +34,7 @@ public class PerfRecordTranslatorFactoryPostProcessor implements TranslatorFacto
                             long start = System.currentTimeMillis();
                             Object result = preTranslator.doTranslate(args);
                             long end = System.currentTimeMillis();
-                            LogUtils.debug(log::debug, "{}执行完成，耗时{}ms，翻译结果为=>{}", () -> translatorName, () -> end - start, () -> {
+                            LogUtils.debug(log::debug, "{}执行完成，耗时{}ms，翻译结果为=> {}", () -> translatorName, () -> end - start, () -> {
                                 if (result instanceof Iterable) {
                                     Iterable<Object> iterable = ((Iterable) result);
                                     String sb = "\n{\n" +
@@ -42,7 +42,7 @@ public class PerfRecordTranslatorFactoryPostProcessor implements TranslatorFacto
                                             "\n}\n";
                                     return sb;
                                 }
-                                return result;
+                                return "{"+result+"}";
                             });
                             return result;
                         };

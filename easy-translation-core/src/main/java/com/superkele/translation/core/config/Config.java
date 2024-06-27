@@ -16,6 +16,8 @@ import java.util.function.Supplier;
 
 /**
  * Easy-Translation 全局配置类
+ * 可使用 configCustomizer配置
+ * @see TranslationAutoConfigurationCustomizer
  */
 public class Config {
     /**

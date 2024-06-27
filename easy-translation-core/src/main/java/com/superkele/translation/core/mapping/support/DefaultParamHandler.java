@@ -86,14 +86,15 @@ public class DefaultParamHandler implements ParamHandler<Object, Object> {
             Object array = Array.newInstance(componentType, params.size());
             if (sourceClazz.isAssignableFrom(componentType)) {
                 for (int i = 0; i < params.size(); i++) {
-                    Array.set(array, i, Convert.convert(componentType, params.get(i)));
+                    Array.set(array, i, params.get(i));
                 }
             } else {
                 for (int i = 0; i < params.size(); i++) {
-                    Array.set(array, i, params.get(i));
+                    Array.set(array, i, Convert.convert(componentType, params.get(i)));
                 }
             }
-        } else if (ArrayList.class.isAssignableFrom(targetClazz)) {
+            return array;
+        } else if (targetClazz.isAssignableFrom(ArrayList.class)) {
             if (isSameType) {
                 return new ArrayList<>(params);
             } else {
@@ -101,7 +102,7 @@ public class DefaultParamHandler implements ParamHandler<Object, Object> {
                 params.forEach(param -> arrayList.add(Convert.convert(types[0], param)));
                 return arrayList;
             }
-        } else if (HashSet.class.isAssignableFrom(targetClazz)) {
+        } else if (targetClazz.isAssignableFrom(HashSet.class)) {
             if (isSameType) {
                 return new HashSet<>(params);
             } else {
@@ -109,7 +110,7 @@ public class DefaultParamHandler implements ParamHandler<Object, Object> {
                 params.forEach(param -> set.add(Convert.convert(types[0], param)));
                 return new HashSet<>(set);
             }
-        } else if (LinkedList.class.isAssignableFrom(targetClazz)) {
+        } else if (targetClazz.isAssignableFrom(LinkedList.class)) {
             if (isSameType) {
                 return new LinkedList<>(params);
             } else {

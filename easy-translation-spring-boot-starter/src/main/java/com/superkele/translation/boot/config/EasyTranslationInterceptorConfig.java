@@ -61,7 +61,7 @@ public class EasyTranslationInterceptorConfig implements ApplicationContextAware
     }
 
     @Autowired(required = false)
-    public void addContextHolder(List<ContextHolder<Object>> contextHolders) {
+    public void addContextHolder(List<ContextHolder> contextHolders) {
         if (contextHolders != null)
             contextHolders.forEach(contextHolder -> {
                 defaultTranslationProcessor.addContextHolder(contextHolder);

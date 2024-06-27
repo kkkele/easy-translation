@@ -67,7 +67,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
         //处理翻译结果
         Object processedResult = resultHandler.handle(mappingValue, event.getGroupKey(), false);
         //分配结果
-        Object mapResult = resultHandler.map(processedResult, mapperKey, false);
+        Object mapResult = resultHandler.map(processedResult, 0,mapperKey, false);
         PropertyUtils.invokeSetter(source, event.getPropertyName(), PropertyUtils.invokeGetter(mapResult, event.getReceive()));
     }
 
@@ -122,7 +122,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
             }
             Object[] mapperKey = mapperKeys.get(i);
             //分配结果
-            Object mapResult = resultHandler.map(processedResult, mapperKey, true);
+            Object mapResult = resultHandler.map(processedResult,i, mapperKey, true);
             //注入值
             PropertyUtils.invokeSetter(source, event.getPropertyName(), PropertyUtils.invokeGetter(mapResult, event.getReceive()));
         }

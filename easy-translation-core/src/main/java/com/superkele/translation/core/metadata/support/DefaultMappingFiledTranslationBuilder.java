@@ -108,8 +108,8 @@ public class DefaultMappingFiledTranslationBuilder extends AbstractMappingFiledT
         int i = 0;
         while (i < mapperParamHandlerPair.size() && i < mapperIndexs.length) {
             Pair<String, String> pair = mapperParamHandlerPair.get(i);
+            String mapperFieldName = pair.getKey();
             try {
-                String mapperFieldName = pair.getKey();
                 Field declaredField = declaringClass.getDeclaredField(mapperFieldName);
                 ParamDesc parameterType = parameterTypes[mapperIndexs[i]];
                 MapperDesc mapperDesc = new MapperDesc();
@@ -120,7 +120,7 @@ public class DefaultMappingFiledTranslationBuilder extends AbstractMappingFiledT
                 mapperDesc.setTargetClass(parameterType.getTargetClass());
                 mapperDesc.setTypes(parameterType.getTypes());
             } catch (NoSuchFieldException e) {
-                throw new TranslationException("请填写正确的mapper字段名,传递多个参数时请使用数组", e);
+                throw new TranslationException(StrUtil.format("{}不存在字段{},请填写正确的mapper字段名,传递多个参数时请使用数组",declaringClass,mapperFieldName), e);
             }
         }
         while (i < mapperIndexs.length) {
@@ -136,13 +136,6 @@ public class DefaultMappingFiledTranslationBuilder extends AbstractMappingFiledT
     @Override
     protected void setGroupKey(FieldTranslationEvent event, Field field, Mapping mapping) {
         String[] groupKey = mapping.groupKey();
-        if (groupKey.length == 0) {
-            Mapper[] mappers = mapping.mappers();
-            groupKey = Arrays.stream(mappers)
-                    .map(Mapper::value)
-                    .flatMap(Arrays::stream)
-                    .toArray(String[]::new);
-        }
         event.setGroupKey(groupKey);
     }
 

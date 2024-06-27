@@ -10,7 +10,7 @@ import java.util.Map;
  * 参数解包处理器
  * 用来处理List<List<> Object[] Map<>...等复杂结构
  */
-public interface TranslationUnpackingHandler {
+public interface UnpackingHandler {
 
     /**
      * 解包List

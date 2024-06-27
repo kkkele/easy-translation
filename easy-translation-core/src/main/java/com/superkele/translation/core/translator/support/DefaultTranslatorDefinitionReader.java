@@ -44,6 +44,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
 
     /**
      * 枚举翻译暂且只支持一个mapper参数
+     *
      * @param enumClass 枚举类
      */
     @Override
@@ -112,22 +113,22 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
         try {
             methodHandle = MethodConvert.getDynamicMethodHandle(translatorClazz, method);
         } catch (IllegalAccessException e) {
-            throw new TranslationException("TranslatorDefinition produce failed",e);
+            throw new TranslationException("TranslatorDefinition produce failed", e);
         } catch (LambdaConversionException e) {
-            throw new TranslationException("TranslatorDefinition produce failed",e);
+            throw new TranslationException("TranslatorDefinition produce failed", e);
         }
         BeanNameResolver beanNameResolver = singleton.computeIfAbsent(translation.beanNameResolver(), key -> {
             try {
                 Constructor<? extends BeanNameResolver> constructor = key.getConstructor();
                 return constructor.newInstance();
             } catch (NoSuchMethodException e) {
-                throw new TranslationException("TranslatorDefinition produce failed",e);
+                throw new TranslationException("TranslatorDefinition produce failed", e);
             } catch (InvocationTargetException e) {
-                throw new TranslationException("TranslatorDefinition produce failed",e);
+                throw new TranslationException("TranslatorDefinition produce failed", e);
             } catch (InstantiationException e) {
-                throw new TranslationException("TranslatorDefinition produce failed",e);
+                throw new TranslationException("TranslatorDefinition produce failed", e);
             } catch (IllegalAccessException e) {
-                throw new TranslationException("TranslatorDefinition produce failed",e);
+                throw new TranslationException("TranslatorDefinition produce failed", e);
             }
         });
         TranslatorDefinition definition = new TranslatorDefinition();
@@ -152,7 +153,7 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
             Parameter parameter = parameters[i];
             if (parameter.isAnnotationPresent(TransMapper.class)) {
                 mapperIndexList.add(i);
-            }else if (parameter.isAnnotationPresent(TransOther.class)){
+            } else if (parameter.isAnnotationPresent(TransOther.class)) {
                 otherIndexList.add(i);
             }
         }
@@ -165,22 +166,27 @@ public class DefaultTranslatorDefinitionReader extends AbstractTranslatorDefinit
     }
 
     public ParamDesc[] buildParamDesc(Method method) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
         Type[] genericParameterTypes = method.getGenericParameterTypes();
-        return Arrays.stream(genericParameterTypes)
-                .map(type -> {
+        ParamDesc[] res = Arrays.stream(parameterTypes)
+                .map(clazz -> {
                     ParamDesc paramDesc = new ParamDesc();
-                    if (type instanceof ParameterizedType) {
-                        ParameterizedType parameterizedType = (ParameterizedType) type;
-                        paramDesc.setTargetClass(searchForClass(parameterizedType.getRawType().getTypeName()));
-                        paramDesc.setTypes(Arrays.stream(parameterizedType.getActualTypeArguments())
-                                .map(t -> searchForClass(t.getTypeName()))
-                                .toArray(Class[]::new));
-                    } else {
-                        paramDesc.setTargetClass(searchForClass(type.getTypeName()));
-                    }
+                    paramDesc.setTargetClass(clazz);
                     return paramDesc;
                 })
                 .toArray(ParamDesc[]::new);
+        for (int i = 0; i < parameterTypes.length; i++) {
+            Type type = genericParameterTypes[i];
+            ParamDesc paramDesc = res[i];
+            if (type instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) type;
+                paramDesc.setTargetClass(searchForClass(parameterizedType.getRawType().getTypeName()));
+                paramDesc.setTypes(Arrays.stream(parameterizedType.getActualTypeArguments())
+                        .map(t -> searchForClass(t.getTypeName()))
+                        .toArray(Class[]::new));
+            }
+        }
+        return res;
     }
 
     public Class<?> searchForClass(String className) {

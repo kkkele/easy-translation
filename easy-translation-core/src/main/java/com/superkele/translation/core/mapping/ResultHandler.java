@@ -25,9 +25,10 @@ public interface ResultHandler<T, R, S> {
      * 结果选择
      *
      * @param processResult #handle 处理后的结果
+     * @param index         对象的索引
      * @param mapperKey     对象的映射key数组 例如@Mapping(mapper={"spuId","createTime"})，则会选取spuId和createTime两个属性的值
      * @param isBatch       是否是批量翻译
      * @return
      */
-    S map(R processResult, Object[] mapperKey, boolean isBatch);
+    S map(R processResult, int index, Object[] mapperKey, boolean isBatch);
 }

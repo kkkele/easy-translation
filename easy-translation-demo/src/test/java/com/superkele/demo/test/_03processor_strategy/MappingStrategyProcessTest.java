@@ -1,8 +1,7 @@
-package com.superkele.demo.test._3_processor_strategy;
+package com.superkele.demo.test._03processor_strategy;
 
 
 import com.superkele.demo.EasyTranslationDemoApplication;
-import com.superkele.demo.processor_mapping_strategy.DictVo;
 import com.superkele.demo.processor_mapping_strategy.DictVo2;
 import com.superkele.demo.processor_mapping_strategy.Order;
 import com.superkele.demo.processor_mapping_strategy.Sku;

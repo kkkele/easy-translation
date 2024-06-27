@@ -1,12 +1,12 @@
 package com.superkele.translation.annotation.constant;
 
-import com.superkele.translation.annotation.TranslationUnpackingHandler;
+import com.superkele.translation.annotation.UnpackingHandler;
 import com.superkele.translation.annotation.bean.BeanDescription;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DefaultTranslationTypeHandler implements TranslationUnpackingHandler {
+public class DefaultUnpackingHandler implements UnpackingHandler {
 
     @Override
     public List<BeanDescription> unpackingCollection(Collection collection, Class<?> clazz) {

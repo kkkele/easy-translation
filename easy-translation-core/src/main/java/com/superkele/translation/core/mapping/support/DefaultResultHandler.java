@@ -1,5 +1,6 @@
 package com.superkele.translation.core.mapping.support;
 
+import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.mapping.ResultHandler;
 import com.superkele.translation.core.util.PropertyUtils;
 
@@ -32,7 +33,7 @@ public class DefaultResultHandler implements ResultHandler<Object, Object, Objec
 
 
     @Override
-    public Object map(Object processResult, Object[] mapperKey, boolean isBatch) {
+    public Object map(Object processResult,int index ,Object[] mapperKey, boolean isBatch) {
         if (!isBatch || mapperKey.length == 0) {
             return processResult;
         }
@@ -47,6 +48,13 @@ public class DefaultResultHandler implements ResultHandler<Object, Object, Objec
                 }
             }
             return res;
+        }else if (processResult instanceof List){
+            try {
+                List<Object> list = (List<Object>) processResult;
+                return list.get(index);
+            } catch (IndexOutOfBoundsException e) {
+                throw new TranslationException("无法顺利执行结果分配，重自定义ResultHandler，重写分配规则",e);
+            }
         }
         return processResult;
     }

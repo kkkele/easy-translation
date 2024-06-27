@@ -1,4 +1,4 @@
-package com.superkele.demo.test._5_callback;
+package com.superkele.demo.test._05callback;
 
 import com.superkele.demo.EasyTranslationDemoApplication;
 import com.superkele.translation.annotation.Translation;

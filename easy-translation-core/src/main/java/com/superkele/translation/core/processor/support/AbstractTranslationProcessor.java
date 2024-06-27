@@ -1,7 +1,7 @@
 package com.superkele.translation.core.processor.support;
 
 
-import com.superkele.translation.annotation.TranslationUnpackingHandler;
+import com.superkele.translation.annotation.UnpackingHandler;
 import com.superkele.translation.annotation.bean.BeanDescription;
 import com.superkele.translation.core.util.ReflectUtils;
 import com.superkele.translation.core.util.Singleton;
@@ -10,15 +10,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.superkele.translation.annotation.TranslationUnpackingHandler.*;
+import static com.superkele.translation.annotation.UnpackingHandler.*;
 
 public abstract class AbstractTranslationProcessor extends FilterTranslationProcessor {
 
 
     @Override
-    public void process(Object obj, Class<?> type, String field, boolean async, Class<? extends TranslationUnpackingHandler> listTypeHandlerClazz) {
+    public void process(Object obj, Class<?> type, String field, boolean async, Class<? extends UnpackingHandler> listTypeHandlerClazz) {
         Object targetObj = ReflectUtils.invokeGetter(obj, field);
-        TranslationUnpackingHandler listTypeHandler = Singleton.get(listTypeHandlerClazz);
+        UnpackingHandler listTypeHandler = Singleton.get(listTypeHandlerClazz);
         int unpackingType = listTypeHandler.unpackingType(targetObj);
         if (unpackingType > OBJECT_TYPE) {
             List<BeanDescription> unpacking = null;

@@ -45,11 +45,11 @@ public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactor
                         } catch (ClassCastException e) {
                             String params = Arrays.stream(reWrapper)
                                     .map(param -> Optional.ofNullable(param)
-                                            .map(x ->   x + " : " + x.getClass().getSimpleName() )
+                                            .map(x -> x + " : " + x.getClass().getSimpleName())
                                             .orElse("NULL"))
                                     .reduce((x, y) -> x + "," + y)
                                     .orElse("");
-                            System.err.println(translatorName +" | params=> ("+params+")");
+                            System.err.println(translatorName + " | params=> (" + params + ")");
                             throw new TranslationException("请确认mapper顺序与@TransMapper参数顺序一致，且类型相同", e);
                         }
                     });
@@ -60,11 +60,15 @@ public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactor
         Object[] reWrapperArgs = new Object[keys.length + others.length];
         // 复原原来的位置情况
         //arr的前几个位置全都是mapper，找到对应的key位置填充 ，others同理
-        for (int i = 0; i < keys.length; i++) {
-            reWrapperArgs[keys[i]] = args[i];
-        }
-        for (int i = 0; i < others.length; i++) {
-            reWrapperArgs[others[i]] = Convert.convert(parameterTypes[others[i]], args[i + keys.length]);
+        try {
+            for (int i = 0; i < keys.length; i++) {
+                reWrapperArgs[keys[i]] = args[i];
+            }
+            for (int i = 0; i < others.length; i++) {
+                reWrapperArgs[others[i]] = Convert.convert(parameterTypes[others[i]], args[i + keys.length]);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new TranslationException("参数数量与@TransMapper不一致", e);
         }
         return reWrapperArgs;
     }

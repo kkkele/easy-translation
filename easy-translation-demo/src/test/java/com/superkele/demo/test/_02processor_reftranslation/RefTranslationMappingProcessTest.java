@@ -1,4 +1,4 @@
-package com.superkele.demo.test._2_processor_reftranslation;
+package com.superkele.demo.test._02processor_reftranslation;
 
 import com.superkele.demo.processor.ProductVo5;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * 对于 @Mapping和DefaultTranslator的基础使用，在BaseMappingProcessTest中查看
  *
- * @see com.superkele.demo.test._1_processor.BaseMappingProcessTest
+ * @see com.superkele.demo.test._01processor.BaseMappingProcessTest
  */
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
