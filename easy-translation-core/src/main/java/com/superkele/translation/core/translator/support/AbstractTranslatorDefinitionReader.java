@@ -88,41 +88,6 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
     public void loadTranslatorDefinitions(Resource resource) {
         //todo 增加读文件或者定义远程接口方式实现
     }
-/*
-    @Override
-    public void loadDynamicTranslatorDefinitions(Object invokeObj, TranslatorDefinitionRegistry registry) {
-        Optional.ofNullable(invokeObj)
-                .map(obj -> {
-                    Class<?> clazz = obj.getClass();
-                    if (Proxy.isProxyClass(clazz)) {
-                        clazz = clazz.getInterfaces()[0];
-                    } else if (StringUtils.contains(clazz.getName(), "$Enhancer")) {
-                        do {
-                            clazz = clazz.getSuperclass();
-                        } while (StringUtils.contains(clazz.getName(), "$Enhancer"));
-                    }
-                    return Pair.of(obj, clazz);
-                })
-                .filter(pair -> translatorMap.containsKey(pair.getValue()))
-                .ifPresent(pair -> {
-                    Object obj = pair.getKey();
-                    Class<?> clazz = pair.getValue();
-                    Set<Method> methods = translatorMap.get(clazz);
-                    if (methods == null) {
-                        return;
-                    }
-                    methods.stream()
-                            .filter(method -> !ReflectUtils.isStaticMethod(method))
-                            .map(method -> {
-                                Translation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(method, Translation.class);
-                                return Pair.of(method, mergedAnnotation);
-                            })
-                            .forEach(methodAnnotationPair -> {
-                                TranslatorDefinition translatorDefinition = convertDynamicMethodToTranslatorDefinition(obj, methodAnnotationPair.getKey());
-                                registry.register(getTranslatorName(methodAnnotationPair.getValue(), methodAnnotationPair.getKey()), translatorDefinition);
-                            });
-                });
-    }*/
 
     protected void loadEnumTranslatorDefinitions(Class<?> clazz) {
         Optional.of(clazz)
