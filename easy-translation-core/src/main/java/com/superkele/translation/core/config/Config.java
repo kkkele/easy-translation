@@ -22,7 +22,7 @@ public class Config {
      * key: 参数长度
      * value: 被映射成的翻译器类
      */
-    private Map<Integer, Class<? extends Translator>> translatorClazzMap = new ConcurrentHashMap<>(16);
+    private final Map<Integer, Class<? extends Translator>> translatorClazzMap = new ConcurrentHashMap<>(16);
     /**
      * 翻译线程池
      */

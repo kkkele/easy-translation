@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class FilterTranslationProcessor implements TranslationProcessor {
 
-    private Map<Class<?>, Boolean> filterCache = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Boolean> filterCache = new ConcurrentHashMap<>();
 
     @Override
     public void process(Object obj) {

@@ -23,7 +23,7 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
 
     protected List<TranslatorPostProcessor> translatorPostProcessors = new CopyOnWriteArrayList<>();
 
-    private List<Consumer<ConfigurableTranslatorContext>> listeners = new LinkedList<>();
+    private final List<Consumer<ConfigurableTranslatorContext>> listeners = new LinkedList<>();
 
     @Override
     protected void noticeListeners() {

@@ -37,11 +37,10 @@ public class PerfRecordTranslatorFactoryPostProcessor implements TranslatorFacto
                             LogUtils.debug(log::debug, "{}执行完成，耗时{}ms，翻译结果为=>{}", () -> translatorName, () -> end - start, () -> {
                                 if (result instanceof Iterable) {
                                     Iterable<Object> iterable = ((Iterable) result);
-                                    StringBuilder sb = new StringBuilder();
-                                    sb.append("\n{\n");
-                                    sb.append(StrUtil.join(",\n",iterable));
-                                    sb.append("\n}\n");
-                                    return sb.toString();
+                                    String sb = "\n{\n" +
+                                            StrUtil.join(",\n", iterable) +
+                                            "\n}\n";
+                                    return sb;
                                 }
                                 return result;
                             });

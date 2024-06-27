@@ -13,11 +13,11 @@ import java.util.Map;
 public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext {
 
 
-    private String[] basePackages;
+    private final String[] basePackages;
 
-    private InvokeBeanFactory invokeBeanFactory;
+    private final InvokeBeanFactory invokeBeanFactory;
 
-    private Config config;
+    private final Config config;
 
     public DefaultTranslatorContext(Config config, InvokeBeanFactory invokeBeanFactory, String... basePackages) {
         this.config = config;

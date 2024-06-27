@@ -4,7 +4,7 @@ public class ContextPasser {
 
     private final ContextHolder contextHolder;
     private Object context;
-    private Thread mainThread;
+    private final Thread mainThread;
 
     public ContextPasser(ContextHolder contextHolder) {
         this.contextHolder = contextHolder;

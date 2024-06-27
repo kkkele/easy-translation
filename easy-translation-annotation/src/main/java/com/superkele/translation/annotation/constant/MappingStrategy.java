@@ -15,6 +15,6 @@ public enum MappingStrategy {
     /**
      * 自定义处理
      */
-    DIY;
+    DIY
 
 }

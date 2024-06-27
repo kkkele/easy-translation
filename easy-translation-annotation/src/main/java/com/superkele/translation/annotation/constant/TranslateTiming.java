@@ -4,5 +4,5 @@ public enum TranslateTiming {
 
     AFTER_RETURN,
     JSON_SERIALIZE,
-    NO_EXECUTE;
+    NO_EXECUTE
 }

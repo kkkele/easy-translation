@@ -159,9 +159,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
      * 组建翻译参数
      */
     protected void fillTranslatorArgs(Object[] args, int mapperLength, Object[] mapperKeys, int otherLength, String[] others) {
-        for (int i = 0; i < mapperLength; i++) {
-            args[i] = mapperKeys[i];
-        }
+        if (mapperLength >= 0) System.arraycopy(mapperKeys, 0, args, 0, mapperLength);
         int j = 0;
         int i = mapperLength;
         //填充args的other参数
@@ -179,9 +177,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
      */
     protected boolean filterNotMapping(Object source, FieldTranslationEvent event) {
         if (!event.isNotNullMapping()) {
-            if (PropertyUtils.invokeGetter(source, event.getPropertyName()) != null) {
-                return true;
-            }
+            return PropertyUtils.invokeGetter(source, event.getPropertyName()) != null;
         }
         return false;
     }

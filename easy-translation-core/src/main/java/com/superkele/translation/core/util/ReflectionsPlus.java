@@ -67,12 +67,12 @@ public class ReflectionsPlus extends Reflections {
     }
 
     public Set<Method> getMethodsMergedAnnotatedWith(Class<? extends Annotation> annotation) {
-        Iterable<String> methods = this.store.get(index(MethodMergedAnnotationsScanner.class), new String[]{annotation.getName()});
+        Iterable<String> methods = this.store.get(index(MethodMergedAnnotationsScanner.class), annotation.getName());
         return Utils.getMethodsFromDescriptors(methods, this.configuration.getClassLoaders());
     }
 
     public Set<Class<?>> getTypesMergedAnnotatedWith(Class<? extends Annotation> annotation, boolean honorInherited) {
-        Iterable<String> annotated = this.store.get(index(TypeMergedAnnotationsScanner.class), new String[]{annotation.getName()});
+        Iterable<String> annotated = this.store.get(index(TypeMergedAnnotationsScanner.class), annotation.getName());
         Iterable<String> classes = this.getAllAnnotated(annotated, annotation.isAnnotationPresent(Inherited.class), honorInherited);
         return Sets.newHashSet(Iterables.concat(ReflectionUtils.forNames(annotated, this.configuration.getClassLoaders()), ReflectionUtils.forNames(classes, this.configuration.getClassLoaders())));
     }
