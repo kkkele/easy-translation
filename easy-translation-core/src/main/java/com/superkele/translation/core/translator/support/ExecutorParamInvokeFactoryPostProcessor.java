@@ -6,6 +6,7 @@ import com.superkele.translation.core.metadata.ParamDesc;
 import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import java.util.Optional;
  * 调整mapperKey的位置,使得调用方法参数时，按照 mapperKey0,mapperKey1,mapperKey2......other1,other2,other3的字段来传参
  */
 public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactoryPostProcessor {
+
     @Override
     public void postProcess(ConfigurableTranslatorDefinitionFactory factory) {
         String[] translatorNames = factory.getTranslatorNames();
@@ -43,14 +45,14 @@ public class ExecutorParamInvokeFactoryPostProcessor implements TranslatorFactor
                         try {
                             return translator.doTranslate(reWrapper);
                         } catch (ClassCastException e) {
+
                             String params = Arrays.stream(reWrapper)
                                     .map(param -> Optional.ofNullable(param)
                                             .map(x -> x + " : " + x.getClass().getSimpleName())
                                             .orElse("NULL"))
                                     .reduce((x, y) -> x + "," + y)
                                     .orElse("");
-                            System.err.println(translatorName + " | params=> (" + params + ")");
-                            throw new TranslationException("请确认mapper顺序与@TransMapper参数顺序一致，且类型相同", e);
+                            throw new TranslationException(translatorName + " | params=> (" + params + ")"+"请确认mapper顺序与@TransMapper参数顺序一致，且类型相同", e);
                         }
                     });
         }
