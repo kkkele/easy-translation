@@ -2,7 +2,7 @@ package com.superkele.translation.extension.serialize.jackson;
 
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
-import com.fasterxml.jackson.databind.type.CollectionType;
+import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.mapping.TranslationInvoker;
 import com.superkele.translation.core.mapping.support.DefaultTranslationInvoker;
 import com.superkele.translation.core.metadata.FieldTranslation;
@@ -17,10 +17,12 @@ import java.util.Optional;
 public class TranslationSerializerModifier extends BeanSerializerModifier {
     private final FieldTranslationFactory filedTranslationFactory;
     private final TranslationInvoker translationInvoker;
+    private final Config translationConfig;
 
-    public TranslationSerializerModifier(FieldTranslationFactory filedTranslationFactory, TranslatorFactory translatorFactory) {
+    public TranslationSerializerModifier(FieldTranslationFactory filedTranslationFactory, TranslatorFactory translatorFactory, Config translationConfig) {
         this.filedTranslationFactory = filedTranslationFactory;
         this.translationInvoker = new DefaultTranslationInvoker(translatorFactory);
+        this.translationConfig = translationConfig;
     }
 
     @Override
@@ -30,7 +32,7 @@ public class TranslationSerializerModifier extends BeanSerializerModifier {
         return Optional.ofNullable(getFieldTranslation(targetType))
                 .map(fieldTranslation -> {
                     LogUtils.debug(log::debug, "type {} support json translation ", () -> targetType.getSimpleName());
-                    return (JsonSerializer) new TranslationJsonSerializer(fieldTranslation, translationInvoker, serializer);
+                    return (JsonSerializer) new TranslationJsonSerializer(fieldTranslation, translationInvoker, serializer, translationConfig);
                 })
                 .orElse(super.modifySerializer(config, beanDesc, serializer));
     }

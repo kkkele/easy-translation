@@ -3,6 +3,7 @@ package com.superkele.translation.extension.serialize.jackson;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.*;
+import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.mapping.TranslationInvoker;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
@@ -21,11 +22,13 @@ public class TranslationJsonSerializer extends JsonSerializer {
     private final FieldTranslation fieldTranslation;
     private final TranslationInvoker translationInvoker;
     private final JsonSerializer serializer;
+    private final Config config;
 
-    public TranslationJsonSerializer(FieldTranslation fieldTranslation, TranslationInvoker translationInvoker, JsonSerializer serializer) {
+    public TranslationJsonSerializer(FieldTranslation fieldTranslation, TranslationInvoker translationInvoker, JsonSerializer serializer, Config config) {
         this.fieldTranslation = fieldTranslation;
         this.translationInvoker = translationInvoker;
         this.serializer = serializer;
+        this.config = config;
         LogUtils.debug(log::debug, "{} => TranslationJsonSerializer init...", () -> fieldTranslation.getName());
     }
 
@@ -74,7 +77,7 @@ public class TranslationJsonSerializer extends JsonSerializer {
 
         @Override
         protected boolean getCacheEnabled() {
-            return true;
+            return config.getCacheEnabled().get();
         }
 
         @Override
@@ -84,7 +87,7 @@ public class TranslationJsonSerializer extends JsonSerializer {
 
         @Override
         protected Executor getExecutor() {
-            return null;
+            return config.getThreadPoolExecutor();
         }
 
         @Override

@@ -2,10 +2,12 @@ package com.superkele.demo.test._09json_serialize;
 
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.superkele.demo.EasyTranslationDemoApplication;
 import com.superkele.demo.jackson_serializer.JsonVo;
+import com.superkele.demo.jackson_serializer.Person;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -14,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Repeat;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @SpringBootTest(classes = {EasyTranslationDemoApplication.class})
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -36,7 +35,6 @@ public class ObjectMapperTest {
     }
 
     @Test
-    @Repeat(10)
     public void test_batch_json_serialize() throws JsonProcessingException {
         R<JsonVo> r = new R<>();
         r.setCode(200);
@@ -50,6 +48,13 @@ public class ObjectMapperTest {
         List<JsonVo> jsonVos = ListUtil.of(jsonVo2, jsonVo3);
         r.setDataList(jsonVos);
         String jsonStr = objectMapper.writeValueAsString(r);
+        System.out.println(jsonStr);
+    }
+
+    @Test
+    public void test_nesting_json_serialize() throws JsonProcessingException {
+        Person person = new Person();
+        String jsonStr = objectMapper.writeValueAsString(person);
         System.out.println(jsonStr);
     }
 

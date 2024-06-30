@@ -9,7 +9,6 @@ import com.superkele.translation.boot.annotation.Translator;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 @Data
@@ -17,12 +16,10 @@ public class JsonVo {
 
     private Integer id = 0;
 
-    private Integer cardType = new Random().nextInt(3) + 1;
+    private Integer cardType;
 
     @Mapping(translator = "getCardTypeNames", strategy = MappingStrategy.BATCH,timing = TranslateTiming.JSON_SERIALIZE,mappers = @Mapper("cardType"))
     private String cardTypeName;
-
-    private JsonVo child = new Random().nextBoolean()? new JsonVo() : null;
 
     @Translator("getCardTypeNames")
     public static List<String> getCardTypeNames(List<Integer> cardTypes) {

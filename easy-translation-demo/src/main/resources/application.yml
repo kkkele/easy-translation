@@ -6,6 +6,7 @@ easy-translation:
       - com.czy
     translator:
       - com.superkele.demo
+  json-serialize: true
 logging:
   level:
     com.superkele: debug

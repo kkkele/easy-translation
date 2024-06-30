@@ -1,24 +1,20 @@
-package com.superkele.translation.annotation;
+package com.superkele.translation.extension.serialize.jackson;
 
-
+import com.superkele.translation.annotation.Mapper;
+import com.superkele.translation.annotation.Mapping;
+import com.superkele.translation.annotation.NullPointerExceptionHandler;
 import com.superkele.translation.annotation.constant.DefaultNullPointerExceptionHandler;
 import com.superkele.translation.annotation.constant.MappingStrategy;
 import com.superkele.translation.annotation.constant.TranslateTiming;
 
 import java.lang.annotation.*;
 
-/**
- * 用以model类中翻译字段，标记了该注解的字段会与字段被FieldTranslationBuilder解析为FieldTranslationEvent对象
- * 然后 processor会将 FieldTranslationEvent 交给 FieldTranslationHandler处理
- *
- * @see com.superkele.translation.core.metadata.FieldTranslationBuilder
- * @see com.superkele.translation.core.processor.FieldTranslationHandler
- */
 @Inherited
-@Target({ElementType.FIELD,ElementType.TYPE})
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Mapping {
+@Mapping(timing = TranslateTiming.JSON_SERIALIZE)
+public @interface JsonMapping {
 
     /**
      * 翻译器名称
@@ -34,11 +30,6 @@ public @interface Mapping {
      * 辅助条件，将值修改成对应类型后直接传递给翻译器
      */
     String[] other() default {};
-
-    /**
-     * 执行时机
-     */
-    TranslateTiming timing() default TranslateTiming.AFTER_RETURN;
 
     /**
      * 映射策略，是单个处理还是批量处理
@@ -97,5 +88,4 @@ public @interface Mapping {
      * 当翻译时，属性为空导致了空指针异常的解决方案
      */
     Class<? extends NullPointerExceptionHandler> nullPointerHandler() default DefaultNullPointerExceptionHandler.class;
-
 }

@@ -3,6 +3,7 @@ package com.superkele.translation.extension.serialize.jackson;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.superkele.translation.core.config.Config;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
 import com.superkele.translation.core.metadata.FieldTranslationFactory;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
@@ -18,6 +19,8 @@ public class TranslationJsonNodeModule extends Module {
 
     private final TranslatorFactory translatorFactory;
 
+    private final Config config;
+
 
     @Override
     public String getModuleName() {
@@ -31,7 +34,7 @@ public class TranslationJsonNodeModule extends Module {
 
     @Override
     public void setupModule(SetupContext setupContext) {
-        setupContext.addBeanSerializerModifier(new TranslationSerializerModifier(fieldTranslationFactory, translatorFactory));
+        setupContext.addBeanSerializerModifier(new TranslationSerializerModifier(fieldTranslationFactory, translatorFactory, config));
     }
 
     @Override

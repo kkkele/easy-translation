@@ -1,4 +1,4 @@
-package com.superkele.translation.boot.config;
+package com.superkele.translation.boot.auto;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,15 +74,9 @@ public class EasyTranslationInterceptorConfig implements ApplicationContextAware
             });
     }
 
-    @Autowired
-    public void setObjectMapper(ObjectMapper objectMapper) {
-        objectMapper.registerModules(new TranslationJsonNodeModule(fieldTranslationFactory, defaultTransExecutorContext));
-    }
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.defaultTransExecutorContext.refresh();
     }
-
 
 }
