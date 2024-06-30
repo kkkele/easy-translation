@@ -3,7 +3,7 @@ easy-translation:
   debug: true
   base-package:
     domain:
-      - com.czy
+      - com.superkele
     translator:
       - com.superkele.demo
   json-serialize: true

@@ -33,7 +33,6 @@ public class BookService {
     }
 
     @Translator("getBookArr")
-
     public Book[] getBookArr(List<Integer> ids) {
         return ids.stream()
                 .map(id -> {

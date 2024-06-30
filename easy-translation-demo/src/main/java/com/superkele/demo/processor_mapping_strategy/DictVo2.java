@@ -18,7 +18,9 @@ public class DictVo2 {
     private Integer dictCode;
 
     @Mapping(translator = "getDictValues",
-            mappers = @Mapper({"dictType", "dictCode"}),
+            mappers = {
+                    @Mapper({"dictType", "dictCode"})
+            },
             receive = "dictValue",
             strategy = MappingStrategy.BATCH)
     private String dictValue;

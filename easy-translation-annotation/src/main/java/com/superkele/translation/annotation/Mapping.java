@@ -46,8 +46,8 @@ public @interface Mapping {
     MappingStrategy strategy() default MappingStrategy.SINGLE;
 
     /**
+     * 映射对象的属性值，处理后传递给翻译器
      * 替代原先的mapper字段
-     * 后续将逐步替换掉mapper字段的使用
      * @since 1.4.0
      * @return
      */

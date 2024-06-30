@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 /**
  * Easy-Translation 全局配置类
  * 可使用 configCustomizer配置
+ *
  * @see TranslationAutoConfigurationCustomizer
  */
 public class Config {
@@ -49,6 +50,10 @@ public class Config {
      * 是否开启事务翻译缓存
      */
     private Supplier<Boolean> cacheEnabled = () -> true;
+
+    public Config() {
+        init();
+    }
 
     public Map<Integer, Class<? extends Translator>> getTranslatorClazzMap() {
         return translatorClazzMap;
@@ -98,12 +103,9 @@ public class Config {
         return this;
     }
 
-    public Config() {
-        init();
-    }
-
     protected void init() {
         registerTranslatorClazz(ContextTranslator.class, MapperTranslator.class, ConditionTranslator.class, ThreeParamTranslator.class, FourParamTranslator.class, FiveParamTranslator.class);
     }
+
 
 }

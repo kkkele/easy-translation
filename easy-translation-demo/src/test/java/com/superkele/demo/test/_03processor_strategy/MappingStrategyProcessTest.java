@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
+import org.springframework.test.annotation.Repeat;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class MappingStrategyProcessTest {
      * @see com.superkele.demo.processor_mapping_strategy.OrderService#getOrders(List)
      */
     @Test
+    @Repeat(2)
     public void test_one_mapper_sync_batch_process() {
         List<Order> mainOrder = service.getMainOrder();
         mainOrder.forEach(order -> {

@@ -9,5 +9,9 @@ public interface TranslationCallBack<T> {
      */
     String match();
 
+    /**
+     * 翻译成功回调
+     * @param result 翻译结果
+     */
     void onSuccess(T result);
 }
