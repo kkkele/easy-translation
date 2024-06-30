@@ -71,6 +71,7 @@
             <groupId>io.github.kkkele</groupId>
             <artifactId>easy-translation-jackson-serialize</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

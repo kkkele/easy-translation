@@ -1,0 +1,4 @@
+com.superkele.translation.boot.auto.EasyTranslationPropertiesAutoConfig
+com.superkele.translation.boot.auto.EasyTranslationBaseAutoConfig
+com.superkele.translation.boot.auto.EasyTranslationInterceptorConfig
+com.superkele.translation.boot.auto.EasyTranslationJacksonSerializeAutoConfig
