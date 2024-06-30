@@ -1,7 +1,13 @@
 easy-translation:
+  enable: true
   debug: true
+  base-package:
+    domain:
+      - com.czy
+    translator:
+      - com.superkele.demo
+  json-serialize: true
 logging:
   level:
     com.superkele: debug
-
 

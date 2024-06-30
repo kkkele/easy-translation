@@ -7,8 +7,10 @@ import com.superkele.translation.core.util.LogUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -17,10 +19,14 @@ public class TranslationScanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         Class<?> clazz = bean.getClass();
+        if (clazz.isAnnotationPresent(SpringBootApplication.class)){
+            TranslationGlobalInformation.addTranslatorPackage(Collections.singleton(clazz.getPackage().getName()));
+            TranslationGlobalInformation.addDomainPackage(Collections.singleton(clazz.getPackage().getName()));
+        }
         TranslatorScan translatorScan = AnnotatedElementUtils.getMergedAnnotation(clazz, TranslatorScan.class);
         if (translatorScan != null) {
-            TranslationGlobalInformation.addPackage(translatorScan.basePackages());
-            TranslationGlobalInformation.addPackage(clazz.getPackage().getName());
+            TranslationGlobalInformation.addTranslatorPackage(ListUtil.of(translatorScan.basePackages()));
+            TranslationGlobalInformation.addTranslatorPackage(Collections.singleton(clazz.getPackage().getName()));
             LogUtils.debug(log::debug,"增加包扫描:{}", () -> {
                 List<String> packages = ListUtil.toList(translatorScan.basePackages());
                 packages.add(clazz.getPackage().getName());

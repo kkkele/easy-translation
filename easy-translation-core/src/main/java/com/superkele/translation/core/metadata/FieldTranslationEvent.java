@@ -1,7 +1,9 @@
 package com.superkele.translation.core.metadata;
 
+import com.superkele.translation.annotation.NullPointerExceptionHandler;
 import com.superkele.translation.annotation.RefTranslation;
-import com.superkele.translation.core.annotation.FieldTranslationInvoker;
+import com.superkele.translation.annotation.constant.MappingStrategy;
+import com.superkele.translation.core.mapping.ResultHandler;
 import lombok.Data;
 
 
@@ -17,9 +19,14 @@ public class FieldTranslationEvent {
     private short eventValue;
 
     /**
-     * 用于修改字段的函数
+     * 翻译器名称
      */
-    private FieldTranslationInvoker fieldTranslationInvoker;
+    private String translator;
+
+    /**
+     * 映射策略
+     */
+    private MappingStrategy mappingStrategy;
 
     /**
      * 属性名称
@@ -27,9 +34,49 @@ public class FieldTranslationEvent {
     private String propertyName;
 
     /**
+     * 是否可以复用结果
+     */
+    private boolean cacheEnable;
+
+    /**
+     * 映射字段对应的类的属性
+     */
+    private String[] groupKey;
+
+    /**
+     * 映射的字段
+     */
+    private MapperDesc[] mappers;
+
+    /**
+     * 其他字段
+     */
+    private String[] others;
+
+    /**
+     * 接收参数
+     */
+    private String receive;
+
+    /**
+     * 结果处理器
+     */
+    private ResultHandler resultHandler;
+
+    /**
      * 是否为关联翻译字段
      */
     private RefTranslation refTranslation;
+
+    /**
+     * 参数不为空时是否映射
+     */
+    private boolean notNullMapping;
+
+    /**
+     * 空指针异常处理器
+     */
+    private NullPointerExceptionHandler nullPointerExceptionHandler;
 
     /**
      * 是否异步
@@ -46,5 +93,5 @@ public class FieldTranslationEvent {
     /**
      * 在此事件更新后发生的回调事件
      */
-    private FieldTranslationEvent[] afterEvents;
+    private FieldTranslationEvent[] activeEvents;
 }

@@ -13,6 +13,7 @@
     <modules>
         <module>easy-translation-perf-record</module>
         <module>easy-translation-execute-callback</module>
+        <module>easy-translation-jackson-serialize</module>
     </modules>
 
     <artifactId>easy-translation-extension</artifactId>

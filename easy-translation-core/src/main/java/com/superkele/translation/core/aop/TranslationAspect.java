@@ -9,10 +9,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
 
 
-
+@Order
 @RequiredArgsConstructor
 @Aspect
-@Order
 public class TranslationAspect {
 
     private final TranslationProcessor translationProcessor;
@@ -20,7 +19,7 @@ public class TranslationAspect {
     @Around("@annotation(translationExecute)")
     public Object translationExecuteHandler(ProceedingJoinPoint joinPoint, TranslationExecute translationExecute) throws Throwable {
         Object obj = joinPoint.proceed();
-        translationProcessor.process(obj, translationExecute.type(), translationExecute.field(), translationExecute.async(), translationExecute.listTypeHandler());
+        translationProcessor.process(obj, translationExecute.type(), translationExecute.field(), translationExecute.async(), translationExecute.unpackingHandler());
         return obj;
     }
 

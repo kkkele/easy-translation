@@ -2,11 +2,14 @@ package com.superkele.translation.core.metadata;
 
 import lombok.Data;
 
-import java.util.List;
-import java.util.Map;
 
 @Data
 public class FieldTranslation {
+
+    /**
+     * special name
+     */
+    private String name;
 
     /**
      * 需要执行的size
@@ -17,6 +20,4 @@ public class FieldTranslation {
      * 使用sort顺序触发的event
      */
     private FieldTranslationEvent[] sortEvents;
-
-    private boolean hasSameInvoker;
 }

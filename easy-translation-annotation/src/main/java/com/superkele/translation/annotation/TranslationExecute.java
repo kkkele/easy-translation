@@ -1,7 +1,7 @@
 package com.superkele.translation.annotation;
 
 
-import com.superkele.translation.annotation.constant.DefaultTranslationTypeHandler;
+import com.superkele.translation.annotation.constant.DefaultUnpackingHandler;
 
 import java.lang.annotation.*;
 
@@ -30,5 +30,5 @@ public @interface TranslationExecute {
     /**
      * 解包返回体为List的情况 用来应对List<List<T>>,Map 等情况
      */
-    Class<? extends TranslationUnpackingHandler> listTypeHandler() default DefaultTranslationTypeHandler.class;
+    Class<? extends UnpackingHandler> unpackingHandler() default DefaultUnpackingHandler.class;
 }

@@ -1,16 +1,21 @@
 package com.superkele.translation.core.context.support;
 
 
-import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.translator.definition.ConfigurableTranslatorFactory;
+import com.superkele.translation.core.config.DefaultTranslatorNameGenerator;
+import com.superkele.translation.core.context.ConfigurableTranslatorContext;
+import com.superkele.translation.core.translator.Translator;
+import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 import com.superkele.translation.core.translator.support.DefaultTranslatorFactory;
 import com.superkele.translation.core.translator.support.ExecutorParamInvokeFactoryPostProcessor;
 import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefreshableTranslatorContext {
 
@@ -18,6 +23,14 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
 
     protected List<TranslatorPostProcessor> translatorPostProcessors = new CopyOnWriteArrayList<>();
 
+    private final List<Consumer<ConfigurableTranslatorContext>> listeners = new LinkedList<>();
+
+    @Override
+    protected void noticeListeners() {
+        for (Consumer<ConfigurableTranslatorContext> listener : listeners) {
+            listener.accept(this);
+        }
+    }
 
     public void addTranslatorPostProcessor(TranslatorPostProcessor translatorPostProcessor) {
         translatorPostProcessors.remove(translatorPostProcessor);
@@ -25,19 +38,22 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
     }
 
     @Override
-    protected void loadTranslatorPostProcessors(ConfigurableTranslatorFactory translatorFactory) {
+    protected void loadTranslatorPostProcessors(ConfigurableTranslatorDefinitionFactory translatorFactory) {
         translatorPostProcessors.forEach(translatorFactory::addTranslatorPostProcessor);
     }
 
     @Override
     protected void loadTranslatorDefinition(DefaultTranslatorFactory translatorFactory) {
-        DefaultTranslatorDefinitionReader definitionReader = new DefaultTranslatorDefinitionReader(translatorFactory);
-        definitionReader.setConfig(getConfig());
+        DefaultTranslatorDefinitionReader definitionReader = new DefaultTranslatorDefinitionReader(translatorFactory, getTranslatorNameGenerator(), getTranslatorClazzMap());
         definitionReader.loadTranslatorDefinitions(getBasePackages());
     }
 
+    protected abstract Map<Integer, Class<? extends Translator>> getTranslatorClazzMap();
+
+    protected abstract DefaultTranslatorNameGenerator getTranslatorNameGenerator();
+
     @Override
-    protected void invokeTranslatorFactoryPostProcessors(ConfigurableTranslatorFactory translatorFactory) {
+    protected void invokeTranslatorFactoryPostProcessors(ConfigurableTranslatorDefinitionFactory translatorFactory) {
         addFirstTranslatorFactoryPostProcessor(new ExecutorParamInvokeFactoryPostProcessor());
         for (TranslatorFactoryPostProcessor translatorFactoryPostProcessor : translatorFactoryPostProcessors) {
             translatorFactoryPostProcessor.postProcess(translatorFactory);
@@ -78,7 +94,12 @@ public abstract class AbstractAutoLoadTranslatorContext extends AbstractRefresha
         translatorFactoryPostProcessors.add(translatorFactoryPostProcessor);
     }
 
-    protected abstract Config getConfig();
-
     protected abstract String[] getBasePackages();
+
+    @Override
+    public void register(Consumer<ConfigurableTranslatorContext> consumer) {
+        this.listeners.remove(consumer);
+        this.listeners.add(consumer);
+    }
+
 }

@@ -1,63 +1,51 @@
 package com.superkele.translation.core.processor.support;
 
-import com.superkele.translation.core.annotation.MappingHandler;
-import com.superkele.translation.core.annotation.support.DefaultMappingHandler;
+
 import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.context.TranslatorContext;
-import com.superkele.translation.core.context.support.DefaultTranslatorContext;
-import com.superkele.translation.core.property.PropertyGetter;
-import com.superkele.translation.core.property.PropertySetter;
+import com.superkele.translation.core.mapping.TranslationInvoker;
+import com.superkele.translation.core.mapping.support.DefaultTranslationInvoker;
+import com.superkele.translation.core.metadata.FieldTranslationFactory;
+import com.superkele.translation.core.translator.factory.TranslatorFactory;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 
-public class DefaultTranslationProcessor extends ListableTranslationProcessor {
 
-    private DefaultMappingHandler mappingHandler;
+public class DefaultTranslationProcessor extends AsyncableTranslationProcessor {
 
-    private Config config;
 
-    public DefaultTranslationProcessor(TranslatorContext context) {
-        this.mappingHandler = new DefaultMappingHandler(context, propertyHandler);
-        if (context instanceof DefaultTranslatorContext) {
-            Config config = ((DefaultTranslatorContext) context).getConfig();
-            this.config = config;
-        }
-    }
+    private final TranslationInvoker translationInvoker;
+    private final Config config;
 
-    public DefaultTranslationProcessor(TranslatorContext context, Config config) {
-        this.mappingHandler = new DefaultMappingHandler(context, propertyHandler);
+
+    public DefaultTranslationProcessor(TranslationInvoker translationInvoker, FieldTranslationFactory fieldTranslationFactory, Config config) {
+        super(fieldTranslationFactory);
+        this.translationInvoker = translationInvoker;
         this.config = config;
     }
 
-
-    @Override
-    protected ExecutorService getThreadPoolExecutor() {
-        return this.config.getThreadPoolExecutor();
-    }
-
-    public DefaultTranslationProcessor replacePropertyGetter(PropertyGetter propertyGetter) {
-        this.mappingHandler = mappingHandler;
-        return this;
-    }
-
-    public DefaultTranslationProcessor replacePropertySetter(PropertySetter propertySetter) {
-        this.mappingHandler = mappingHandler;
-        return this;
+    public DefaultTranslationProcessor(TranslatorFactory translatorFactory, FieldTranslationFactory fieldTranslationFactory, Config config) {
+        super(fieldTranslationFactory);
+        this.translationInvoker = new DefaultTranslationInvoker(translatorFactory);
+        this.config = config;
     }
 
     @Override
-    protected boolean getAsyncEnable() {
-        return this.config.getThreadPoolExecutor() != null;
+    protected boolean getAsyncEnabled() {
+        return config.getAsyncEnabled().get();
     }
 
     @Override
-    protected MappingHandler getMappingHandler() {
-        return mappingHandler;
+    protected TranslationInvoker getTranslationInvoker() {
+        return this.translationInvoker;
     }
 
     @Override
-    protected long getTimeout() {
-        return config.getTimeout();
+    protected Executor getExecutor() {
+        return config.getThreadPoolExecutor();
     }
 
+    @Override
+    protected boolean getCacheEnabled() {
+        return config.getCacheEnabled().get();
+    }
 }

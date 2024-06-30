@@ -14,9 +14,8 @@
     <url>https://gitee.com/cai-zhiyuDaKeLe/easy-translation</url>
 
     <properties>
-        <revision>1.3.2</revision>
+        <revision>1.4.0-SNAPSHOT</revision>
     </properties>
-
 
     <developers>
         <developer>
@@ -73,6 +72,12 @@
             <dependency>
                 <groupId>io.github.kkkele</groupId>
                 <artifactId>easy-translation-execute-callback</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.kkkele</groupId>
+                <artifactId>easy-translation-jackson-serialize</artifactId>
                 <version>${revision}</version>
             </dependency>
         </dependencies>

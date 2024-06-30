@@ -3,7 +3,7 @@ package com.superkele.translation.core.translator.support;
 import cn.hutool.core.util.ArrayUtil;
 import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.invoker.InvokeBeanFactory;
-import com.superkele.translation.core.translator.definition.ConfigurableTranslatorFactory;
+import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
 import com.superkele.translation.core.util.Assert;
@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultTranslatorFactory extends AbstractAutowireCapableTranslatorFactory
-        implements ConfigurableTranslatorFactory, TranslatorDefinitionRegistry {
+        implements ConfigurableTranslatorDefinitionFactory, TranslatorDefinitionRegistry {
 
     private final InvokeBeanFactory invokeBeanRegistry;
     private final Map<String, TranslatorDefinition> translatorDefinitionMap = new ConcurrentHashMap<>();

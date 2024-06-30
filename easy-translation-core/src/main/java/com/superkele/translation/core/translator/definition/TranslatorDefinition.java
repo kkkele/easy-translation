@@ -3,6 +3,7 @@ package com.superkele.translation.core.translator.definition;
 import com.superkele.translation.annotation.constant.InvokeBeanScope;
 import com.superkele.translation.core.decorator.TranslatorDecorator;
 import com.superkele.translation.core.invoker.enums.TranslatorType;
+import com.superkele.translation.core.metadata.ParamDesc;
 import com.superkele.translation.core.translator.Translator;
 import lombok.Data;
 
@@ -29,7 +30,7 @@ public class TranslatorDefinition {
     /**
      * 翻译器方法参数类型
      */
-    private Class<?>[] parameterTypes;
+    private ParamDesc[] parameterTypes;
 
     /**
      * 翻译器的类型

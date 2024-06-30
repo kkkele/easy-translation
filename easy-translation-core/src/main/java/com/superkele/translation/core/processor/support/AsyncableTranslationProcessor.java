@@ -1,30 +1,15 @@
 package com.superkele.translation.core.processor.support;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.ConcurrentHashSet;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import com.superkele.translation.annotation.Mapping;
-import com.superkele.translation.annotation.RefTranslation;
-import com.superkele.translation.annotation.constant.TranslateTiming;
-import com.superkele.translation.core.annotation.FieldTranslationInvoker;
-import com.superkele.translation.core.annotation.MappingHandler;
+import com.superkele.translation.core.mapping.TranslationInvoker;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
-import com.superkele.translation.core.property.support.DefaultMethodHandlePropertyHandler;
+import com.superkele.translation.core.metadata.FieldTranslationFactory;
 import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.thread.ContextPasser;
-import com.superkele.translation.core.util.Assert;
-import com.superkele.translation.core.util.Pair;
-import com.superkele.translation.core.util.ReflectUtils;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import com.superkele.translation.core.util.PropertyUtils;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
@@ -32,245 +17,133 @@ import java.util.stream.Collectors;
  */
 public abstract class AsyncableTranslationProcessor extends AbstractTranslationProcessor {
 
-
     /**
      * key：主类
      * value：处理后的，需要翻译的字段
      */
-    private final Map<Class<?>, FieldTranslation> fieldTranslationMap = new ConcurrentHashMap<>();
-    protected List<ContextHolder> contextHolders = new ArrayList<>();
-    protected DefaultMethodHandlePropertyHandler propertyHandler = new DefaultMethodHandlePropertyHandler();
+    private final FieldTranslationFactory fieldTranslationFactory;
 
-    protected abstract ExecutorService getThreadPoolExecutor();
+    /**
+     * 多线程上下文Holder
+     */
+    private final List<ContextHolder> contextHolders = new CopyOnWriteArrayList<>();
 
-    protected abstract boolean getAsyncEnable();
+    protected AsyncableTranslationProcessor(FieldTranslationFactory fieldTranslationFactory) {
+        this.fieldTranslationFactory = fieldTranslationFactory;
+    }
 
-    protected abstract MappingHandler getMappingHandler();
-
-    protected abstract long getTimeout();
-
-
-    public void addContextHolders(ContextHolder contextHolder) {
+    /**
+     * 添加多线程上下文Holder
+     */
+    public void addContextHolder(ContextHolder contextHolder) {
         contextHolders.remove(contextHolder);
         contextHolders.add(contextHolder);
     }
 
+    /**
+     * 添加多线程上下文Holder
+     */
+    public void addContextHolders(Iterator<ContextHolder> contextHolders) {
+        Optional.ofNullable(contextHolders)
+                .ifPresent(iterator -> {
+                    while (iterator.hasNext()) {
+                        ContextHolder contextHolder = iterator.next();
+                        this.contextHolders.remove(contextHolder);
+                        this.contextHolders.add(contextHolder);
+                    }
+                });
+    }
+
+    @Override
+    protected void processInternal(Map<Class, List> classMap, boolean async) {
+        if (async && getAsyncEnabled()) {
+            CompletableFuture[] futures = classMap.keySet().stream()
+                    .map(clazz -> {
+                        FieldTranslation fieldTranslation = fieldTranslationFactory.get(clazz, false);
+                        OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, classMap.get(clazz));
+                        return CompletableFuture.runAsync(() -> onceFieldTranslationHandler.handle(), getExecutor());
+                    })
+                    .toArray(CompletableFuture[]::new);
+            CompletableFuture.allOf(futures).join();
+        } else {
+            classMap.forEach((clazz, list) -> {
+                FieldTranslation fieldTranslation = fieldTranslationFactory.get(clazz, false);
+                OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, list);
+                onceFieldTranslationHandler.handle();
+            });
+        }
+    }
+
     @Override
     protected void processInternal(Object obj, Class<?> clazz) {
-        FieldTranslation fieldTranslation = fieldTranslationMap.get(clazz);
-        OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation);
-        onceFieldTranslationHandler.handle(obj);
+        FieldTranslation fieldTranslation = fieldTranslationFactory.get(clazz, false);
+        OnceFieldTranslationHandler onceFieldTranslationHandler = new OnceFieldTranslationHandler(fieldTranslation, Collections.singletonList(obj));
+        onceFieldTranslationHandler.handle();
     }
 
     @Override
     protected Boolean predictFilter(Class<?> clazz) {
-        Field[] fields = ReflectUtils.getFields(clazz);
-        List<Pair<Field, Mapping>> mappingFields = new ArrayList<>();
-        for (Field field : fields) {
-            Mapping mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, Mapping.class);
-            Optional.ofNullable(mergedAnnotation)
-                    .filter(mapping -> mapping.timing() == TranslateTiming.AFTER_RETURN)
-                    .map(mapping -> Pair.of(field, mapping))
-                    .ifPresent(mappingFields::add);
-        }
-        if (CollectionUtil.isNotEmpty(mappingFields)) {
-            FieldTranslation fieldTranslation = computeFieldTranslationToCache(mappingFields);
-            if (ObjectUtil.isNotNull(fieldTranslation)) {
-                fieldTranslationMap.put(clazz, fieldTranslation);
-            }
-        }
-        return fieldTranslationMap.containsKey(clazz);
+        return fieldTranslationFactory.get(clazz, false) != null;
     }
 
-    protected FieldTranslation computeFieldTranslationToCache(List<Pair<Field, Mapping>> mappingFields) {
-        //fieldName event map
-        Map<String, FieldTranslationEvent> fieldNameEventMap = new HashMap<>();
-        //记录了不同的 eventMask 可以触发的事件
-        Map<Short, List<FieldTranslationEvent>> eventMaskAfterMap = new HashMap<>();
-        List<FieldTranslationEvent> sortEvents = new ArrayList<>();
-        //先将所有的mapping和field改造成FieldTranslationEvent对象
-        //1.简单排序
-        mappingFields.sort(Comparator.comparingInt(o -> o.getValue().sort()));
-        short initEvent = 1;
-        short leftShift = 0;
-        //第一次遍历，转化为FieldTranslationEvent对象
-        //并放入map收集基本情况
-        //查看是否需要开启缓存功能
-        boolean cacheEnabled = false;
-        Set<String> uniqueNameSet = new HashSet<>();
-        for (Pair<Field, Mapping> pair : mappingFields) {
-            Field field = pair.getKey();
-            Mapping mapping = pair.getValue();
-            FieldTranslationEvent event = new FieldTranslationEvent();
-            short eventValue = (short) (initEvent << leftShift);
-            RefTranslation mergedAnnotation = AnnotatedElementUtils.getMergedAnnotation(field, RefTranslation.class);
-            event.setRefTranslation(mergedAnnotation);
-            event.setPropertyName(field.getName());
-            event.setEventValue(eventValue);
-            event.setAsync(mapping.async());
-            event.setFieldTranslationInvoker(getMappingHandler().convert(field, mapping));
-            fieldNameEventMap.put(field.getName(), event);
-            leftShift++;
-            String uniqueName = StrUtil.join(",", mapping.translator(), mapping.mapper(), mapping.other());
-            if (cacheEnabled || uniqueNameSet.contains(uniqueName)) {
-                cacheEnabled = true;
-            } else {
-                uniqueNameSet.add(uniqueName);
-            }
-        }
-        //第二次遍历，划分sort事件和after事件(触发的时机不同，sort事件是按顺序直接触发（一定会），after事件是回调触发（存在不执行的可能）)
-        for (Pair<Field, Mapping> pair : mappingFields) {
-            String fieldName = pair.getKey().getName();
-            Mapping mapping = pair.getValue();
-            FieldTranslationEvent event = fieldNameEventMap.get(fieldName);
-            if (mapping.after().length == 0) {
-                event.setTriggerMask((short) 0);
-                sortEvents.add(event);
-            } else {
-                short eventMask = 0;
-                short[] preEvents = new short[mapping.after().length];
-                int count = 0;
-                for (int i = 0; i < mapping.after().length; i++) {
-                    String afterFieldName = mapping.after()[i];
-                    //获取前置事件
-                    FieldTranslationEvent preEvent = fieldNameEventMap.get(afterFieldName);
-                    Assert.notNull(preEvent, "找不到名为 [" + afterFieldName + "]的前置事件，after字段必须为加了@Mapping注解(或其对应的组合注解)的字段,如果有多个参数，请使用数组传参\n" +
-                            "If a precedent named [" + afterFieldName + "] could not be found, the after field must be a field with a @Mapping annotation (or its corresponding combination annotation), if there are multiple parameters, use an array of parameters");
-                    if (preEvent.isAsync()) {
-                        preEvents[count++] = preEvent.getEventValue();
-                    }
-                    eventMask |= preEvent.getEventValue();
-                }
-                List<FieldTranslationEvent> afterEvents = eventMaskAfterMap.computeIfAbsent(eventMask, key -> new ArrayList<>());
-                //设置前置事件掩码
-                event.setTriggerMask(eventMask);
-                afterEvents.add(event);
-            }
-        }
-        //第三次遍历，给每个事件增加 after 事件
-        for (Pair<Field, Mapping> pair : mappingFields) {
-            FieldTranslationEvent event = fieldNameEventMap.get(pair.getKey().getName());
-            List<FieldTranslationEvent> after = new ArrayList<>();
-            eventMaskAfterMap.forEach((eventMask, events) -> {
-                if ((eventMask.shortValue() & event.getEventValue()) == event.getEventValue()) {
-                    after.addAll(events);
-                }
-            });
-            event.setAfterEvents(after.stream().toArray(FieldTranslationEvent[]::new));
-        }
-        FieldTranslation res = new FieldTranslation();
-        res.setSortEvents(ArrayUtil.toArray(sortEvents, FieldTranslationEvent.class));
-        res.setConsumeSize(mappingFields.size());
-        res.setHasSameInvoker(cacheEnabled);
-        return res;
-    }
-
-    protected List<ContextPasser> buildContextPassers() {
-        return contextHolders.stream()
+    protected List<ContextPasser> buildPassers() {
+        return this.contextHolders.stream()
                 .map(ContextPasser::new)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 只能用来处理一次的FieldTranslationHandler
-     */
-    public class OnceFieldTranslationHandler {
-        private final AtomicInteger activeEvent = new AtomicInteger(0);
-        private final List<ContextPasser> passerCollect = buildContextPassers();
-        /**
-         * 已执行的事件集合
-         */
-        private final boolean cacheEnabled;
-        private final CountDownLatch latch;
-        private Set<Short> consumed = new ConcurrentHashSet<>();
-        private Map<String, Object> translationResCache;
-        private FieldTranslation fieldTranslation;
-        private ReentrantLock lock = new ReentrantLock();
+    protected abstract boolean getAsyncEnabled();
 
-        public OnceFieldTranslationHandler(FieldTranslation fieldTranslation) {
-            this.fieldTranslation = fieldTranslation;
-            this.latch = new CountDownLatch(fieldTranslation.getConsumeSize());
-            this.cacheEnabled = fieldTranslation.isHasSameInvoker();
-            if (this.cacheEnabled) {
-                translationResCache = new ConcurrentHashMap<>();
-            }
+    protected abstract TranslationInvoker getTranslationInvoker();
+
+    protected abstract Executor getExecutor();
+
+    protected abstract boolean getCacheEnabled();
+
+    public class OnceFieldTranslationHandler extends AbstractOnceFieldTranslationHandler {
+
+        private final List<ContextPasser> contextPassers = buildPassers();
+
+        public OnceFieldTranslationHandler(FieldTranslation fieldTranslation, List<Object> sources) {
+            super(fieldTranslation, sources);
         }
 
-        public void handle(Object obj) {
-            if (getAsyncEnable()) {
-                passerCollect.forEach(ContextPasser::setPassValue);
-            }
-            FieldTranslationEvent[] sortEvents = this.fieldTranslation.getSortEvents();
-            //顺序执行事件
-            for (FieldTranslationEvent sortEvent : sortEvents) {
-                translate(obj, sortEvent);
-            }
-            try {
-                latch.await(getTimeout(), TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        @Override
+        protected boolean getCacheEnabled() {
+            return AsyncableTranslationProcessor.this.getCacheEnabled();
         }
 
-        //如果是after事件，需要阻塞直到前事件执行完毕
-        private void translate(Object obj, FieldTranslationEvent event) {
-            //如果没开启异步支持
-            if (!getAsyncEnable()) {
-                translateInternal(obj, event);
-                return;
-            }
-            if (event.isAsync()) {
-                //使用上下文同步器传递上下文
-                CompletableFuture.runAsync(() -> {
-                    passerCollect.forEach(ContextPasser::passContext);
-                    translateInternal(obj, event);
-                    passerCollect.forEach(ContextPasser::clearContext);
-                }, getThreadPoolExecutor());
-            } else {
-                translateInternal(obj, event);
-            }
+        @Override
+        protected TranslationInvoker getTranslationInvoker() {
+            return AsyncableTranslationProcessor.this.getTranslationInvoker();
         }
 
-        private void translateInternal(Object obj, FieldTranslationEvent event) {
-            //获取事件值
-            short eventValue = event.getEventValue();
-            //获取单个字段翻译器
-            FieldTranslationInvoker fieldTranslationInvoker = event.getFieldTranslationInvoker();
-            if (cacheEnabled) {
-                fieldTranslationInvoker.invoke(obj, translationResCache::get, translationResCache::put);
-            } else {
-                fieldTranslationInvoker.invoke(obj);
-            }
-            //如果开启了关联翻译的话
-            RefTranslation refTranslation = event.getRefTranslation();
-            if (refTranslation != null) {
-                //处理相关内容
-                process(propertyHandler.invokeGetter(obj, event.getPropertyName()), refTranslation.type(),
-                        refTranslation.field(), refTranslation.async(), refTranslation.listTypeHandler());
-            }
-            latch.countDown();
-            //更新事件
-            int activeEvent = this.activeEvent.updateAndGet(current -> current | eventValue);
-            //获取事件掩码集合，对比触发after事件
-            for (FieldTranslationEvent afterEvent : event.getAfterEvents()) {
-                if (consumed.contains(afterEvent.getEventValue())) {
-                    continue;
-                }
-                short triggerMask = afterEvent.getTriggerMask();
-                if ((activeEvent & triggerMask) == triggerMask) {
-                    if (getAsyncEnable()) {
-                        lock.lock();
-                        try {
-                            if (consumed.contains(afterEvent.getEventValue())) {
-                                continue;
-                            }
-                            consumed.add(afterEvent.getEventValue());
-                        } finally {
-                            lock.unlock();
-                        }
-                    }
-                    translate(obj, afterEvent);
-                }
+        @Override
+        protected Executor getExecutor() {
+            return AsyncableTranslationProcessor.this.getExecutor();
+        }
+
+        @Override
+        protected boolean getAsyncEnabled() {
+            return AsyncableTranslationProcessor.this.getAsyncEnabled();
+        }
+
+        @Override
+        protected void buildAsyncEnv() {
+            contextPassers.forEach(ContextPasser::passContext);
+        }
+
+        @Override
+        protected void cleanAsyncEnv() {
+            contextPassers.forEach(ContextPasser::clearContext);
+        }
+
+
+        @Override
+        protected void processHook(int sourceIndex, FieldTranslationEvent event) {
+            if (event.getRefTranslation() != null) {
+                process(PropertyUtils.invokeGetter(sources.get(sourceIndex), event.getPropertyName()), event.getRefTranslation().type(),
+                        event.getRefTranslation().field(), event.isAsync(), event.getRefTranslation().listTypeHandler());
             }
         }
     }

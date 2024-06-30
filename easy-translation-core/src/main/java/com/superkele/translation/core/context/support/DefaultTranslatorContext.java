@@ -1,8 +1,11 @@
 package com.superkele.translation.core.context.support;
 
 import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.config.DefaultTranslatorNameGenerator;
 import com.superkele.translation.core.invoker.InvokeBeanFactory;
-import com.superkele.translation.core.translator.support.DefaultTranslatorDefinitionReader;
+import com.superkele.translation.core.translator.Translator;
+
+import java.util.Map;
 
 /**
  * 默认翻译器上下文
@@ -10,37 +13,30 @@ import com.superkele.translation.core.translator.support.DefaultTranslatorDefini
 public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext {
 
 
-    private String[] basePackages;
+    private final String[] basePackages;
 
-    private InvokeBeanFactory invokeBeanFactory;
+    private final InvokeBeanFactory invokeBeanFactory;
 
-    private Config config;
+    private final Config config;
 
-    public DefaultTranslatorContext() {
-    }
-
-    public DefaultTranslatorContext(String[] basePackages, InvokeBeanFactory invokeBeanFactory, Config config) {
+    public DefaultTranslatorContext(Config config, InvokeBeanFactory invokeBeanFactory, String... basePackages) {
+        this.config = config;
         this.basePackages = basePackages;
         this.invokeBeanFactory = invokeBeanFactory;
-        this.config = config;
     }
 
-    public DefaultTranslatorContext(String[] basePackages, InvokeBeanFactory invokeBeanFactory) {
-        this(basePackages, invokeBeanFactory, new Config());
-    }
-
-    public DefaultTranslatorContext(String[] basePackages) {
-        this(basePackages, null, new Config());
+    public DefaultTranslatorContext(InvokeBeanFactory invokeBeanFactory, String... basePackages) {
+        this(new Config(), invokeBeanFactory, basePackages);
     }
 
     @Override
-    public Config getConfig() {
-        return config;
+    protected Map<Integer, Class<? extends Translator>> getTranslatorClazzMap() {
+        return config.getTranslatorClazzMap();
     }
 
-    public DefaultTranslatorContext setConfig(Config config) {
-        this.config = config;
-        return this;
+    @Override
+    protected DefaultTranslatorNameGenerator getTranslatorNameGenerator() {
+        return config.getDefaultTranslatorNameGenerator();
     }
 
     @Override
@@ -48,18 +44,8 @@ public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext 
         return basePackages;
     }
 
-    public DefaultTranslatorContext setBasePackages(String[] basePackages) {
-        this.basePackages = basePackages;
-        return this;
-    }
-
     @Override
     protected InvokeBeanFactory getInvokeBeanFactory() {
         return invokeBeanFactory;
-    }
-
-    public DefaultTranslatorContext setInvokeBeanFactory(InvokeBeanFactory invokeBeanFactory) {
-        this.invokeBeanFactory = invokeBeanFactory;
-        return this;
     }
 }
