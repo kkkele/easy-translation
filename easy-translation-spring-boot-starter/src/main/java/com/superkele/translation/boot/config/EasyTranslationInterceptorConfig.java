@@ -1,14 +1,17 @@
 package com.superkele.translation.boot.config;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.superkele.translation.boot.config.properties.TranslationConfig;
 import com.superkele.translation.core.config.TranslationAutoConfigurationCustomizer;
 import com.superkele.translation.core.context.support.DefaultTranslatorContext;
+import com.superkele.translation.core.metadata.FieldTranslationFactory;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.core.thread.ContextHolder;
 import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
 import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 import com.superkele.translation.core.util.LogUtils;
+import com.superkele.translation.extension.serialize.jackson.TranslationJsonNodeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -29,6 +32,8 @@ public class EasyTranslationInterceptorConfig implements ApplicationContextAware
     private final TranslationConfig config;
 
     private final DefaultTranslatorContext defaultTransExecutorContext;
+
+    private final FieldTranslationFactory fieldTranslationFactory;
 
     private final DefaultTranslationProcessor defaultTranslationProcessor;
 
@@ -69,8 +74,15 @@ public class EasyTranslationInterceptorConfig implements ApplicationContextAware
             });
     }
 
+    @Autowired
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        objectMapper.registerModules(new TranslationJsonNodeModule(fieldTranslationFactory, defaultTransExecutorContext));
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.defaultTransExecutorContext.refresh();
     }
+
+
 }

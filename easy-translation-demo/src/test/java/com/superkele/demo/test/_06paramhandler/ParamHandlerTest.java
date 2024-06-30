@@ -1,7 +1,6 @@
 package com.superkele.demo.test._06paramhandler;
 
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.util.StrUtil;
 import com.superkele.demo.EasyTranslationDemoApplication;
 import com.superkele.demo.paramhandler.Animal;
 import com.superkele.demo.paramhandler.Animal2;

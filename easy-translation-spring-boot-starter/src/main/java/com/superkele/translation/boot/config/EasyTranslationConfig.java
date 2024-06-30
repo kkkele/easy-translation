@@ -11,14 +11,12 @@ import com.superkele.translation.core.context.support.DefaultTranslatorContext;
 import com.superkele.translation.core.mapping.support.DefaultParamHandler;
 import com.superkele.translation.core.mapping.support.DefaultResultHandler;
 import com.superkele.translation.core.metadata.support.DefaultConfigurableFieldTranslationFactory;
-import com.superkele.translation.core.metadata.support.DefaultMappingFiledTranslationBuilder;
 import com.superkele.translation.core.processor.TranslationProcessor;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.core.util.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
@@ -87,4 +85,5 @@ public class EasyTranslationConfig {
     public TranslationAspect translationAspect(TranslationProcessor defaultTranslationProcessor) {
         return new TranslationAspect(defaultTranslationProcessor);
     }
+
 }

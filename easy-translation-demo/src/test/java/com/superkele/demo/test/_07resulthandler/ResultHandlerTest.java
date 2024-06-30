@@ -3,11 +3,9 @@ package com.superkele.demo.test._07resulthandler;
 
 import cn.hutool.core.collection.ListUtil;
 import com.superkele.demo.EasyTranslationDemoApplication;
-import com.superkele.demo.resulthandler.Book;
 import com.superkele.demo.resulthandler.BookVo;
 import com.superkele.demo.resulthandler.BookVo2;
 import com.superkele.demo.resulthandler.BookVo3;
-import com.superkele.demo.test._06paramhandler.ParamHandlerTest;
 import com.superkele.demo.test.utils.PropertyUtils;
 import com.superkele.translation.annotation.constant.DefaultUnpackingHandler;
 import com.superkele.translation.core.processor.TranslationProcessor;

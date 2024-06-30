@@ -5,7 +5,6 @@ import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.constant.MappingStrategy;
 import lombok.Data;
 
-import java.util.Random;
 
 @Data
 public class Animal3 {
