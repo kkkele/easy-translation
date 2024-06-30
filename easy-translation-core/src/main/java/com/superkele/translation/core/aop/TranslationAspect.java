@@ -9,10 +9,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
 
 
-
+@Order
 @RequiredArgsConstructor
 @Aspect
-@Order
 public class TranslationAspect {
 
     private final TranslationProcessor translationProcessor;

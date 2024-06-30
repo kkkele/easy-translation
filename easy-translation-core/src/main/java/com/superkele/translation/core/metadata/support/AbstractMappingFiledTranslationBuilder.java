@@ -121,6 +121,7 @@ public abstract class AbstractMappingFiledTranslationBuilder implements FieldTra
             event.setActiveEvents(after.stream().toArray(FieldTranslationEvent[]::new));
         }
         FieldTranslation res = new FieldTranslation();
+        res.setName(mappingFields.get(0).getKey().getDeclaringClass().getName());
         res.setSortEvents(ArrayUtil.toArray(sortEvents, FieldTranslationEvent.class));
         res.setConsumeSize(mappingFields.size());
         return res;

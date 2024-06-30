@@ -27,10 +27,11 @@ public class TranslationSerializerModifier extends BeanSerializerModifier {
     public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
         JavaType type = beanDesc.getType();
         Class<?> targetType = type.getRawClass();
-        LogUtils.error(log::error, "serializer simple type begin analise {}", () -> targetType.getSimpleName());
-        FieldTranslation fieldTranslation1 = getFieldTranslation(targetType);
-        return Optional.ofNullable(fieldTranslation1)
-                .map(fieldTranslation -> (JsonSerializer) new TranslationJsonSerializer(fieldTranslation, translationInvoker, serializer))
+        return Optional.ofNullable(getFieldTranslation(targetType))
+                .map(fieldTranslation -> {
+                    LogUtils.debug(log::debug, "type {} support json translation ", () -> targetType.getSimpleName());
+                    return (JsonSerializer) new TranslationJsonSerializer(fieldTranslation, translationInvoker, serializer);
+                })
                 .orElse(super.modifySerializer(config, beanDesc, serializer));
     }
 

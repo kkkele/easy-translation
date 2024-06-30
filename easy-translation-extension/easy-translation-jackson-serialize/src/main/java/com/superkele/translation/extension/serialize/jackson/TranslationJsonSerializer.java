@@ -1,24 +1,23 @@
 package com.superkele.translation.extension.serialize.jackson;
 
 import cn.hutool.core.collection.ConcurrentHashSet;
-import cn.hutool.core.collection.ListUtil;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.*;
 import com.superkele.translation.core.mapping.TranslationInvoker;
 import com.superkele.translation.core.metadata.FieldTranslation;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.processor.support.AbstractOnceFieldTranslationHandler;
+import com.superkele.translation.core.util.LogUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 
 @Slf4j
 public class TranslationJsonSerializer extends JsonSerializer {
 
-
-    private static final Set<Integer> BEAN_CONSUMED = new ConcurrentHashSet<>();
     private final FieldTranslation fieldTranslation;
     private final TranslationInvoker translationInvoker;
     private final JsonSerializer serializer;
@@ -27,51 +26,45 @@ public class TranslationJsonSerializer extends JsonSerializer {
         this.fieldTranslation = fieldTranslation;
         this.translationInvoker = translationInvoker;
         this.serializer = serializer;
+        LogUtils.debug(log::debug, "{} => TranslationJsonSerializer init...", () -> fieldTranslation.getName());
     }
 
     @Override
     public void serialize(Object propertyValue, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        if (BEAN_CONSUMED.contains(propertyValue.hashCode())) {
+        Object currentValue = jsonGenerator.getCurrentValue();
+        if (currentValue == null) {
+            translate(Collections.singletonList(propertyValue));
             serializer.serialize(propertyValue, jsonGenerator, serializerProvider);
             return;
         }
-        Object currentValue = jsonGenerator.getCurrentValue();
-        if (currentValue == null) {
-            JsonOnceFieldTranslationHandler jsonOnceFieldTranslationHandler = new JsonOnceFieldTranslationHandler(fieldTranslation, Collections.singletonList(propertyValue));
-            jsonOnceFieldTranslationHandler.handle();
+        handleCurrentValue(currentValue, propertyValue);
+        serializer.serialize(propertyValue, jsonGenerator, serializerProvider);
+    }
+
+    private void handleCurrentValue(Object currentValue, Object propertyValue) throws IOException {
+        if (currentValue instanceof List) {
+            handleCollection((Collection<?>) currentValue);
+        } else if (currentValue.getClass().isArray()) {
+            handleCollection(Arrays.asList((Object[]) currentValue));
+        } else if (currentValue instanceof Set) {
+            handleCollection(new ArrayList<>((Set<?>) currentValue));
         } else {
-            if (currentValue instanceof List) {
-                if (!BEAN_CONSUMED.contains(currentValue.hashCode())) {
-                    List<Object> list = (List<Object>) currentValue;
-                    JsonOnceFieldTranslationHandler jsonOnceFieldTranslationHandler = new JsonOnceFieldTranslationHandler(fieldTranslation, list);
-                    jsonOnceFieldTranslationHandler.handle();
-                    BEAN_CONSUMED.add(currentValue.hashCode());
-                }
-            } else if (currentValue.getClass().isArray()) {
-                if (!BEAN_CONSUMED.contains(currentValue.hashCode())) {
-                    ArrayList<Object> list = ListUtil.toList((Object[]) currentValue);
-                    JsonOnceFieldTranslationHandler jsonOnceFieldTranslationHandler = new JsonOnceFieldTranslationHandler(fieldTranslation, list);
-                    jsonOnceFieldTranslationHandler.handle();
-                    BEAN_CONSUMED.add(currentValue.hashCode());
-                }
-            } else if (currentValue instanceof Set) {
-                if (!BEAN_CONSUMED.contains(currentValue.hashCode())) {
-                    JsonOnceFieldTranslationHandler jsonOnceFieldTranslationHandler = new JsonOnceFieldTranslationHandler(fieldTranslation, new ArrayList<>((Set) currentValue));
-                    jsonOnceFieldTranslationHandler.handle();
-                    BEAN_CONSUMED.add(currentValue.hashCode());
-                }
-            } else {
-                JsonOnceFieldTranslationHandler jsonOnceFieldTranslationHandler = new JsonOnceFieldTranslationHandler(fieldTranslation, Collections.singletonList(propertyValue));
-                jsonOnceFieldTranslationHandler.handle();
-            }
-        }
-        BEAN_CONSUMED.add(propertyValue.hashCode());
-        try {
-            jsonGenerator.writeObject(propertyValue);
-        } finally {
-            BEAN_CONSUMED.remove(propertyValue.hashCode());
+            translate(Collections.singletonList(propertyValue));
         }
     }
+
+    private void handleCollection(Collection<?> collection) throws IOException {
+        if (!ConsumedContext.isConsumed(collection)) {
+            translate(new CopyOnWriteArrayList<>(collection));
+            ConsumedContext.addToConsumed(collection);
+        }
+    }
+
+    private void translate(List<Object> list) {
+        JsonOnceFieldTranslationHandler jsonOnceFieldTranslationHandler = new JsonOnceFieldTranslationHandler(fieldTranslation, list);
+        jsonOnceFieldTranslationHandler.handle();
+    }
+
 
     public class JsonOnceFieldTranslationHandler extends AbstractOnceFieldTranslationHandler {
 

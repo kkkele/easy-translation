@@ -7,6 +7,11 @@ import lombok.Data;
 public class FieldTranslation {
 
     /**
+     * special name
+     */
+    private String name;
+
+    /**
      * 需要执行的size
      */
     private int consumeSize;
