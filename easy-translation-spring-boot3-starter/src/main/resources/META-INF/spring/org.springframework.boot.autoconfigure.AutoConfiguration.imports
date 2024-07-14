@@ -1,4 +1,8 @@
-com.superkele.translation.boot.auto.EasyTranslationPropertiesAutoConfig
-com.superkele.translation.boot.auto.EasyTranslationBaseAutoConfig
-com.superkele.translation.boot.auto.EasyTranslationInterceptorConfig
-com.superkele.translation.boot.auto.EasyTranslationJacksonSerializeAutoConfig
+  com.superkele.translation.boot.auto.EasyTranslationPropertiesAutoConfig
+  com.superkele.translation.boot.auto.EasyTranslationBaseBean
+  com.superkele.translation.boot.auto.EasyTranslationInitConfig
+  com.superkele.translation.boot.auto.EasyTranslationJacksonSerializeAutoConfig
+  com.superkele.translation.boot.auto.EasyTranslationInject
+  com.superkele.translation.boot.invoker.SpringInvokeBeanFactory
+  com.superkele.translation.boot.resolver.SpringParamHandlerResolver
+  com.superkele.translation.boot.resolver.SpringResultHandlerResolver
