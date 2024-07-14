@@ -1,5 +1,6 @@
 package com.superkele.translation.core.config;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.log.LogLevel;
@@ -12,10 +13,12 @@ import java.io.Serializable;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 /**
  * Easy-Translation 全局配置类
@@ -48,38 +51,18 @@ public class TranslationConfig implements Serializable {
      * 是否开启异步翻译
      */
     private boolean asyncEnabled = false;
-
-    @Override
-    public String toString() {
-        return "TranslationConfig{" +
-               "printLog=" + printLog +
-               ", logLevel=" + logLevel +
-               ", threadPoolExecutor=" + threadPoolExecutor +
-               ", asyncEnabled=" + asyncEnabled +
-               ", colorLog=" + colorLog +
-               ", translatorPackages=" + Arrays.toString(translatorPackages) +
-               ", domainPackages=" + Arrays.toString(domainPackages) +
-               ", defaultTranslatorNameGenerator=" + defaultTranslatorNameGenerator +
-               ", cacheEnabled=" + cacheEnabled +
-               '}';
-    }
-
     /**
      * 是否打印彩色日志
      */
     private boolean colorLog = true;
-
     /**
      * 翻译器包
      */
     private String[] translatorPackages;
-
     /**
      * 域包
      */
     private String[] domainPackages;
-
-
     /**
      * 默认翻译器名称生成器
      */
@@ -99,6 +82,21 @@ public class TranslationConfig implements Serializable {
 
     public TranslationConfig() {
         init();
+    }
+
+    @Override
+    public String toString() {
+        return "TranslationConfig{" +
+               "printLog=" + printLog +
+               ", logLevel=" + logLevel +
+               ", threadPoolExecutor=" + threadPoolExecutor +
+               ", asyncEnabled=" + asyncEnabled +
+               ", colorLog=" + colorLog +
+               ", translatorPackages=" + Arrays.toString(translatorPackages) +
+               ", domainPackages=" + Arrays.toString(domainPackages) +
+               ", defaultTranslatorNameGenerator=" + defaultTranslatorNameGenerator +
+               ", cacheEnabled=" + cacheEnabled +
+               '}';
     }
 
     public String[] getTranslatorPackages() {
@@ -191,6 +189,40 @@ public class TranslationConfig implements Serializable {
             Pair<Method, MethodType> pair = ReflectUtils.findFunctionInterfaceMethodType(translatorClazz);
             translatorClazzMap.put(pair.getKey().getParameterCount(), translatorClazz);
         }
+        return this;
+    }
+
+    public TranslationConfig addTranslatorPackage(String... extraPackage) {
+        this.translatorPackages = Optional.ofNullable(this.translatorPackages)
+                .map(basePackages -> {
+                    if (extraPackage == null) {
+                        return basePackages;
+                    }
+                    List<String> collect = Arrays.stream(extraPackage)
+                            .collect(Collectors.toList());
+                    collect.addAll(Arrays.asList(basePackages));
+                    return collect.stream()
+                            .distinct()
+                            .toArray(String[]::new);
+                })
+                .orElse(extraPackage);
+        return this;
+    }
+
+    public TranslationConfig addDomainPackage(String... extraPackage) {
+        this.domainPackages = Optional.ofNullable(this.domainPackages)
+                .map(basePackages -> {
+                    if (extraPackage == null) {
+                        return basePackages;
+                    }
+                    List<String> collect = Arrays.stream(extraPackage)
+                            .collect(Collectors.toList());
+                    collect.addAll(Arrays.asList(basePackages));
+                    return collect.stream()
+                            .distinct()
+                            .toArray(String[]::new);
+                })
+                .orElse(extraPackage);
         return this;
     }
 

@@ -1,7 +1,7 @@
 package com.superkele.translation.boot.invoker;
 
 import cn.hutool.core.exceptions.UtilException;
-import com.superkele.translation.core.invoker.support.AbstractInvokeBeanFactory;
+import com.superkele.translation.core.invoker.support.AbstractAutoNoticeInvokeBeanFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 
 @Component
-public class SpringInvokeBeanFactory extends AbstractInvokeBeanFactory implements BeanFactoryPostProcessor, ApplicationContextAware, CommandLineRunner {
+public class SpringInvokeBeanFactory extends AbstractAutoNoticeInvokeBeanFactory implements BeanFactoryPostProcessor, ApplicationContextAware, CommandLineRunner {
 
     private ConfigurableListableBeanFactory beanFactory;
 
@@ -34,11 +34,6 @@ public class SpringInvokeBeanFactory extends AbstractInvokeBeanFactory implement
     @Override
     public <T> Map<String, T> getBeansOfType(Class<T> clazz) {
         return getBeanFactory().getBeansOfType(clazz);
-    }
-
-    @Override
-    protected String[] getBeanNames(Class<?> clazz) {
-        return getBeanFactory().getBeanDefinitionNames();
     }
 
     @Override

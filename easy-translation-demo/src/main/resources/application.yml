@@ -1,7 +1,7 @@
 easy-translation:
   enable: true
   json-serialize: true
-  log-level: debug
+  log-level: trace
 logging:
   level:
     com.superkele: debug

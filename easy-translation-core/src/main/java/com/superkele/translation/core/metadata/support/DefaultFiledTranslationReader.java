@@ -2,6 +2,8 @@ package com.superkele.translation.core.metadata.support;
 
 import cn.hutool.core.collection.ListUtil;
 import com.superkele.translation.annotation.Mapping;
+import com.superkele.translation.core.TransManager;
+import com.superkele.translation.core.log.TransLog;
 import com.superkele.translation.core.metadata.FieldTranslationInfo;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
 import com.superkele.translation.core.metadata.FieldTranslationReader;
@@ -37,6 +39,7 @@ public class DefaultFiledTranslationReader implements FieldTranslationReader {
         ReflectionsPlus reflectionsPlus = ReflectionsPlus.getReflectionsPlus(ListUtil.of(ScannerEnum.FILED),basePath);
         Set<Field> fieldsMergedAnnotatedWith = reflectionsPlus.getFieldsMergedAnnotatedWith(Mapping.class);
         Set<Class<?>> clazzSet = new HashSet<>();
+        TransLog transLog = TransManager.getTransLog();
         fieldsMergedAnnotatedWith.forEach(field -> {
             Class<?> declaringClass = field.getDeclaringClass();
             if (clazzSet.contains(declaringClass)){
@@ -46,10 +49,12 @@ public class DefaultFiledTranslationReader implements FieldTranslationReader {
             FieldTranslationInfo common = builder.build(declaringClass, false);
             if (common != null){
                 registry.register(declaringClass, false, common);
+                transLog.trace("add afterReturn FiledTranslationInfo ---> {}",() -> declaringClass.getSimpleName());
             }
             FieldTranslationInfo json = builder.build(declaringClass, true);
             if (json != null){
                 registry.register(declaringClass, true, json);
+                transLog.trace("add json FiledTranslationInfo ---> {}",() -> declaringClass.getSimpleName());
             }
         });
     }

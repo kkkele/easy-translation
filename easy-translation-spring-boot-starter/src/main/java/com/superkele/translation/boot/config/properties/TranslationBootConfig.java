@@ -75,7 +75,7 @@ public class TranslationBootConfig extends TranslationConfig {
             this.domain = domain;
             Optional.ofNullable(this.domain)
                     .ifPresent(domainPackages -> {
-                        setDomainPackages(domainPackages.stream().toArray(String[]::new));
+                        addDomainPackage(domainPackages.stream().toArray(String[]::new));
                     });
             return this;
         }
@@ -88,7 +88,7 @@ public class TranslationBootConfig extends TranslationConfig {
             this.translator = translator;
             Optional.ofNullable(this.translator)
                     .ifPresent(translatorPackages -> {
-                        setTranslatorPackages(translatorPackages.stream().toArray(String[]::new));
+                        addTranslatorPackage(translatorPackages.stream().toArray(String[]::new));
                     });
             return this;
         }

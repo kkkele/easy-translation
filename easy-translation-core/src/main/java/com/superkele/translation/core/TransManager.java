@@ -1,15 +1,10 @@
 package com.superkele.translation.core;
 
 import com.superkele.translation.core.config.TranslationConfig;
-import com.superkele.translation.core.context.ConfigurableTranslatorContext;
-import com.superkele.translation.core.context.DynamicTranslatorContext;
 import com.superkele.translation.core.context.FieldTranslationInfoContext;
-import com.superkele.translation.core.context.TranslatorContext;
 import com.superkele.translation.core.context.support.DefaultTranslatorContext;
 import com.superkele.translation.core.exception.TranslationException;
-import com.superkele.translation.core.invoker.InvokeBeanFactory;
 import com.superkele.translation.core.invoker.support.ConfigurableInvokeBeanFactory;
-import com.superkele.translation.core.invoker.support.DefaultInvokeBeanFactory;
 import com.superkele.translation.core.log.TransLog;
 import com.superkele.translation.core.log.TransLogForConsole;
 import com.superkele.translation.core.mapping.ParamHandler;
@@ -17,7 +12,6 @@ import com.superkele.translation.core.mapping.ParamHandlerResolver;
 import com.superkele.translation.core.mapping.ResultHandler;
 import com.superkele.translation.core.mapping.ResultHandlerResolver;
 import com.superkele.translation.core.metadata.support.DefaultFieldTranslationInfoContext;
-import com.superkele.translation.core.processor.TranslationProcessor;
 import com.superkele.translation.core.processor.support.DefaultTranslationProcessor;
 import com.superkele.translation.core.util.EasyTransUtil;
 import com.superkele.translation.core.util.Singleton;
@@ -151,7 +145,9 @@ public class TransManager {
 
     public static void setConfig(TranslationConfig translationConfig) {
         TransManager.translationConfig = translationConfig;
-        EasyTransUtil.printEasyTranslation();
+        if (translationConfig.isPrintLog()){
+            EasyTransUtil.printEasyTranslation();
+        }
     }
 
     /**
@@ -162,12 +158,6 @@ public class TransManager {
         return new TranslationConfig();
     }
 
-    /**
-     * 当在非Spring等环境下，用于加载默认的InvokeBeanFactory
-     */
-    public static ConfigurableInvokeBeanFactory createInvokeBeanFactory() {
-        return new DefaultInvokeBeanFactory();
-    }
 
     public static TransLog getTransLog() {
         return TransManager.transLog;
