@@ -3,7 +3,7 @@ package com.superkele.translation.core.translator.support;
 import com.superkele.translation.annotation.Translation;
 import com.superkele.translation.core.translator.Resource;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
-import com.superkele.translation.core.translator.definition.TranslatorDefinitionReader;
+import com.superkele.translation.core.translator.definition.DynamicTranslatorDefinitionReader;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
 import com.superkele.translation.core.translator.definition.TranslatorLoader;
 import com.superkele.translation.core.util.Pair;
@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class AbstractTranslatorDefinitionReader implements TranslatorDefinitionReader {
+public abstract class AbstractTranslatorDefinitionReader implements DynamicTranslatorDefinitionReader {
 
 
     private final TranslatorDefinitionRegistry registry;
@@ -59,7 +59,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                 })
                 .forEach(pair -> {
                     TranslatorDefinition translatorDefinition = convertStaticMethodToTranslatorDefinition(clazz, pair.getKey());
-                    registry.register(getTranslatorName(pair.getValue(), pair.getKey()), translatorDefinition);
+                    getRegistry().register(getTranslatorName(pair.getValue(), pair.getKey()), translatorDefinition);
                 });
     }
 
@@ -71,7 +71,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                 })
                 .forEach(methodAnnotationPair -> {
                     TranslatorDefinition translatorDefinition = convertDynamicMethodToTranslatorDefinition(clazz, methodAnnotationPair.getKey(), methodAnnotationPair.getValue());
-                    registry.register(getTranslatorName(methodAnnotationPair.getValue(), methodAnnotationPair.getKey()), translatorDefinition);
+                    getRegistry().register(getTranslatorName(methodAnnotationPair.getValue(), methodAnnotationPair.getKey()), translatorDefinition);
                 });
     }
 
@@ -95,7 +95,7 @@ public abstract class AbstractTranslatorDefinitionReader implements TranslatorDe
                 .map(enumClazz -> Pair.of(enumClazz, AnnotatedElementUtils.getMergedAnnotation(enumClazz, Translation.class)))
                 .ifPresent(pair -> {
                     Class<? extends Enum> key = (Class<? extends Enum>) pair.getKey();
-                    registry.register(getTranslatorName(pair.getValue(), key), convertEnumToTranslatorDefinition(key));
+                    getRegistry().register(getTranslatorName(pair.getValue(), key), convertEnumToTranslatorDefinition(key));
                 });
     }
 

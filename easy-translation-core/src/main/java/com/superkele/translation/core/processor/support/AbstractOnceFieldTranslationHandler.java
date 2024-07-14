@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.superkele.translation.annotation.constant.MappingStrategy;
 import com.superkele.translation.core.exception.TranslationException;
 import com.superkele.translation.core.mapping.TranslationInvoker;
-import com.superkele.translation.core.metadata.FieldTranslation;
+import com.superkele.translation.core.metadata.FieldTranslationInfo;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.processor.FieldTranslationHandler;
 import com.superkele.translation.core.util.Pair;
@@ -28,15 +28,15 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class AbstractOnceFieldTranslationHandler implements FieldTranslationHandler {
 
-    protected final FieldTranslation fieldTranslation;
+    protected final FieldTranslationInfo fieldTranslationInfo;
     protected final List<Object> sources;
     private final AtomicInteger[] activeEvents;
     private final ReentrantLock[] locks;
     private final Set<Pair<Integer, Short>> consumed = new ConcurrentHashSet<>();
     private final Map<String, Object> cache;
 
-    public AbstractOnceFieldTranslationHandler(FieldTranslation fieldTranslation, List<Object> sources) {
-        this.fieldTranslation = fieldTranslation;
+    public AbstractOnceFieldTranslationHandler(FieldTranslationInfo fieldTranslationInfo, List<Object> sources) {
+        this.fieldTranslationInfo = fieldTranslationInfo;
         this.sources = sources;
         this.locks = new ReentrantLock[sources.size()];
         this.activeEvents = new AtomicInteger[sources.size()];
@@ -63,8 +63,8 @@ public abstract class AbstractOnceFieldTranslationHandler implements FieldTransl
 
 
     @Override
-    public FieldTranslation getFieldTranslation() {
-        return fieldTranslation;
+    public FieldTranslationInfo getFieldTranslation() {
+        return fieldTranslationInfo;
     }
 
     @Override

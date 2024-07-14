@@ -67,7 +67,6 @@
         <aspectj.version>1.9.19</aspectj.version>
     </properties>
 
-
     <dependencyManagement>
         <dependencies>
 

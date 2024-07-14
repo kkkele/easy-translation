@@ -1,17 +1,22 @@
 package com.superkele.translation.core.context.support;
 
+import com.superkele.translation.core.TransManager;
 import com.superkele.translation.core.context.ConfigurableTranslatorContext;
 import com.superkele.translation.core.translator.Translator;
 import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
-import com.superkele.translation.core.util.LogUtils;
+import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 /**
  * 抽象翻译器上下文
  */
 public abstract class AbstractTranslatorContext implements ConfigurableTranslatorContext {
 
+    private List<Consumer<ConfigurableTranslatorContext>> listeners = new CopyOnWriteArrayList<>();
 
     @Override
     public void refresh() {
@@ -24,25 +29,30 @@ public abstract class AbstractTranslatorContext implements ConfigurableTranslato
         //装载translatorPostProcessor
         loadTranslatorPostProcessors(translatorFactory);
         //实例化translator
-        loadTranslators(translatorFactory);
-        //回调触发其他事件
-        noticeListeners();
+        loadTranslators(translatorFactory.getTranslatorNames(), translatorFactory);
+        //通知监听器
+        notice();
     }
 
-    protected abstract void noticeListeners();
+    @Override
+    public void notice() {
+        listeners.forEach(listener -> listener.accept(this));
+    }
 
-    protected void loadTranslators(ConfigurableTranslatorDefinitionFactory translatorFactory) {
-        Arrays.stream(translatorFactory.getTranslatorNames())
-                .map(translatorName -> {
-                    try {
-                        return translatorFactory.findTranslator(translatorName);
-                    } catch (RuntimeException e) {
-                        LogUtils.error(System.err::printf, "load translator error:\n%s\n", () -> e);
-                        return null;
-                    }
-                })
-                .forEach(translator -> {
-                });
+    @Override
+    public void addListener(Consumer<ConfigurableTranslatorContext> action) {
+        listeners.add(action);
+    }
+
+    protected void loadTranslators(String[] translatorNames, ConfigurableTranslatorDefinitionFactory translatorFactory) {
+        for (String translatorName : translatorNames) {
+            try {
+                TransManager.getTransLog().trace("load translator ---> {}", () -> translatorName);
+                translatorFactory.findTranslator(translatorName);
+            } catch (RuntimeException e) {
+                TransManager.getTransLog().error("load translator error:\n{}\n", () -> e);
+            }
+        }
     }
 
     protected abstract void loadTranslatorPostProcessors(ConfigurableTranslatorDefinitionFactory translatorFactory);
@@ -54,6 +64,11 @@ public abstract class AbstractTranslatorContext implements ConfigurableTranslato
     @Override
     public Translator findTranslator(String translator) {
         return getTranslatorFactory().findTranslator(translator);
+    }
+
+    @Override
+    public TranslatorDefinition findTranslatorDefinition(String translatorName) {
+        return getTranslatorFactory().findTranslatorDefinition(translatorName);
     }
 
     @Override

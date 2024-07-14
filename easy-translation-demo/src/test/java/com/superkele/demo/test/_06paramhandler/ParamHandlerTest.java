@@ -83,7 +83,7 @@ public class ParamHandlerTest {
 
         @Bean
         public TranslationAutoConfigurationCustomizer translationAutoConfigurationCustomizer2() {
-            return config -> config.setCacheEnabled(() -> false);
+            return config -> config.setCacheEnabled(false);
         }
     }
 }

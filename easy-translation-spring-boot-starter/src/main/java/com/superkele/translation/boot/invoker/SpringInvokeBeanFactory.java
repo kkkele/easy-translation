@@ -1,19 +1,21 @@
 package com.superkele.translation.boot.invoker;
 
 import cn.hutool.core.exceptions.UtilException;
-import com.superkele.translation.core.invoker.InvokeBeanFactory;
+import com.superkele.translation.core.invoker.support.AbstractInvokeBeanFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 
-public class SpringInvokeBeanFactory implements BeanFactoryPostProcessor, ApplicationContextAware, InvokeBeanFactory {
-
+@Component
+public class SpringInvokeBeanFactory extends AbstractInvokeBeanFactory implements BeanFactoryPostProcessor, ApplicationContextAware, CommandLineRunner {
 
     private ConfigurableListableBeanFactory beanFactory;
 
@@ -35,6 +37,11 @@ public class SpringInvokeBeanFactory implements BeanFactoryPostProcessor, Applic
     }
 
     @Override
+    protected String[] getBeanNames(Class<?> clazz) {
+        return getBeanFactory().getBeanDefinitionNames();
+    }
+
+    @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException {
         this.beanFactory = configurableListableBeanFactory;
     }
@@ -50,5 +57,10 @@ public class SpringInvokeBeanFactory implements BeanFactoryPostProcessor, Applic
             throw new UtilException("No ConfigurableListableBeanFactory or ApplicationContext injected, maybe not in the Spring environment?");
         }
         return factory;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        refresh();
     }
 }

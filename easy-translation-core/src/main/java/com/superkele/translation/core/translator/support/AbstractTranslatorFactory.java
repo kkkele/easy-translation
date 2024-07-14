@@ -13,7 +13,6 @@ public abstract class AbstractTranslatorFactory extends DefaultSingletonTranslat
 
     private final List<TranslatorPostProcessor> translatorPostProcessors = new ArrayList<>();
 
-
     @Override
     public Translator findTranslator(String translatorName) {
         //增加 原型Translator和单例Translator的区分

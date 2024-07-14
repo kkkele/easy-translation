@@ -12,6 +12,7 @@ import com.superkele.translation.core.metadata.MapperDesc;
 import com.superkele.translation.core.metadata.ParamDesc;
 import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
+import com.superkele.translation.core.translator.definition.TranslatorDefinitionFactory;
 import com.superkele.translation.core.util.Pair;
 import com.superkele.translation.core.util.Singleton;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -23,13 +24,13 @@ import java.util.stream.Collectors;
 
 public class DefaultMappingFiledTranslationBuilder extends AbstractMappingFiledTranslationBuilder {
 
-    private final ConfigurableTranslatorDefinitionFactory translatorDefinitionFactory;
+    private final TranslatorDefinitionFactory translatorDefinitionFactory;
 
     private final ParamHandlerResolver paramHandlerResolver;
 
     private final ResultHandlerResolver resultResolver;
 
-    public DefaultMappingFiledTranslationBuilder(ConfigurableTranslatorDefinitionFactory translatorDefinitionFactory, ParamHandlerResolver paramHandlerResolver, ResultHandlerResolver resultResolver) {
+    public DefaultMappingFiledTranslationBuilder(TranslatorDefinitionFactory translatorDefinitionFactory, ParamHandlerResolver paramHandlerResolver, ResultHandlerResolver resultResolver) {
         this.translatorDefinitionFactory = translatorDefinitionFactory;
         this.paramHandlerResolver = paramHandlerResolver;
         this.resultResolver = resultResolver;

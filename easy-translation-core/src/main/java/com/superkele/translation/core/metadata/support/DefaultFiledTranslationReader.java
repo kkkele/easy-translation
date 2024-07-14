@@ -2,7 +2,7 @@ package com.superkele.translation.core.metadata.support;
 
 import cn.hutool.core.collection.ListUtil;
 import com.superkele.translation.annotation.Mapping;
-import com.superkele.translation.core.metadata.FieldTranslation;
+import com.superkele.translation.core.metadata.FieldTranslationInfo;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
 import com.superkele.translation.core.metadata.FieldTranslationReader;
 import com.superkele.translation.core.metadata.FieldTranslationRegistry;
@@ -31,6 +31,9 @@ public class DefaultFiledTranslationReader implements FieldTranslationReader {
 
     @Override
     public void load(String[] basePath) {
+        if (basePath == null){
+            return;
+        }
         ReflectionsPlus reflectionsPlus = ReflectionsPlus.getReflectionsPlus(ListUtil.of(ScannerEnum.FILED),basePath);
         Set<Field> fieldsMergedAnnotatedWith = reflectionsPlus.getFieldsMergedAnnotatedWith(Mapping.class);
         Set<Class<?>> clazzSet = new HashSet<>();
@@ -40,11 +43,11 @@ public class DefaultFiledTranslationReader implements FieldTranslationReader {
                 return;
             }
             clazzSet.add(declaringClass);
-            FieldTranslation common = builder.build(declaringClass, false);
+            FieldTranslationInfo common = builder.build(declaringClass, false);
             if (common != null){
                 registry.register(declaringClass, false, common);
             }
-            FieldTranslation json = builder.build(declaringClass, true);
+            FieldTranslationInfo json = builder.build(declaringClass, true);
             if (json != null){
                 registry.register(declaringClass, true, json);
             }

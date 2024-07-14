@@ -1,14 +1,16 @@
 package com.superkele.translation.extension.serialize.jackson;
 
-import cn.hutool.core.collection.ConcurrentHashSet;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.*;
-import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.TransManager;
+import com.superkele.translation.core.config.TranslationConfig;
+import com.superkele.translation.core.context.DynamicTranslatorContext;
+import com.superkele.translation.core.log.TransLog;
 import com.superkele.translation.core.mapping.TranslationInvoker;
-import com.superkele.translation.core.metadata.FieldTranslation;
+import com.superkele.translation.core.mapping.support.DefaultTranslationInvoker;
+import com.superkele.translation.core.metadata.FieldTranslationInfo;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.processor.support.AbstractOnceFieldTranslationHandler;
-import com.superkele.translation.core.util.LogUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -19,17 +21,15 @@ import java.util.concurrent.Executor;
 @Slf4j
 public class TranslationJsonSerializer extends JsonSerializer {
 
-    private final FieldTranslation fieldTranslation;
-    private final TranslationInvoker translationInvoker;
+    private final FieldTranslationInfo fieldTranslationInfo;
     private final JsonSerializer serializer;
-    private final Config config;
+    private final TranslationInvoker invoker = new DefaultTranslationInvoker();
 
-    public TranslationJsonSerializer(FieldTranslation fieldTranslation, TranslationInvoker translationInvoker, JsonSerializer serializer, Config config) {
-        this.fieldTranslation = fieldTranslation;
-        this.translationInvoker = translationInvoker;
+    public TranslationJsonSerializer(FieldTranslationInfo fieldTranslationInfo, JsonSerializer serializer) {
+        this.fieldTranslationInfo = fieldTranslationInfo;
         this.serializer = serializer;
-        this.config = config;
-        LogUtils.debug(log::debug, "{} => TranslationJsonSerializer init...", () -> fieldTranslation.getName());
+        TransLog transLog = TransManager.getTransLog();
+        transLog.debug("{} => TranslationJsonSerializer init...", () -> fieldTranslationInfo.getName());
     }
 
     @Override
@@ -64,30 +64,30 @@ public class TranslationJsonSerializer extends JsonSerializer {
     }
 
     private void translate(List<Object> list) {
-        JsonOnceFieldTranslationHandler jsonOnceFieldTranslationHandler = new JsonOnceFieldTranslationHandler(fieldTranslation, list);
+        JsonOnceFieldTranslationHandler jsonOnceFieldTranslationHandler = new JsonOnceFieldTranslationHandler(fieldTranslationInfo, list);
         jsonOnceFieldTranslationHandler.handle();
     }
 
 
     public class JsonOnceFieldTranslationHandler extends AbstractOnceFieldTranslationHandler {
 
-        public JsonOnceFieldTranslationHandler(FieldTranslation fieldTranslation, List<Object> sources) {
-            super(fieldTranslation, sources);
+        public JsonOnceFieldTranslationHandler(FieldTranslationInfo fieldTranslationInfo, List<Object> sources) {
+            super(fieldTranslationInfo, sources);
         }
 
         @Override
         protected boolean getCacheEnabled() {
-            return config.getCacheEnabled().get();
+            return TransManager.getConfig().isCacheEnabled();
         }
 
         @Override
         protected TranslationInvoker getTranslationInvoker() {
-            return translationInvoker;
+            return invoker;
         }
 
         @Override
         protected Executor getExecutor() {
-            return config.getThreadPoolExecutor();
+            return TransManager.getConfig().getThreadPoolExecutor();
         }
 
         @Override

@@ -2,10 +2,8 @@ package com.superkele.translation.extension.serialize.jackson;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.superkele.translation.core.config.Config;
-import com.superkele.translation.core.metadata.FieldTranslationBuilder;
-import com.superkele.translation.core.metadata.FieldTranslationFactory;
+import com.superkele.translation.core.config.TranslationConfig;
+import com.superkele.translation.core.metadata.FieldTranslationInfoFactory;
 import com.superkele.translation.core.translator.factory.TranslatorFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -13,14 +11,6 @@ import lombok.RequiredArgsConstructor;
 public class TranslationJsonNodeModule extends Module {
 
     public static final String MODULE_NAME = TranslationJsonNodeModule.class.getSimpleName();
-
-
-    private final FieldTranslationFactory fieldTranslationFactory;
-
-    private final TranslatorFactory translatorFactory;
-
-    private final Config config;
-
 
     @Override
     public String getModuleName() {
@@ -34,7 +24,7 @@ public class TranslationJsonNodeModule extends Module {
 
     @Override
     public void setupModule(SetupContext setupContext) {
-        setupContext.addBeanSerializerModifier(new TranslationSerializerModifier(fieldTranslationFactory, translatorFactory, config));
+        setupContext.addBeanSerializerModifier(new TranslationSerializerModifier());
     }
 
     @Override

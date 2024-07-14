@@ -1,11 +1,11 @@
 package com.superkele.translation.core.processor;
 
-import com.superkele.translation.core.metadata.FieldTranslation;
+import com.superkele.translation.core.metadata.FieldTranslationInfo;
 
 
 public interface FieldTranslationHandler {
 
-    FieldTranslation getFieldTranslation();
+    FieldTranslationInfo getFieldTranslation();
 
     void handle();
 

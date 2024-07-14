@@ -1,18 +1,10 @@
 package com.superkele.translation.core.context;
 
-import java.util.function.Consumer;
+import com.superkele.translation.core.configurable.Configurable;
 
 /**
  * 可配置的翻译器上下文
  */
-public interface ConfigurableTranslatorContext extends TranslatorContext {
-    /**
-     * 刷新容器
-     */
-    void refresh();
+public interface ConfigurableTranslatorContext extends TranslatorContext, Configurable<ConfigurableTranslatorContext> {
 
-    /**
-     * 注册事件
-     */
-    void register(Consumer<ConfigurableTranslatorContext> consumer);
 }

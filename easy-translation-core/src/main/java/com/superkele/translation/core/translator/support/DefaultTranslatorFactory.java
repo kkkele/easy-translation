@@ -6,6 +6,7 @@ import com.superkele.translation.core.invoker.InvokeBeanFactory;
 import com.superkele.translation.core.translator.definition.ConfigurableTranslatorDefinitionFactory;
 import com.superkele.translation.core.translator.definition.TranslatorDefinition;
 import com.superkele.translation.core.translator.definition.TranslatorDefinitionRegistry;
+import com.superkele.translation.core.translator.definition.MergeableTranslatorDefinitionFactory;
 import com.superkele.translation.core.util.Assert;
 
 import java.util.Map;
@@ -72,4 +73,12 @@ public class DefaultTranslatorFactory extends AbstractAutowireCapableTranslatorF
         return (T) defaultBean;
     }
 
+    @Override
+    public void merge(MergeableTranslatorDefinitionFactory factory) {
+        String[] translatorNames = factory.getTranslatorNames();
+        for (String translatorName : translatorNames) {
+            TranslatorDefinition definition = factory.findTranslatorDefinition(translatorName);
+            register(translatorName, definition);
+        }
+    }
 }

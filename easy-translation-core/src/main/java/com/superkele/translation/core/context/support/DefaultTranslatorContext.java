@@ -1,10 +1,17 @@
 package com.superkele.translation.core.context.support;
 
-import com.superkele.translation.core.config.Config;
+import com.superkele.translation.core.TransManager;
 import com.superkele.translation.core.config.DefaultTranslatorNameGenerator;
+import com.superkele.translation.core.context.ConfigurableTranslatorContext;
 import com.superkele.translation.core.invoker.InvokeBeanFactory;
+import com.superkele.translation.core.invoker.support.ConfigurableInvokeBeanFactory;
+import com.superkele.translation.core.log.TransLog;
 import com.superkele.translation.core.translator.Translator;
+import com.superkele.translation.core.translator.definition.TranslatorFactoryPostProcessor;
+import com.superkele.translation.core.translator.definition.TranslatorPostProcessor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,40 +19,23 @@ import java.util.Map;
  */
 public class DefaultTranslatorContext extends AbstractAutoLoadTranslatorContext {
 
-
-    private final String[] basePackages;
-
-    private final InvokeBeanFactory invokeBeanFactory;
-
-    private final Config config;
-
-    public DefaultTranslatorContext(Config config, InvokeBeanFactory invokeBeanFactory, String... basePackages) {
-        this.config = config;
-        this.basePackages = basePackages;
-        this.invokeBeanFactory = invokeBeanFactory;
-    }
-
-    public DefaultTranslatorContext(InvokeBeanFactory invokeBeanFactory, String... basePackages) {
-        this(new Config(), invokeBeanFactory, basePackages);
-    }
-
     @Override
     protected Map<Integer, Class<? extends Translator>> getTranslatorClazzMap() {
-        return config.getTranslatorClazzMap();
+        return TransManager.getConfig().getTranslatorClazzMap();
     }
 
     @Override
     protected DefaultTranslatorNameGenerator getTranslatorNameGenerator() {
-        return config.getDefaultTranslatorNameGenerator();
+        return TransManager.getConfig().getDefaultTranslatorNameGenerator();
     }
 
     @Override
     protected String[] getBasePackages() {
-        return basePackages;
+        return TransManager.getConfig().getTranslatorPackages();
     }
 
     @Override
-    protected InvokeBeanFactory getInvokeBeanFactory() {
-        return invokeBeanFactory;
+    protected ConfigurableInvokeBeanFactory getInvokeBeanFactory() {
+        return TransManager.getInvokeBeanFactory();
     }
 }

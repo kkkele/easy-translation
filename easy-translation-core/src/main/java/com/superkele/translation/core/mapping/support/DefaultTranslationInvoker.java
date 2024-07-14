@@ -1,6 +1,7 @@
 package com.superkele.translation.core.mapping.support;
 
 import cn.hutool.core.util.StrUtil;
+import com.superkele.translation.core.TransManager;
 import com.superkele.translation.core.mapping.ResultHandler;
 import com.superkele.translation.core.mapping.TranslationInvoker;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
@@ -19,10 +20,8 @@ import static com.superkele.translation.core.util.PropertyUtils.getPropertyHandl
 
 public class DefaultTranslationInvoker implements TranslationInvoker {
 
-    private final TranslatorFactory translatorFactory;
-
-    public DefaultTranslationInvoker(TranslatorFactory translatorFactory) {
-        this.translatorFactory = translatorFactory;
+    public TranslatorFactory getTranslatorFactory(){
+        return TransManager.getTranslatorContext();
     }
 
     @Override
@@ -52,7 +51,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
                     }
                     fillTranslatorArgs(args, mapperLength, processedMapperKey, otherLength, others);
                     //翻译值
-                    Translator translator = translatorFactory.findTranslator(event.getTranslator());
+                    Translator translator = getTranslatorFactory().findTranslator(event.getTranslator());
                     return translator.doTranslate(args);
                 });
         if (mappingValue == null) {
@@ -101,7 +100,7 @@ public class DefaultTranslationInvoker implements TranslationInvoker {
                         processedMapperKey[i] = mappers[i].getParamHandler().wrapperBatch(params, mappers[i].getSourceClass(), mappers[i].getTargetClass(), mappers[i].getTypes());
                     }
                     fillTranslatorArgs(args, mapperLength, processedMapperKey, otherLength, others);
-                    Translator translator = translatorFactory.findTranslator(event.getTranslator());
+                    Translator translator = getTranslatorFactory().findTranslator(event.getTranslator());
                     return translator.doTranslate(args);
                 });
         if (mappingValue == null) {

@@ -9,8 +9,9 @@ import com.superkele.translation.core.util.Singleton;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class SpringResultHandlerResolver implements ResultHandlerResolver, ApplicationContextAware {
 
     private ApplicationContext applicationContext;

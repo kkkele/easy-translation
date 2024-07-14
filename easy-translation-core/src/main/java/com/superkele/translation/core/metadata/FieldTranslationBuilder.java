@@ -2,5 +2,5 @@ package com.superkele.translation.core.metadata;
 
 public interface FieldTranslationBuilder {
 
-    FieldTranslation build(Class<?> clazz,boolean isJsonSerialize);
+    FieldTranslationInfo build(Class<?> clazz, boolean isJsonSerialize);
 }

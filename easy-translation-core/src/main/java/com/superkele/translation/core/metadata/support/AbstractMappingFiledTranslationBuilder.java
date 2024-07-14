@@ -5,7 +5,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.superkele.translation.annotation.Mapping;
 import com.superkele.translation.annotation.constant.TranslateTiming;
-import com.superkele.translation.core.metadata.FieldTranslation;
+import com.superkele.translation.core.metadata.FieldTranslationInfo;
 import com.superkele.translation.core.metadata.FieldTranslationBuilder;
 import com.superkele.translation.core.metadata.FieldTranslationEvent;
 import com.superkele.translation.core.util.Assert;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractMappingFiledTranslationBuilder implements FieldTranslationBuilder {
 
     @Override
-    public FieldTranslation build(Class<?> clazz, boolean isJsonSerialize) {
+    public FieldTranslationInfo build(Class<?> clazz, boolean isJsonSerialize) {
         Field[] fields = ReflectUtils.getFields(clazz);
         List<Pair<Field, Mapping>> mappingFields = Arrays.stream(fields)
                 .map(field -> Pair.of(field, AnnotatedElementUtils.getMergedAnnotation(field, Mapping.class)))
@@ -37,7 +37,7 @@ public abstract class AbstractMappingFiledTranslationBuilder implements FieldTra
     }
 
 
-    protected FieldTranslation computeFieldTranslation(List<Pair<Field, Mapping>> mappingFields) {
+    protected FieldTranslationInfo computeFieldTranslation(List<Pair<Field, Mapping>> mappingFields) {
         //fieldName event map
         Map<String, FieldTranslationEvent> fieldNameEventMap = new HashMap<>();
         //记录了不同的 eventMask 可以触发的事件
@@ -120,7 +120,7 @@ public abstract class AbstractMappingFiledTranslationBuilder implements FieldTra
             });
             event.setActiveEvents(after.stream().toArray(FieldTranslationEvent[]::new));
         }
-        FieldTranslation res = new FieldTranslation();
+        FieldTranslationInfo res = new FieldTranslationInfo();
         res.setName(mappingFields.get(0).getKey().getDeclaringClass().getName());
         res.setSortEvents(ArrayUtil.toArray(sortEvents, FieldTranslationEvent.class));
         res.setConsumeSize(mappingFields.size());
